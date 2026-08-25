@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Catálogo de agentes — DragonflAI</title>
+<meta name="description" content="Agentes de IA listos para tu negocio: WhatsApp, reservas, reseñas, reportes y más. Precio de lanzamiento por tiempo limitado." />
+
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="logo-mark.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png" />
+<meta name="theme-color" content="#201A2E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Catálogo de agentes — DragonflAI" />
+<meta property="og:description" content="Agentes de IA listos para tu negocio, con precio de lanzamiento." />
+<meta property="og:url" content="https://dragonflailabs.com/catalogo.html" />
+<meta property="og:image" content="https://dragonflailabs.com/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #201A2E;
+    --ink-soft: #2A2140;
+    --paper: #F8F7F3;
+    --paper-dim: #F1EAF3;
+    --cyan: #24A88A;
+    --violet: #7A4AD6;
+    --coral: #D64A96;
+    --muted: #756B85;
+    --muted-light: #9C93AC;
+    --border: rgba(32, 26, 46, 0.08);
+    --border-dark: rgba(255,255,255,0.10);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --wing-gradient: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 55%, var(--coral) 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img, svg { display: block; max-width: 100%; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(248, 247, 243, 0.82);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; padding-bottom: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px; }
+  .brand .wingmark { width: 30px; height: 30px; border-radius: 8px; }
+  .navlinks { display: flex; gap: 32px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  .navlinks a:hover { color: var(--ink); }
+  .nav-cta { background: var(--ink); color: var(--paper) !important; padding: 10px 20px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .navlinks-mobile-hide { display: flex; }
+  @media (max-width: 720px) { .navlinks-mobile-hide { display: none; } }
+
+  /* ---------- HEADER ---------- */
+  .cat-header { position: relative; padding: 72px 0 56px; overflow: hidden; }
+  .hero-glow {
+    position: absolute; top: -220px; right: -180px; width: 620px; height: 620px;
+    border-radius: 50%; background: var(--wing-gradient); filter: blur(90px); opacity: 0.30; pointer-events: none;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--coral);
+    background: rgba(214,74,150,0.10); border: 1px solid rgba(214,74,150,0.22);
+    padding: 7px 14px; border-radius: 999px; margin-bottom: 26px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--wing-gradient); }
+  .cat-header h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 700; line-height: 1.1; max-width: 720px; }
+  .cat-header p.lede { margin-top: 20px; font-size: 17px; color: var(--muted); max-width: 560px; }
+
+  /* ---------- SECTION HEADERS ---------- */
+  section { padding: 24px 0 72px; }
+  .section-tag { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--violet); margin-bottom: 12px; }
+  .section-title { font-size: clamp(22px, 3vw, 28px); font-weight: 700; }
+  .section-head { margin-bottom: 32px; }
+
+  /* ---------- PRICING GRID ---------- */
+  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+  .price-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 26px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .price-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(32,26,46,0.08); }
+
+  .badge-descuento {
+    position: absolute; top: -11px; right: 22px;
+    background: var(--coral); color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+    padding: 5px 11px; border-radius: 999px;
+  }
+
+  .price-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .price-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--paper-dim);
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .price-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; align-self: flex-start;
+  }
+
+  .price-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .price-card p.desc { font-size: 14px; color: var(--muted); line-height: 1.55; margin-bottom: 14px; flex-grow: 1; }
+  .ver-ficha { display: inline-block; font-size: 12.5px; font-weight: 600; color: var(--violet); margin-bottom: 18px; }
+  .ver-ficha:hover { text-decoration: underline; }
+
+  .price-block { padding-top: 16px; border-top: 1px solid var(--border); margin-bottom: 20px; }
+  .price-row { display: flex; align-items: baseline; gap: 10px; }
+  .price-old { font-size: 14px; color: var(--muted-light); text-decoration: line-through; }
+  .price-new { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; color: var(--ink); }
+  .price-new span.period { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); }
+  .price-setup { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+  .price-founder { font-size: 11.5px; color: var(--coral); margin-top: 6px; font-weight: 600; }
+
+  /* ---------- BOTONES ---------- */
+  .price-actions { display: flex; flex-direction: column; gap: 8px; }
+  .btn-buy, .btn-wa {
+    display: block; width: 100%;
+    padding: 13px 16px; border-radius: 999px;
+    font-size: 14.5px; font-weight: 600; text-align: center;
+    border: none; cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-buy { background: var(--ink); color: var(--paper); }
+  .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(32,26,46,0.18); }
+  .btn-wa { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
+  .btn-wa:hover { border-color: var(--ink); }
+
+  .separador { display: flex; align-items: center; gap: 14px; margin: 8px 0 28px; }
+  .separador .linea { flex-grow: 1; height: 1px; background: var(--border); }
+  .separador span { font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  /* ---------- NOTA FINAL ---------- */
+  .nota-duda { max-width: 580px; margin: 0 auto; padding: 8px 0 0; font-size: 14.5px; color: var(--muted); text-align: center; }
+  .nota-duda a { color: var(--violet); font-weight: 600; }
+
+  /* ---------- FOOTER ---------- */
+  footer { padding: 40px 0; border-top: 1px solid var(--border); }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-copy { font-size: 13.5px; color: var(--muted-light); }
+  .footer-social { display: flex; gap: 14px; }
+  .footer-social a {
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; color: var(--muted);
+    transition: all 0.15s ease;
+  }
+  .footer-social a:hover { border-color: var(--ink); color: var(--ink); transform: translateY(-2px); }
+  .footer-social svg { width: 17px; height: 17px; }
+
+  @media (max-width: 560px) {
+    section { padding: 16px 0 56px; }
+    .cat-header { padding: 48px 0 40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="index.html" class="brand">
+      <img class="wingmark" src="logo-mark.png" alt="Logo DragonflAI" />
+      DragonflAI
+    </a>
+    <div class="navlinks navlinks-mobile-hide">
+      <a href="index.html#servicios">Servicios</a>
+      <a href="index.html#proyectos">Proyectos</a>
+      <a href="index.html#sobre">Sobre mí</a>
+    </div>
+    <a href="index.html#contacto" class="nav-cta">Hablemos</a>
+  </div>
+</nav>
+
+<header class="cat-header">
+  <div class="hero-glow"></div>
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span> Precio de lanzamiento — cupos limitados</span>
+    <h1>Agentes de IA listos para usar, con -50% de descuento</h1>
+    <p class="lede">Compra directa y activación rápida. ¿Tienes dudas sobre cuál te conviene? Siempre puedes escribirme antes de decidir.</p>
+  </div>
+</header>
+
+<section id="negocio">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Para tu negocio</div>
+      <h2 class="section-title">Automatiza lo que más tiempo te quita</h2>
+    </div>
+    <div class="price-grid">
+
+      <!-- WhatsApp Cotización -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">💬</div>
+          <div class="price-tag">Negocio</div>
+        </div>
+        <h3>WhatsApp Cotización</h3>
+        <p class="desc">Atiende y cotiza automáticamente por WhatsApp — conversación real, no botones ni palabras clave rígidas.</p>
+        <a href="agente-whatsapp-cotizacion.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$1,000</span>
+            <div class="price-new">$499 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-setup">+ $1,000 MXN de configuración inicial (antes $2,000)</div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/eVq8wQftIePg1gAf1FdEs05" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20WhatsApp%20Cotizaci%C3%B3n" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Reservas -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">📅</div>
+          <div class="price-tag">Negocio</div>
+        </div>
+        <h3>Reservas / Citas</h3>
+        <p class="desc">Agenda citas solo, valida horario y disponibilidad, y confirma automáticamente con tu cliente.</p>
+        <a href="agente-reservas.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$800</span>
+            <div class="price-new">$400 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-setup">+ $900 MXN de configuración inicial (antes $1,800)</div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/cNiaEYchwbD46AUbPtdEs06" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20Reservas" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Reseñas -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">⭐</div>
+          <div class="price-tag">Negocio</div>
+        </div>
+        <h3>Reseñas</h3>
+        <p class="desc">Pide feedback tras cada compra y protege tu reputación: solo lo positivo llega a Google.</p>
+        <a href="agente-resenas.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$600</span>
+            <div class="price-new">$300 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-setup">+ $600 MXN de configuración inicial (antes $1,200)</div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/7sY5kE5T89uW6AU8DhdEs07" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20Rese%C3%B1as" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Reportes -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">📊</div>
+          <div class="price-tag">Negocio</div>
+        </div>
+        <h3>Reportes Semanales</h3>
+        <p class="desc">Junta los datos de tus otros agentes y te manda un resumen claro cada semana, por correo.</p>
+        <a href="agente-reportes.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$700</span>
+            <div class="price-new">$350 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-setup">+ $750 MXN de configuración inicial (antes $1,500)</div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/fZu7sM1CS4aC9N6g5JdEs08" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20Reportes" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Instagram DM -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">📷</div>
+          <div class="price-tag">Creadores</div>
+        </div>
+        <h3>Comentario-a-DM</h3>
+        <p class="desc">Convierte comentarios de Instagram en DMs automáticos — entiende intención real, no solo palabras clave.</p>
+        <a href="agente-instagram-dm.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$700</span>
+            <div class="price-new">$350 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-setup">+ $750 MXN de configuración inicial (antes $1,500)</div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/dRm14oepEaz0bVe7zddEs09" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20Comentario-a-DM" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="personal" style="background: var(--paper-dim);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Para ti</div>
+      <h2 class="section-title">Agentes personales, a precio de suscripción</h2>
+    </div>
+    <div class="price-grid">
+
+      <!-- Habitos -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">✅</div>
+          <div class="price-tag">Personal</div>
+        </div>
+        <h3>Hábitos / Recordatorios</h3>
+        <p class="desc">Chat diario que lleva tus rachas y te motiva a seguir — sin apps complicadas de configurar.</p>
+        <a href="agente-habitos.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$99</span>
+            <div class="price-new">$49 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/28E7sM4P4cH84sM8DhdEs0a" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20H%C3%A1bitos" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Finanzas -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">💰</div>
+          <div class="price-tag">Personal</div>
+        </div>
+        <h3>Finanzas Personales</h3>
+        <p class="desc">Cuéntale tus gastos en texto libre y te arma el resumen por categoría automáticamente.</p>
+        <a href="agente-finanzas.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$129</span>
+            <div class="price-new">$65 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/dRm00kdlA22uaRa3iXdEs0b" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20Finanzas" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Correo/Agenda -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">📧</div>
+          <div class="price-tag">Personal</div>
+        </div>
+        <h3>Correo / Agenda</h3>
+        <p class="desc">Prioriza tu bandeja, resume, sugiere respuesta, y detecta reuniones propuestas automáticamente.</p>
+        <a href="agente-correo-agenda.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$129</span>
+            <div class="price-new">$65 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/9B628s1CS36y7EY1aPdEs0c" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20Correo%2FAgenda" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Búsqueda de empleo -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">💼</div>
+          <div class="price-tag">Personal</div>
+        </div>
+        <h3>Búsqueda de Empleo</h3>
+        <p class="desc">Lleva tu tablero de aplicaciones y te avisa cuáles necesitan seguimiento — con borrador listo.</p>
+        <a href="agente-empleo.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$249</span>
+            <div class="price-new">$125 MXN<span class="period">único</span></div>
+          </div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/7sYbJ281gdLcbVe06LdEs0g" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20B%C3%BAsqueda%20de%20Empleo" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+      <!-- Tutor -->
+      <div class="price-card">
+        <div class="badge-descuento">-50%</div>
+        <div class="price-top">
+          <div class="price-icon">🎓</div>
+          <div class="price-tag">Personal</div>
+        </div>
+        <h3>Tutor de Aprendizaje</h3>
+        <p class="desc">Arma tu plan de lecciones sobre cualquier tema: explica, pregunta, y sigue tu progreso.</p>
+        <a href="agente-tutor.html" class="ver-ficha">Ver ficha completa →</a>
+        <div class="price-block">
+          <div class="price-row">
+            <span class="price-old">$199</span>
+            <div class="price-new">$99 MXN<span class="period">/mes</span></div>
+          </div>
+          <div class="price-founder">Precio de fundador — primeros clientes</div>
+        </div>
+        <div class="price-actions">
+          <a href="https://buy.stripe.com/9B6eVechw22ue3m8DhdEs0f" class="btn-buy">Comprar ahora</a>
+          <a href="https://wa.me/524411310704?text=Hola%2C%20tengo%20dudas%20sobre%20el%20agente%20de%20Tutor" class="btn-wa">¿Tienes dudas? Escríbeme</a>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="nota-duda">¿No estás segura si es lo que necesitas? <a href="https://wa.me/524411310704">Escríbeme por WhatsApp</a> — con gusto te oriento, sin compromiso.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-copy">© 2026 DragonflAI — Claudia Acosta</div>
+    <div class="footer-social">
+      <a href="https://linkedin.com/in/claudiaacostaqa/" target="_blank" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+      </a>
+      <a href="https://tiktok.com/@dragonflai" target="_blank" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82c-.9-.98-1.4-2.26-1.4-3.62h-3.13v13.44c0 1.5-1.22 2.72-2.72 2.72a2.72 2.72 0 0 1 0-5.44c.28 0 .55.04.8.12V9.9a5.9 5.9 0 0 0-.8-.05 5.85 5.85 0 1 0 5.85 5.85V9.1a7.66 7.66 0 0 0 4.4 1.4V7.38a4.85 4.85 0 0 1-2.99-1.56z"/></svg>
+      </a>
+      <a href="https://instagram.com/dragonflai" target="_blank" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2zm0 5.94a2.34 2.34 0 1 1 0-4.68 2.34 2.34 0 0 1 0 4.68zm4.6-6.09a.84.84 0 1 1-1.68 0 .84.84 0 0 1 1.68 0zM20.9 7.6a5.2 5.2 0 0 0-1.34-3.68 5.24 5.24 0 0 0-3.68-1.34c-1.45-.08-5.8-.08-7.25 0A5.22 5.22 0 0 0 4.94 3.9 5.22 5.22 0 0 0 3.6 7.6c-.08 1.45-.08 5.8 0 7.25a5.23 5.23 0 0 0 1.34 3.68 5.24 5.24 0 0 0 3.68 1.34c1.45.08 5.8.08 7.25 0a5.22 5.22 0 0 0 3.68-1.34 5.23 5.23 0 0 0 1.34-3.68c.08-1.45.08-5.79 0-7.25zm-1.86 8.8a2.98 2.98 0 0 1-1.68 1.68c-1.16.46-3.92.35-5.2.35s-4.05.1-5.2-.35a2.98 2.98 0 0 1-1.68-1.68c-.46-1.16-.35-3.92-.35-5.2s-.1-4.05.35-5.2A2.98 2.98 0 0 1 6.96 4.32c1.16-.46 3.92-.35 5.2-.35s4.05-.1 5.2.35a2.98 2.98 0 0 1 1.68 1.68c.46 1.16.35 3.92.35 5.2s.11 4.05-.35 5.2z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
