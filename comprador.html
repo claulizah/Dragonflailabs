@@ -213,6 +213,31 @@
     }
   }
 
+  // Supabase Auth regresa sus mensajes de error en inglés y en un tono muy
+  // técnico ("Invalid login credentials") — poco útil para alguien que
+  // apenas está probando la plataforma. Los traducimos a algo accionable,
+  // y en el caso más común (intentar entrar sin tener cuenta todavía) le
+  // señalamos directamente el botón de registro en vez de dejarlo adivinar.
+  function traducirErrorAuth(mensaje, esRegistro) {
+    const m = (mensaje || "").toLowerCase();
+    if (m.includes("invalid login credentials")) {
+      return 'Ese correo o contraseña no coinciden con ninguna cuenta. Si es tu primera vez aquí, dale clic a "¿No tienes cuenta? Regístrate" en vez de "Entrar".';
+    }
+    if (m.includes("already registered")) {
+      return "Ya existe una cuenta con ese correo — intenta iniciar sesión en vez de registrarte.";
+    }
+    if (m.includes("email not confirmed")) {
+      return "Todavía no confirmas tu correo. Revisa tu bandeja de entrada (y spam) y confirma tu cuenta antes de entrar.";
+    }
+    if (m.includes("password should be at least")) {
+      return "La contraseña debe tener al menos 6 caracteres.";
+    }
+    if (m.includes("unable to validate email")) {
+      return "Ese correo no parece válido — revisa que esté bien escrito.";
+    }
+    return mensaje;
+  }
+
   async function iniciarSesion(esRegistro) {
     const correo = document.getElementById("correo").value.trim();
     const contrasena = document.getElementById("contrasena").value;
@@ -238,7 +263,7 @@
 
       init();
     } catch (err) {
-      errorDiv.innerHTML = `<div class="error">${escapeHtml(err.message)}</div>`;
+      errorDiv.innerHTML = `<div class="error">${escapeHtml(traducirErrorAuth(err.message, esRegistro))}</div>`;
     }
   }
 
