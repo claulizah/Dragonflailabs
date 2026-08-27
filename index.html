@@ -246,10 +246,15 @@
 
   .service-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
   @media (max-width: 880px) { .service-grid { grid-template-columns: 1fr; } }
+
+  .service-grid-single {
+    grid-template-columns: minmax(280px, 480px);
+    justify-content: center;
+  }
 
   .service-card {
     background: var(--ink-soft);
@@ -527,7 +532,7 @@
     <div class="section-head">
       <div class="section-tag">Servicios</div>
       <h2 class="section-title">Lo que puedo construir</h2>
-      <p class="section-sub">Desde un agente a la medida hasta agentes ya armados — para tu negocio o para tu día a día.</p>
+      <p class="section-sub">Desde un agente a la medida, hasta soluciones ya armadas para tu negocio o tu propia página web.</p>
     </div>
     <div class="service-grid">
       <a href="#contacto" class="service-card featured">
@@ -536,17 +541,19 @@
         <div class="service-desc">Diseño un agente de IA a la medida de tu proceso: atención al cliente, cotizaciones, seguimiento de leads o lo que tu negocio necesite resolver.</div>
         <div class="service-price">Cotización según alcance →</div>
       </a>
-      <a href="catalogo.html#negocio" class="service-card">
+      <!-- Oculto temporalmente mientras se termina de armar bien esta línea de producto.
+      <a href="catalogo.html" class="service-card">
         <div class="service-icon">🤖</div>
         <div class="service-title">Agentes para pymes</div>
-        <div class="service-desc">Catálogo listo de agentes probados: WhatsApp, reservas, reseñas, reportes semanales — implementación rápida, sin partir de cero.</div>
+        <div class="service-desc">Catálogo de agentes ya listos para tu negocio — WhatsApp, reservas, reseñas, reportes semanales y más, con precio fijo.</div>
         <div class="service-price">Desde $300 MXN/mes · -50% de lanzamiento →</div>
       </a>
-      <a href="catalogo.html#personal" class="service-card">
-        <div class="service-icon">🌱</div>
-        <div class="service-title">Agentes para ti</div>
-        <div class="service-desc">Agentes personales para tu día a día: hábitos, finanzas, correo, aprendizaje — pensados para ti, no para tu negocio.</div>
-        <div class="service-price">Desde $49 MXN/mes · -50% de lanzamiento →</div>
+      -->
+      <a href="#contacto" class="service-card">
+        <div class="service-icon">🌐</div>
+        <div class="service-title">Diseño de páginas web</div>
+        <div class="service-desc">Sitios y catálogos con checkout y funcionalidades a la medida, diseñados para que tú mismo los administres después, sin depender de mí.</div>
+        <div class="service-price">Cotización según proyecto →</div>
       </a>
     </div>
   </div>
@@ -574,12 +581,28 @@
         <span class="project-tag tag-live">Activo</span>
         <h3>DragonflAI Events</h3>
         <p>App con IA para planear eventos: cronograma, presupuesto, ideas e invitación digital, todo generado automáticamente.</p>
-        <a href="#" target="_blank" class="project-link">Ver proyecto →</a>
+        <a href="https://dragonflaievents.com" target="_blank" class="project-link">Ver proyecto →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-swatch" style="background: linear-gradient(135deg, #7A4AD6, #24A88A);"></div>
+        <span class="project-tag tag-soon">En proceso</span>
+        <h3>EnseñAI</h3>
+        <p>Genera resúmenes, trivias y actividades con IA, adaptados a cómo aprende cada quien — para papás, maestros y psicólogos.</p>
+        <a href="https://ensenai.com" target="_blank" class="project-link">Ver proyecto →</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-swatch" style="background: linear-gradient(135deg, #201A2E, #7A4AD6);"></div>
+        <span class="project-tag tag-live">Activo</span>
+        <h3>Páginas y catálogos web</h3>
+        <p>Sitios y catálogos con checkout integrado — este mismo sitio y mi catálogo de agentes son ejemplo de lo que puedo construirte.</p>
+        <a href="catalogo.html" class="project-link">Ver catálogo →</a>
       </div>
 
       <div class="project-card">
         <div class="project-swatch" style="background: linear-gradient(135deg, #24A88A, #D64A96);"></div>
-        <span class="project-tag tag-live">Activo</span>
+        <span class="project-tag tag-soon">En proceso</span>
         <h3>Comparador de Trayecto</h3>
         <p>App móvil que compara el costo real de moverte en auto propio, Uber/DiDi o transporte público, viaje por viaje.</p>
         <span class="project-link disabled">Próximamente en tiendas</span>
