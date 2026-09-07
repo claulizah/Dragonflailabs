@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personaliza tu regalo — DragonflAI Labs</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#201A2E; --tinta-suave:#756B85; --violeta:#7A4AD6; --violeta-osc:#5F35B0;
+  --cyan:#24A88A; --coral:#D64A96; --fondo:#F8F7F3; --superficie:#fff;
+  --linea:rgba(32,26,46,.08);
+  --ala:linear-gradient(135deg,var(--cyan) 0%,var(--violeta) 55%,var(--coral) 100%);
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--fondo); color:var(--tinta);
+  font-family:'Inter',-apple-system,system-ui,sans-serif; font-size:16px; line-height:1.6;
+}
+h1,h2{ font-family:'Space Grotesk','Inter',sans-serif; font-weight:600; line-height:1.15; margin:0; text-wrap:balance; }
+.envoltura{ max-width:620px; margin:0 auto; padding:34px 22px 70px; }
+
+.gracias{
+  background:var(--ala); color:#fff;
+  border-radius:22px; padding:30px 26px; margin-bottom:30px;
+}
+.gracias h1{ font-size:1.7rem; margin-bottom:8px; }
+.gracias p{ margin:0; opacity:.92; font-size:.98rem; }
+.ref{ font-size:.78rem; opacity:.72; margin-top:12px; font-family:ui-monospace,monospace; }
+
+fieldset{ border:none; padding:0; margin:0 0 30px; }
+legend{
+  font-size:.76rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--violeta); font-weight:700; padding:0; margin-bottom:14px;
+}
+label{ display:block; font-weight:600; font-size:.94rem; margin-bottom:6px; }
+.pista{ font-weight:400; color:var(--tinta-suave); font-size:.87rem; display:block; margin-bottom:7px; }
+input[type=text], input[type=email], textarea, select{
+  width:100%; font-family:inherit; font-size:1rem; padding:12px 14px;
+  border:1.6px solid var(--linea); border-radius:12px; background:var(--superficie);
+  color:var(--tinta); margin-bottom:18px;
+}
+textarea{ min-height:96px; resize:vertical; }
+input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible{
+  outline:2.5px solid var(--violeta); outline-offset:2px;
+}
+
+.opciones{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:20px; }
+.opcion{
+  border:1.6px solid var(--linea); border-radius:14px; padding:13px 14px; cursor:pointer;
+  background:var(--superficie); transition:border-color .15s ease, background .15s ease;
+}
+.opcion:has(input:checked){ border-color:var(--violeta); background:var(--fondo); }
+.opcion input{ position:absolute; opacity:0; width:0; height:0; }
+.opcion .n{ font-weight:600; font-size:.95rem; display:block; }
+.opcion .d{ color:var(--tinta-suave); font-size:.84rem; }
+.muestras{ display:flex; gap:6px; margin-top:8px; }
+.muestras span{ width:17px; height:17px; border-radius:50%; display:inline-block; }
+
+.contacto-fila{ display:grid; grid-template-columns:1fr 1fr auto; gap:10px; align-items:start; margin-bottom:10px; }
+.contacto-fila input{ margin-bottom:0; }
+.quitar{ background:none; border:1.6px solid var(--linea); color:var(--coral); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:inherit; font-weight:600; }
+
+button.btn{
+  background:var(--violeta); color:#fff; border:none; border-radius:999px;
+  padding:15px 26px; font-family:inherit; font-size:1.02rem; font-weight:600;
+  cursor:pointer; width:100%;
+}
+button.btn:hover{ background:var(--violeta-osc); }
+button.btn.suave{ background:transparent; color:var(--violeta); border:1.6px solid var(--violeta); margin-top:10px; }
+button.chico{ background:none; border:1.6px solid var(--linea); color:var(--violeta); border-radius:999px; padding:9px 16px; font-family:inherit; font-weight:600; cursor:pointer; font-size:.9rem; }
+
+.aviso{ background:#F4F2FE; border:1.5px solid var(--linea); border-radius:14px; padding:14px 16px; font-size:.9rem; color:var(--tinta-suave); margin-bottom:22px; }
+.error{ background:#FEF2F2; border:1.5px solid #FBD5D5; color:#9B1C1C; border-radius:14px; padding:12px 15px; font-size:.92rem; margin-bottom:16px; }
+.ok{ background:#ECFDF5; border:1.5px solid #A7F3D0; color:#065F46; border-radius:14px; padding:12px 15px; font-size:.92rem; margin-bottom:16px; }
+@media (prefers-reduced-motion:reduce){ *{ transition:none!important; } }
+</style>
+</head>
+<body>
+<div class="envoltura">
+
+  <div class="gracias">
+    <h1 id="tituloGracias">Gracias por tu compra 💌</h1>
+    <p id="subGracias">Ahora cuéntame de esa persona. Son cinco minutos y con eso armo su app.</p>
+    <p class="ref" id="referencia"></p>
+  </div>
+
+  <div class="aviso">
+    Escribe con calma: esto es lo que va a leer cuando abra el sobre. Si te falta algo,
+    puedes mandarlo después por WhatsApp.
+  </div>
+
+  <form id="forma" novalidate>
+    <fieldset>
+      <legend>De quién a quién</legend>
+
+      <label for="para">¿Cómo se llama? <span class="pista">Como le dices tú. Así va a aparecer en el sobre y en el saludo.</span></label>
+      <input type="text" id="para" maxlength="30" required autocomplete="off">
+
+      <label for="de">¿De parte de quién? <span class="pista">Va firmando la dedicatoria. Déjalo vacío si la quieres anónima.</span></label>
+      <input type="text" id="de" maxlength="30" autocomplete="off">
+
+      <label for="dedicatoria">Tu dedicatoria <span class="pista">Dos o tres renglones. Es lo primero que va a leer.</span></label>
+      <textarea id="dedicatoria" maxlength="240" placeholder="Te hice esto para los días en que se te olvide lo mucho que vales."></textarea>
+    </fieldset>
+
+    <fieldset>
+      <legend>Qué diseño</legend>
+      <div class="opciones" id="categorias"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Qué colores</legend>
+      <div class="opciones" id="temas"></div>
+    </fieldset>
+
+    <fieldset id="bloqueMeta" style="display:none;">
+      <legend>Su avance</legend>
+      <label for="meta"><span id="etiquetaMeta">¿En cuál va y cuántas son?</span>
+        <span class="pista">Para la barra de avance. Si no aplica, déjalo vacío.</span></label>
+      <input type="text" id="meta" placeholder="5 de 16" maxlength="20">
+    </fieldset>
+
+    <fieldset>
+      <legend>A quién puede marcarle</legend>
+      <p class="pista" style="margin-top:-6px;">
+        Cuando marque que se siente mal, la app le ofrece llamar o mandar WhatsApp a estas personas.
+        Opcional, pero es de lo que más se agradece.
+      </p>
+      <div id="contactos"></div>
+      <button type="button" class="chico" onclick="agregarContacto()">+ Agregar contacto</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Para localizarte</legend>
+      <label for="correo">Tu correo <span class="pista">Ahí te mando la liga y el QR.</span></label>
+      <input type="email" id="correo" required autocomplete="email">
+
+      <label for="tel">Tu WhatsApp <span class="pista">Por si necesito preguntarte algo.</span></label>
+      <input type="text" id="tel" inputmode="tel" autocomplete="tel">
+
+      <label for="cuando">¿Para cuándo la necesitas? <span class="pista">Normal son 3 días. Si es antes, dímelo y vemos.</span></label>
+      <input type="text" id="cuando" placeholder="Su cumpleaños es el 20" maxlength="60">
+
+      <label for="extra">Algo más que deba saber <span class="pista">Lo que sea que me ayude a que se sienta suya.</span></label>
+      <textarea id="extra" maxlength="400" placeholder="Le dicen Anita. Le encantan las mariposas y el café."></textarea>
+    </fieldset>
+
+    <div id="mensajes"></div>
+    <button type="submit" class="btn">Mandar mi pedido por WhatsApp</button>
+    <button type="button" class="btn suave" onclick="copiarPedido()">Copiar el pedido y mandarlo por correo</button>
+    <p style="font-size:.86rem;color:var(--tinta-suave);text-align:center;margin-top:14px;">
+      Se abre WhatsApp con todo escrito. Solo le das enviar.
+    </p>
+  </form>
+</div>
+
+<script>
+/* Mismo bloque que en regalos.html — mantén los dos iguales. */
+const AJUSTES = { whatsapp:"524411310704", correo:"contacto@dragonflailabs.com" };
+
+const CATEGORIAS = [
+  { id:"animo", n:"Levantar el ánimo", d:"Para una racha pesada" },
+  { id:"salud", n:"Acompañamiento",    d:"Citas, estudios y cómo se siente", meta:"¿En qué ciclo o sesión va?" },
+  { id:"amor",  n:"Romántico",         d:"Aniversario o distancia" },
+  { id:"reto",  n:"Un reto personal",  d:"Maratón, tesis, dejar un vicio", meta:"¿En cuál va de cuántas?" },
+  { id:"bebe",  n:"Nueva mamá",        d:"Embarazo o recién nacido",       meta:"¿En qué semana va?" },
+];
+const TEMAS = [
+  { id:"mariposa",  n:"Mariposa",  d:"Rosa suave",      c:["#E85D9E","#F6DCE9","#8FAE8B"] },
+  { id:"noche",     n:"Noche",     d:"Lavanda profundo", c:["#7C5CE0","#E5E0FA","#5EAAA8"] },
+  { id:"bosque",    n:"Bosque",    d:"Verde tranquilo",  c:["#3E9B62","#DCEEE1","#DFA22B"] },
+  { id:"atardecer", n:"Atardecer", d:"Naranja cálido",   c:["#F2704B","#FBE0D3","#E0A458"] },
+  { id:"durazno",   n:"Durazno",   d:"Coral y menta",    c:["#EE7E92","#FBDDE1","#93B8A5"] },
+];
+
+/* Referencia de Stripe: es lo que te deja casar el pago con este pedido. */
+const params = new URLSearchParams(location.search);
+const sesion = params.get("session_id") || params.get("ref") || "";
+if (sesion){
+  document.getElementById("referencia").textContent = "Referencia de pago: " + sesion.slice(0, 28);
+} else if (!params.get("ok")) {
+  // Alguien llegó aquí sin pasar por el pago. No se le bloquea —puede ser
+  // un correo reenviado o un pago con otro método— pero sí se avisa.
+  document.getElementById("tituloGracias").textContent = "Cuéntame de esa persona 💌";
+  document.getElementById("subGracias").textContent =
+    "Si todavía no has pagado, no pasa nada: llena esto y lo vemos por WhatsApp.";
+}
+
+/* ── opciones ── */
+const cats = document.getElementById("categorias");
+CATEGORIAS.forEach((c, i) => {
+  const l = document.createElement("label");
+  l.className = "opcion";
+  l.innerHTML = '<input type="radio" name="cat" value="' + c.id + '"' + (i === 0 ? " checked" : "") + '>' +
+    '<span class="n">' + c.n + '</span><span class="d">' + c.d + "</span>";
+  l.querySelector("input").onchange = revisarMeta;
+  cats.appendChild(l);
+});
+const tms = document.getElementById("temas");
+TEMAS.forEach((t, i) => {
+  const l = document.createElement("label");
+  l.className = "opcion";
+  l.innerHTML = '<input type="radio" name="tema" value="' + t.id + '"' + (i === 0 ? " checked" : "") + '>' +
+    '<span class="n">' + t.n + '</span><span class="d">' + t.d + "</span>" +
+    '<span class="muestras">' + t.c.map((h) => '<span style="background:' + h + '"></span>').join("") + "</span>";
+  tms.appendChild(l);
+});
+
+/* La barra de avance solo se pregunta donde significa algo. */
+function revisarMeta(){
+  const id = document.querySelector('input[name=cat]:checked').value;
+  const c = CATEGORIAS.find((x) => x.id === id);
+  const bloque = document.getElementById("bloqueMeta");
+  if (c && c.meta){
+    bloque.style.display = "block";
+    document.getElementById("etiquetaMeta").textContent = c.meta;
+  } else {
+    bloque.style.display = "none";
+    document.getElementById("meta").value = "";
+  }
+}
+revisarMeta();
+
+/* ── contactos ── */
+function agregarContacto(){
+  const zona = document.getElementById("contactos");
+  if (zona.children.length >= 4) return;
+  const fila = document.createElement("div");
+  fila.className = "contacto-fila";
+  fila.innerHTML =
+    '<input type="text" placeholder="Nombre" maxlength="24" class="c-nombre">' +
+    '<input type="text" placeholder="WhatsApp con lada" inputmode="tel" class="c-tel">' +
+    '<button type="button" class="quitar">✕</button>';
+  fila.querySelector(".quitar").onclick = () => fila.remove();
+  zona.appendChild(fila);
+}
+agregarContacto();
+
+/* ── armar el pedido ── */
+function recolectar(){
+  const v = (id) => (document.getElementById(id).value || "").trim();
+  const contactos = [...document.querySelectorAll(".contacto-fila")]
+    .map((f) => ({ nombre:f.querySelector(".c-nombre").value.trim(), tel:f.querySelector(".c-tel").value.trim() }))
+    .filter((c) => c.nombre && c.tel);
+  return {
+    para:v("para"), de:v("de"), dedicatoria:v("dedicatoria"),
+    cat:document.querySelector("input[name=cat]:checked").value,
+    tema:document.querySelector("input[name=tema]:checked").value,
+    meta:v("meta"), correo:v("correo"), tel:v("tel"),
+    cuando:v("cuando"), extra:v("extra"), contactos, sesion,
+  };
+}
+
+function comoTexto(p){
+  const nom = (lista, id) => (lista.find((x) => x.id === id) || {}).n || id;
+  const l = [
+    "🎁 PEDIDO DE APP DE REGALO",
+    "",
+    "Para: " + p.para,
+    p.de ? "De parte de: " + p.de : null,
+    "Diseño: " + nom(CATEGORIAS, p.cat),
+    "Colores: " + nom(TEMAS, p.tema),
+    p.meta ? "Avance: " + p.meta : null,
+    "",
+    "Dedicatoria:",
+    p.dedicatoria || "(sin dedicatoria)",
+    "",
+    p.contactos.length ? "Contactos:" : null,
+    ...p.contactos.map((c) => "  · " + c.nombre + " — " + c.tel),
+    p.contactos.length ? "" : null,
+    "Su correo: " + p.correo,
+    p.tel ? "Su WhatsApp: " + p.tel : null,
+    p.cuando ? "Para cuándo: " + p.cuando : null,
+    p.extra ? "\nNotas:\n" + p.extra : null,
+    p.sesion ? "\nRef. de pago: " + p.sesion : null,
+  ];
+  return l.filter((x) => x !== null).join("\n");
+}
+
+function validar(p){
+  const faltan = [];
+  if (!p.para) faltan.push("el nombre de quien lo recibe");
+  if (!p.correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.correo)) faltan.push("tu correo");
+  return faltan;
+}
+
+function decir(tipo, texto){
+  document.getElementById("mensajes").innerHTML = '<div class="' + tipo + '">' + texto + "</div>";
+  document.getElementById("mensajes").scrollIntoView({ block:"nearest" });
+}
+
+document.getElementById("forma").onsubmit = (e) => {
+  e.preventDefault();
+  const p = recolectar();
+  const faltan = validar(p);
+  if (faltan.length){ decir("error", "Me falta " + faltan.join(" y ") + "."); return; }
+  const url = "https://wa.me/" + AJUSTES.whatsapp + "?text=" + encodeURIComponent(comoTexto(p));
+  // Se abre en la misma pestaña a propósito: en celular, window.open a
+  // veces lo bloquea el navegador y el pedido se pierde ahí mismo.
+  location.href = url;
+};
+
+async function copiarPedido(){
+  const p = recolectar();
+  const faltan = validar(p);
+  if (faltan.length){ decir("error", "Me falta " + faltan.join(" y ") + "."); return; }
+  const texto = comoTexto(p);
+  try{
+    await navigator.clipboard.writeText(texto);
+    decir("ok", "Copiado. Pégalo en un correo a <strong>" + AJUSTES.correo + "</strong> y te contesto hoy mismo.");
+  }catch(err){
+    location.href = "mailto:" + AJUSTES.correo +
+      "?subject=" + encodeURIComponent("Pedido de app de regalo — " + p.para) +
+      "&body=" + encodeURIComponent(texto);
+  }
+}
+</script>
+</body>
+</html>

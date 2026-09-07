@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<title>Un regalo para ti</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#E85D9E" id="metaTheme">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ══════════════════════════════════════════════════════════════
+     Los colores se inyectan desde JS según el TEMA elegido.
+     Aquí solo van los valores de arranque para que no parpadee.
+     ══════════════════════════════════════════════════════════════ */
+  :root{
+    --bg:#FDF2F8; --card:#FFF; --main:#E85D9E; --main-dark:#B23D77;
+    --accent:#8FAE8B; --gold:#F0B429; --rose:#C77B7B;
+    --text:#5A3550; --soft:#9A7288; --line:#F6DCE9;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background:var(--bg); color:var(--text);
+    font-family:'Work Sans',system-ui,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+  }
+  h1,h2,h3,.display{ font-family:'Fraunces',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+
+  #app{
+    max-width:480px; margin:0 auto; min-height:100dvh;
+    display:flex; flex-direction:column;
+    padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  }
+  header{ padding:28px 22px 14px; position:relative; overflow:hidden; }
+  .deco{ position:absolute; font-size:1.8rem; opacity:.35; animation:flutter 4s ease-in-out infinite; }
+  .deco.d1{ top:6px; right:26px; }
+  .deco.d2{ top:46px; right:70px; font-size:1.1rem; animation-delay:1.2s; }
+  .deco.d3{ top:12px; right:96px; font-size:.9rem; opacity:.22; animation-delay:2.1s; }
+  @keyframes flutter{ 0%,100%{transform:translateY(0) rotate(-4deg);} 50%{transform:translateY(-6px) rotate(6deg);} }
+  header .greeting{ font-size:1.5rem; color:var(--main-dark); margin:0 0 2px; font-family:'Fraunces',Georgia,serif; font-weight:600; }
+  header .date{ font-size:.9rem; color:var(--soft); margin:0; }
+  .edit-name{ background:none; border:none; color:var(--soft); font-size:.8rem; text-decoration:underline; padding:6px 0 0; min-height:auto; }
+
+  main{ flex:1; padding:6px 22px 24px; }
+  .screen{ display:none; animation:fade .25s ease; }
+  .screen.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  .card{ background:var(--card); border-radius:20px; padding:24px 20px; border:1px solid var(--line); }
+  .msg-card{ border-left:5px solid var(--main); margin-bottom:22px; }
+  .msg-card p{ font-family:'Fraunces',Georgia,serif; font-size:1.25rem; line-height:1.45; color:var(--main-dark); margin:0 0 18px; }
+
+  button{ font-family:inherit; cursor:pointer; border:none; border-radius:12px; font-size:.95rem; -webkit-tap-highlight-color:transparent; }
+  .btn-ghost{ background:transparent; color:var(--main); border:1.5px solid var(--main); padding:10px 16px; font-weight:600; min-height:44px; }
+  .btn-ghost:active{ background:var(--main); color:#fff; }
+  .btn-solid{ background:var(--main); color:#fff; padding:12px 18px; font-weight:600; min-height:48px; }
+  .btn-solid:active{ background:var(--main-dark); }
+
+  .mood-block{ margin-top:22px; }
+  .mood-block h3, .good-card h3{ font-size:1rem; color:var(--soft); font-weight:600; margin:0 0 12px; }
+  .mood-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .mood-btn{ background:var(--card); border:1.5px solid var(--line); border-radius:16px; font-size:1.5rem; width:56px; height:56px; display:flex; align-items:center; justify-content:center; }
+  .mood-btn.selected{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 14%, #fff); }
+  .mood-note{ margin-top:14px; font-size:.95rem; color:var(--soft); min-height:1.2em; }
+
+  .next-card{ margin-bottom:18px; border-left:5px solid var(--gold); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .next-card .label{ font-size:.8rem; color:var(--soft); margin:0 0 4px; }
+  .next-card .text{ font-size:1.02rem; font-weight:600; color:var(--text); margin:0; }
+  .next-card .time{ font-size:.88rem; color:var(--gold); font-weight:600; }
+  .goto{ background:none; border:none; color:var(--main); font-size:.85rem; font-weight:600; text-decoration:underline; padding:6px; min-height:auto; flex-shrink:0; }
+
+  .good-card{ margin-top:22px; }
+  .good-display{ font-family:'Fraunces',Georgia,serif; font-size:1.1rem; color:var(--main-dark); line-height:1.4; margin:0 0 14px; min-height:1.4em; }
+  .good-add-row{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .good-add-row input, .setup-card input, .add-row input, .add-row textarea{
+    font-family:inherit; font-size:.98rem; padding:12px 14px; border-radius:12px;
+    border:1.5px solid var(--line); background:var(--card); color:var(--text); width:100%;
+  }
+  .add-row textarea{ min-height:90px; resize:none; }
+  .add-row{ display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+  .setup-card input{ margin-bottom:14px; font-size:1.05rem; }
+
+  .contact-item{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+  .contact-item .name{ font-weight:600; font-size:.95rem; flex:1; }
+  .contact-item .actions{ display:flex; gap:6px; }
+  .contact-item a{ display:flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:12px; text-decoration:none; font-size:1.1rem; }
+  .contact-item a.whatsapp{ background:var(--accent); }
+  .contact-item a.call{ background:var(--main); }
+
+  .section-title{ font-size:1.15rem; margin:4px 0 16px; color:var(--main-dark); }
+  .empty{ color:var(--soft); font-size:.98rem; padding:18px 4px; line-height:1.5; }
+
+  .item{ display:flex; align-items:flex-start; gap:12px; padding:14px 2px; border-bottom:1px solid var(--line); }
+  .item:last-child{ border-bottom:none; }
+  .check{ width:26px; height:26px; flex-shrink:0; border-radius:50%; border:2px solid var(--accent); margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:.85rem; color:var(--accent); }
+  .check.done{ background:var(--accent); color:#fff; }
+  .item-body{ flex:1; min-width:0; }
+  .item-text{ font-size:1.02rem; line-height:1.4; overflow-wrap:anywhere; }
+  .item-text.done{ text-decoration:line-through; color:var(--soft); }
+  .item-time{ font-size:.85rem; color:var(--gold); font-weight:600; margin-top:2px; }
+  .item-date{ font-size:.82rem; color:var(--soft); margin-top:2px; }
+  .item-del{ background:none; border:none; color:var(--rose); font-size:.85rem; font-weight:600; padding:6px 4px; min-height:32px; }
+
+  .progress-card{ margin-bottom:18px; }
+  .prog-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .progress-card h3{ font-size:1.05rem; margin:0; color:var(--main-dark); }
+  .edit-link{ background:none; border:none; color:var(--soft); font-size:.78rem; text-decoration:underline; padding:4px; min-height:auto; }
+  .prog-track{ background:var(--line); border-radius:999px; height:14px; overflow:hidden; }
+  .prog-fill{ background:linear-gradient(90deg,var(--main),var(--gold)); height:100%; border-radius:999px; transition:width .4s ease; }
+  .prog-caption{ font-size:.88rem; color:var(--soft); margin:10px 0 0; line-height:1.4; }
+
+  .quick-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .chip{ background:var(--card); border:1.5px dashed var(--main); color:var(--main-dark); padding:9px 14px; border-radius:999px; font-size:.88rem; font-weight:600; min-height:40px; }
+  .chip.plain{ border-style:solid; border-color:var(--line); color:var(--text); }
+
+  /* aviso cuando el navegador NO deja guardar */
+  .warn{
+    background:#FFF7ED; border:1.5px solid #FED7AA; color:#9A3412;
+    border-radius:14px; padding:12px 14px; font-size:.86rem; line-height:1.45; margin-bottom:16px;
+  }
+
+  nav{
+    position:fixed; bottom:0; left:0; right:0; background:var(--card);
+    border-top:1px solid var(--line); display:flex; max-width:480px; margin:0 auto;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  nav button{
+    flex:1; min-width:0; background:none; padding:9px 2px 11px;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    color:var(--soft); font-size:.62rem; font-weight:600; border-radius:0; white-space:nowrap;
+  }
+  nav button .icon{ font-size:1.15rem; }
+  nav button.active{ color:var(--main); }
+  button:focus-visible, input:focus-visible, textarea:focus-visible{ outline:2.5px solid var(--main); outline-offset:2px; }
+
+  /* ══════════ EL SOBRE — es el plano que se graba ══════════ */
+  .intro{
+    position:fixed; inset:0; z-index:999;
+    background:linear-gradient(160deg,var(--main),var(--main-dark));
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px; overflow:hidden;
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .intro.hide{ opacity:0; transform:scale(1.08); pointer-events:none; }
+  .chispa{ position:absolute; pointer-events:none; opacity:0; font-size:1rem; }
+  .chispa.on{ animation:subir 1.5s ease-out forwards; }
+  @keyframes subir{
+    0%{ opacity:0; transform:translateY(0) scale(.4); }
+    25%{ opacity:.95; }
+    100%{ opacity:0; transform:translateY(-160px) scale(1.15); }
+  }
+  .sobre{ font-size:5rem; margin-bottom:22px; animation:bob 2.6s ease-in-out infinite; line-height:1; }
+  .sobre.abriendo{ animation:abrir .9s cubic-bezier(.3,1.4,.5,1) forwards; }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+  @keyframes abrir{
+    0%{ transform:scale(1) rotate(0); }
+    45%{ transform:scale(1.35) rotate(-7deg); }
+    100%{ transform:scale(2.6) rotate(4deg); opacity:0; }
+  }
+  .intro-para{ color:rgba(255,255,255,.75); font-size:.95rem; letter-spacing:.14em; text-transform:uppercase; margin:0 0 6px; }
+  .intro-nombre{ font-family:'Fraunces',Georgia,serif; color:#fff; font-size:2.4rem; font-weight:700; margin:0 0 10px; line-height:1.1; }
+  .intro-sub{ color:rgba(255,255,255,.9); font-size:1.02rem; margin:0 0 30px; max-width:300px; line-height:1.5; }
+  .intro-btn{ background:#fff; color:var(--main-dark); padding:14px 30px; border-radius:999px; font-weight:700; font-size:1.02rem; min-height:48px; }
+
+  /* la carta que sale del sobre: el segundo golpe del video */
+  .carta{
+    position:fixed; inset:0; z-index:998;
+    background:linear-gradient(160deg,var(--main),var(--main-dark));
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:32px; transition:opacity .6s ease;
+  }
+  .carta.ver{ display:flex; }
+  .carta.hide{ opacity:0; pointer-events:none; }
+  .carta-hoja{
+    background:#fff; border-radius:22px; padding:34px 26px; max-width:340px;
+    box-shadow:0 18px 50px rgba(0,0,0,.22);
+    animation:salir .8s cubic-bezier(.2,1.2,.4,1) both;
+  }
+  @keyframes salir{ from{ opacity:0; transform:translateY(70px) scale(.9);} to{ opacity:1; transform:none;} }
+  .carta-hoja .para{ font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin:0 0 8px; }
+  .carta-hoja .nombre{ font-family:'Fraunces',Georgia,serif; font-size:2rem; color:var(--main-dark); margin:0 0 16px; line-height:1.1; }
+  .carta-hoja .dedicatoria{ font-family:'Fraunces',Georgia,serif; font-size:1.08rem; line-height:1.55; color:var(--text); margin:0 0 8px; }
+  .carta-hoja .firma{ font-size:.92rem; color:var(--soft); margin:14px 0 0; }
+  .carta-btn{ background:#fff; color:var(--main-dark); padding:13px 28px; border-radius:999px; font-weight:700; margin-top:26px; min-height:48px; }
+
+  /* botón para repetir la toma — solo aparece en modo demo */
+  /* Se desvanece solo: en cámara casi no se ve, pero sigue ahí para
+     tocarla entre toma y toma. */
+  .regrabar{
+    position:fixed; right:10px; bottom:calc(90px + env(safe-area-inset-bottom)); z-index:900;
+    background:rgba(0,0,0,.5); color:#fff; border-radius:999px;
+    padding:7px 13px; font-size:.72rem; font-weight:600;
+    opacity:.12; transition:opacity .35s ease;
+  }
+  .regrabar:hover, .regrabar:active, .regrabar:focus-visible{ opacity:1; }
+
+  @media (prefers-reduced-motion:reduce){
+    .deco,.sobre,.chispa,.carta-hoja,.screen{ animation:none !important; }
+    .prog-fill{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     PANTALLA 1 — el sobre cerrado
+     ════════════════════════════════════════════════════════════════ -->
+<div class="intro" id="intro">
+  <div class="sobre" id="sobre">💌</div>
+  <p class="intro-para" id="introPara">Para</p>
+  <p class="intro-nombre" id="introNombre">ti</p>
+  <p class="intro-sub" id="introSub">Alguien te preparó algo.</p>
+  <button class="intro-btn" onclick="abrirSobre()">Toca para abrir</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     PANTALLA 2 — la carta (el segundo golpe del video)
+     ════════════════════════════════════════════════════════════════ -->
+<div class="carta" id="carta">
+  <div class="carta-hoja">
+    <p class="para">Para</p>
+    <p class="nombre" id="cartaNombre">ti</p>
+    <p class="dedicatoria" id="cartaDedicatoria"></p>
+    <p class="firma" id="cartaFirma"></p>
+  </div>
+  <button class="carta-btn" onclick="entrar()">Entrar 💛</button>
+</div>
+
+<button class="regrabar" id="regrabar" style="display:none;" onclick="repetirToma()">↻ Repetir toma</button>
+
+<div id="app">
+  <header>
+    <span class="deco d1"></span><span class="deco d2"></span><span class="deco d3"></span>
+    <p class="greeting" id="greeting">Hola</p>
+    <p class="date" id="todayDate"></p>
+    <button class="edit-name" id="editNameBtn" style="display:none;" onclick="editarNombre()">cambiar nombre</button>
+  </header>
+
+  <main>
+    <!-- ───────── HOY ───────── -->
+    <section class="screen active" id="screen-hoy">
+      <div id="avisoGuardado" class="warn" style="display:none;">
+        <strong>Ojo:</strong> este navegador no está dejando guardar (suele pasar en modo privado).
+        Puedes usar la app, pero lo que escribas no se va a conservar al cerrarla.
+      </div>
+
+      <div id="setupBlock" style="display:none;">
+        <div class="card setup-card">
+          <h3 style="margin-top:0;">¿Cómo te llamas?</h3>
+          <input id="nameInput" type="text" placeholder="Tu nombre" maxlength="30">
+          <button class="btn-solid" style="width:100%;" onclick="guardarNombre()">Guardar</button>
+        </div>
+      </div>
+
+      <div id="mainHoyBlock">
+        <div class="card next-card" id="nextCard" style="display:none;">
+          <div>
+            <p class="label">Tu próximo pendiente</p>
+            <p class="text" id="nextText"></p>
+            <span class="time" id="nextTime"></span>
+          </div>
+          <button class="goto" onclick="verTab('recordatorios')">ver todos</button>
+        </div>
+
+        <div class="card progress-card" id="progressCard">
+          <div class="prog-top">
+            <h3 id="progTitle">Tu camino</h3>
+            <button class="edit-link" onclick="editarMeta()">editar</button>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+          <p class="prog-caption" id="progCaption"></p>
+        </div>
+
+        <div class="card msg-card">
+          <p id="dailyMessage">…</p>
+          <button class="btn-ghost" onclick="otroMensaje()">Otro mensajito ✨</button>
+        </div>
+
+        <div class="mood-block">
+          <h3>¿Cómo te sientes hoy?</h3>
+          <div class="mood-row" id="moodRow"></div>
+          <p class="mood-note" id="moodNote"></p>
+          <div id="contactBlock" style="display:none;">
+            <p style="font-size:.95rem;color:var(--soft);">Si quieres hablar con alguien, aquí lo tienes:</p>
+            <div id="contactList"></div>
+            <button class="btn-ghost" style="width:100%;" onclick="agregarContacto()">+ Agregar contacto</button>
+          </div>
+        </div>
+
+        <div class="card good-card">
+          <h3 id="goodTitle">Cajita de cosas buenas 💛</h3>
+          <p class="good-display" id="goodDisplay"></p>
+          <button class="btn-ghost" onclick="otraCosaBuena()">Ver otra</button>
+          <div class="good-add-row">
+            <input id="goodInput" type="text" placeholder="Una cosita buena de hoy…">
+            <button class="btn-solid" style="width:100%;" onclick="agregarCosaBuena()">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── RECORDATORIOS ───────── -->
+    <section class="screen" id="screen-recordatorios">
+      <h2 class="section-title" id="titRecordatorios">Tus recordatorios</h2>
+      <div class="quick-row" id="quickReminders"></div>
+      <div class="add-row">
+        <input id="reminderText" type="text" placeholder="¿Qué quieres recordar?">
+        <input id="reminderTime" type="text" placeholder="Hora (opcional), ej. 9:00 am">
+        <button class="btn-solid" onclick="agregarRecordatorio()">Agregar recordatorio</button>
+      </div>
+      <div id="reminderList"></div>
+    </section>
+
+    <!-- ───────── DIARIO ───────── -->
+    <section class="screen" id="screen-diario">
+      <h2 class="section-title" id="titDiario">Diario rápido</h2>
+      <p class="empty" style="padding-top:0;" id="subDiario"></p>
+      <div class="quick-row" id="quickDiario"></div>
+      <div id="diarioList"></div>
+      <button class="btn-ghost" style="width:100%;margin-top:16px;" onclick="compartirDiario()">Compartir 📋</button>
+    </section>
+
+    <!-- ───────── NOTAS ───────── -->
+    <section class="screen" id="screen-notas">
+      <h2 class="section-title">Tu libreta</h2>
+      <div class="add-row">
+        <textarea id="noteText" placeholder="Escribe lo que quieras que no se te olvide…"></textarea>
+        <button class="btn-solid" onclick="agregarNota()">Guardar nota</button>
+      </div>
+      <div id="noteList"></div>
+      <div style="margin-top:26px;display:flex;flex-direction:column;gap:10px;">
+        <button class="btn-ghost" onclick="descargarRespaldo()">⬇️ Guardar un respaldo</button>
+        <button class="edit-link" onclick="reiniciar()">Reiniciar (borra todo)</button>
+      </div>
+    </section>
+  </main>
+
+  <nav id="nav"></nav>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   ①  CONFIGURACIÓN  —  ES LO ÚNICO QUE CAMBIAS POR VENTA
+   ══════════════════════════════════════════════════════════════════
+   Todo lo personal vive AQUÍ. Nada de datos de nadie más abajo.
+
+   También se puede cambiar desde la URL, sin tocar el archivo:
+     ?para=Ana&de=Clau&tema=noche&cat=amor&demo=1
+   Eso sirve para grabar diez videos distintos con el mismo archivo.
+   ══════════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  para: "",            // nombre de quien recibe. Vacío = se lo pregunta.
+  de: "",              // quién lo regala. Vacío = no se firma.
+  dedicatoria: "",     // vacío = usa la de la categoría
+  tema: "mariposa",    // mariposa · noche · bosque · atardecer · durazno
+  categoria: "animo",  // animo · salud · amor · reto · bebe
+  meta: null,          // { actual: 5, total: 16 } o null para ocultar la barra
+  contactos: [],       // [{ nombre:"Clau", tel:"5215512345678" }]  ← sin datos por default
+  demo: false,         // true = llena la app con contenido de muestra (PARA GRABAR)
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   ②  TEMAS  —  paletas listas
+   ══════════════════════════════════════════════════════════════════ */
+const TEMAS = {
+  mariposa:  { bg:"#FDF2F8", main:"#E85D9E", dark:"#B23D77", accent:"#8FAE8B", gold:"#F0B429", rose:"#C77B7B", text:"#5A3550", soft:"#9A7288", line:"#F6DCE9", deco:"🦋" },
+  noche:     { bg:"#F3F1FD", main:"#7C5CE0", dark:"#4F35A8", accent:"#5EAAA8", gold:"#E8A33D", rose:"#B07BC7", text:"#33285C", soft:"#7C6FA8", line:"#E5E0FA", deco:"✨" },
+  bosque:    { bg:"#F1F8F2", main:"#3E9B62", dark:"#256D42", accent:"#7BA05B", gold:"#DFA22B", rose:"#C08457", text:"#24402F", soft:"#6B8A76", line:"#DCEEE1", deco:"🌿" },
+  atardecer: { bg:"#FFF5EF", main:"#F2704B", dark:"#C24A2B", accent:"#E0A458", gold:"#F0B429", rose:"#D08A7A", text:"#5A3328", soft:"#A5786A", line:"#FBE0D3", deco:"🌅" },
+  durazno:   { bg:"#FFF6F3", main:"#EE7E92", dark:"#C15268", accent:"#93B8A5", gold:"#EDB458", rose:"#D590A0", text:"#5B333C", soft:"#A57783", line:"#FBDDE1", deco:"🌸" },
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   ③  CATEGORÍAS  —  cada una cambia textos, secciones y mensajes
+   ══════════════════════════════════════════════════════════════════ */
+const CATEGORIAS = {
+  animo: {
+    sobre:"💌", titulo:"Alguien te preparó algo.",
+    dedicatoria:"Te hice esto para los días en que se te olvide lo mucho que vales.",
+    metaTitulo:"Tu camino",
+    goodTitulo:"Cajita de cosas buenas 💛",
+    diarioTitulo:"Diario rápido", diarioSub:"Anota cómo va tu día, para que no se te pierda.",
+    diarioTab:"Diario", diarioIcono:"🌤️",
+    quickDiario:["Buen día","Día pesado","Ansiedad","Dormí bien","Me costó levantarme","Me reí mucho"],
+    quickRecordatorios:[["Tomar agua","Cada 2 h"],["Salir a caminar","6:00 pm"]],
+    mensajes:[
+      "Hoy no tienes que poder con todo, solo con lo de hoy.",
+      "Si solo lograste levantarte, ya fue un buen día.",
+      "Descansar también es avanzar, aunque no lo parezca.",
+      "No estás sola en esto, aunque a veces se sienta así.",
+      "Lo que hoy pesa mucho, no va a pesar para siempre.",
+      "Eres muchísimo más de lo que cualquier etiqueta diga de ti.",
+      "Celebra lo chiquito: una risa, un buen café, una siesta rica.",
+      "Está bien pedir ayuda, y está bien también no pedirla hoy.",
+      "Tu valor no depende de lo que produjiste esta semana.",
+      "Un día a la vez, una cosita a la vez, así se va haciendo esto.",
+    ],
+    metaDemo:null,
+    demo:{
+      recordatorios:[["Llamar a mamá","7:00 pm",false],["Salir a caminar","6:00 pm",false],["Tomar agua","",true]],
+      diario:["Me reí mucho","Buen día","Dormí bien"],
+      notas:["Comprar café del que me gusta ☕","La cita del dentista se movió al martes"],
+      buenas:["Hoy me salió el pan","Vi el atardecer completo","Me escribió Sofi de la nada"],
+    },
+  },
+  salud: {
+    sobre:"💌", titulo:"Alguien te preparó algo para acompañarte.",
+    dedicatoria:"Para que no tengas que cargar sola con acordarte de todo.",
+    metaTitulo:"Tu camino",
+    goodTitulo:"Cajita de cosas buenas 💛",
+    diarioTitulo:"Diario rápido", diarioSub:"Toca lo que sientas hoy, así lo tienes a la mano para contárselo a tu doctora.",
+    diarioTab:"Cómo me siento", diarioIcono:"🩹",
+    quickDiario:["Cansancio","Sin apetito","Mareo","Dolor","Frío en manos y pies","Dormí mal"],
+    quickRecordatorios:[["Exámenes","Miércoles"],["Cita de control","Jueves"]],
+    mensajes:[
+      "Hoy no tienes que recordarlo todo, para eso está esta libretita.",
+      "Tu cuerpo está trabajando muy duro ahorita, sé amable con él.",
+      "Si se te olvidó algo, no pasa nada, lo volvemos a escribir y ya.",
+      "No tienes que estar bien todo el tiempo, solo tienes que estar aquí.",
+      "Cada día que sigues intentando, ya ganaste algo importante.",
+      "Está perfecto anotar las cosas, no significa que estés fallando.",
+      "Eres más que cualquier diagnóstico: eres tú, con todo y tus ganas.",
+      "Descansar también es avanzar, aunque no lo parezca.",
+      "Hay una fuerza en ti que muy poca gente tiene.",
+      "Un día a la vez, una cosita a la vez, así se va haciendo esto.",
+    ],
+    metaDemo:{ actual:5, total:16 },
+    demo:{
+      recordatorios:[["Exámenes","Miércoles",false],["Cita de control","Jueves 11:00 am",false],["Tomar la pastilla","9:00 am",true]],
+      diario:["Cansancio","Dormí mal","Sin apetito"],
+      notas:["Preguntar por los resultados del último estudio","Llevar la carpeta azul a la cita"],
+      buenas:["Hoy desayuné completo","Vino Ana a verme","Caminé hasta la esquina"],
+    },
+  },
+  amor: {
+    sobre:"💌", titulo:"Alguien pensó en ti hoy.",
+    dedicatoria:"Te hice esto para que lo abras cuando me extrañes.",
+    metaTitulo:"Nuestra cuenta",
+    goodTitulo:"Nuestras cositas 💛",
+    diarioTitulo:"Momentos", diarioSub:"Guarda los ratos que no quieres que se te olviden.",
+    diarioTab:"Momentos", diarioIcono:"💫",
+    quickDiario:["Me hiciste reír","Te extrañé","Buen día juntos","Cena rica","Peli en casa","Me acordé de ti"],
+    quickRecordatorios:[["Nuestra cena","Viernes 8:00 pm"],["Llamarnos","10:00 pm"]],
+    mensajes:[
+      "Si estás leyendo esto, es porque alguien te quiere mucho.",
+      "Me gusta cómo te ríes cuando crees que nadie te ve.",
+      "Gracias por los días normales, que son mis favoritos.",
+      "Te elegiría otra vez, y otra, y otra.",
+      "Hoy también me acordé de ti sin razón.",
+      "Contigo hasta lo aburrido está bien.",
+      "Eres mi lugar favorito.",
+      "Si hoy fue difícil, aquí estoy.",
+      "Me haces mucha falta cuando no estás.",
+      "Qué suerte la mía.",
+    ],
+    metaDemo:null,
+    demo:{
+      recordatorios:[["Nuestra cena","Viernes 8:00 pm",false],["Llamarnos","10:00 pm",false],["Comprar el vino","",true]],
+      diario:["Me hiciste reír","Peli en casa","Te extrañé"],
+      notas:["Reservar la mesa de la ventana","Su libro favorito: el de la portada azul"],
+      buenas:["El desayuno del domingo","Cuando bailamos en la cocina","Tu mensaje de las 3 am"],
+    },
+  },
+  reto: {
+    sobre:"🎯", titulo:"Alguien cree en lo que estás haciendo.",
+    dedicatoria:"Para que lleves la cuenta y veas hasta dónde has llegado.",
+    metaTitulo:"Tu meta",
+    goodTitulo:"Tus logros 🏅",
+    diarioTitulo:"Bitácora", diarioSub:"Anota cómo te fue hoy, aunque sea en una palabra.",
+    diarioTab:"Bitácora", diarioIcono:"📈",
+    quickDiario:["Lo hice","Día flojo","Me costó","Récord personal","Descanso","Con ganas"],
+    quickRecordatorios:[["Entrenar","6:00 am"],["Pesarme","Domingo"]],
+    mensajes:[
+      "No tiene que ser perfecto, tiene que ser constante.",
+      "El día que no quieres es el que más cuenta.",
+      "Ya llevas más de lo que te falta, aunque no lo sientas.",
+      "Un mal día no borra las semanas buenas.",
+      "Nadie ve el trabajo, pero se nota el resultado.",
+      "Empezar otra vez también es avanzar.",
+      "Hoy te va a dar flojera, y aun así vas a poder.",
+      "Compites contra quien eras hace un mes, con nadie más.",
+      "Descansar es parte del plan, no una falla del plan.",
+      "Vas bien. En serio.",
+    ],
+    metaDemo:{ actual:8, total:12 },
+    demo:{
+      recordatorios:[["Entrenar","6:00 am",false],["Preparar la comida","8:00 pm",false],["Pesarme","Domingo",true]],
+      diario:["Lo hice","Récord personal","Me costó"],
+      notas:["Cambiar los tenis, ya están lisos","Ruta nueva: el parque grande"],
+      buenas:["Primera vez que corro 5 km seguidos","Ya me queda el pantalón","No fallé en toda la semana"],
+    },
+  },
+  bebe: {
+    sobre:"🍼", titulo:"Alguien te preparó algo para esta etapa.",
+    dedicatoria:"Para estos meses en los que se te olvida hasta tu nombre.",
+    metaTitulo:"La cuenta regresiva",
+    goodTitulo:"Cositas para recordar 💛",
+    diarioTitulo:"Cómo voy", diarioSub:"Anota cómo te sientes, para contarlo en la consulta.",
+    diarioTab:"Cómo voy", diarioIcono:"🌙",
+    quickDiario:["Dormí poco","Con energía","Antojo","Náuseas","Se movió mucho","Espalda cansada"],
+    quickRecordatorios:[["Consulta","Martes 10:00 am"],["Vitaminas","9:00 am"]],
+    mensajes:[
+      "Lo estás haciendo bien, aunque nadie te lo diga hoy.",
+      "Tu cuerpo está haciendo algo enorme ahorita.",
+      "Está bien no disfrutar cada minuto de esto.",
+      "Pide ayuda las veces que haga falta.",
+      "Dormir cuando se pueda también es cuidarse.",
+      "No tienes que poder con todo tú sola.",
+      "Cada semana que pasa ya es un logro.",
+      "Está bien llorar sin motivo, de verdad.",
+      "Vas a ser (o ya eres) suficiente.",
+      "Un día a la vez, una cosita a la vez.",
+    ],
+    metaDemo:{ actual:28, total:40 },
+    demo:{
+      recordatorios:[["Consulta","Martes 10:00 am",false],["Vitaminas","9:00 am",false],["Armar la maleta","",true]],
+      diario:["Se movió mucho","Dormí poco","Antojo"],
+      notas:["Preguntar por el curso de lactancia","Nombres que nos gustan: ver la lista"],
+      buenas:["Ya escuchamos el corazón","Llegó la cuna","Mi mamá me hizo sopa"],
+    },
+  },
+};
+
+const MOODS = [
+  { emoji:"😊", label:"bien",       note:"Qué bueno que te sientes así, disfrútalo." },
+  { emoji:"😌", label:"tranquila",  note:"Qué rico sentirse en calma, cuídalo." },
+  { emoji:"😔", label:"baja",       note:"Está bien sentirse así, no tienes que fingir que estás mejor." },
+  { emoji:"😴", label:"cansada",    note:"Tu cuerpo te está pidiendo descanso, dáselo si puedes." },
+  { emoji:"💪", label:"con ánimo",  note:"Qué lindo, aprovecha esa energía como quieras." },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   ④  De aquí para abajo NO hay nada que cambiar por venta.
+   ══════════════════════════════════════════════════════════════════ */
+
+// La URL gana sobre CONFIG: así se graban varios videos con un archivo.
+const params = new URLSearchParams(location.search);
+["para","de","tema","categoria","dedicatoria"].forEach((k) => {
+  const alias = k === "categoria" ? "cat" : k;
+  const v = params.get(alias) || params.get(k);
+  if (v) CONFIG[k] = v;
+});
+if (params.get("demo") === "1") CONFIG.demo = true;
+if (params.get("meta")) {
+  const [a, t] = params.get("meta").split("/").map(Number);
+  if (a > 0 && t > 0) CONFIG.meta = { actual:a, total:t };
+}
+
+const TEMA = TEMAS[CONFIG.tema] || TEMAS.mariposa;
+const CAT  = CATEGORIAS[CONFIG.categoria] || CATEGORIAS.animo;
+
+// Cada categoría+tema guarda aparte, para que al grabar un video no se
+// mezcle con lo del anterior.
+const CLAVE = "regalo:" + CONFIG.categoria + ":" + CONFIG.tema + ":";
+
+let guardadoOk = true;
+let state = {
+  nombre:"", recordatorios:[], notas:[], diario:[], buenas:[], contactos:[],
+  moodPorDia:{}, meta:null, msgIndex:0, buenaIndex:0,
+};
+
+/* ── guardado tolerante ─────────────────────────────────────────── */
+function leer(k){ try{ return localStorage.getItem(CLAVE + k); }catch(e){ guardadoOk = false; return null; } }
+function escribir(k, v){
+  try{ localStorage.setItem(CLAVE + k, v); }
+  catch(e){
+    // ANTES este caso se tragaba en silencio y la persona perdía todo sin
+    // enterarse. Ahora se avisa una vez, arriba de todo.
+    guardadoOk = false;
+    mostrarAvisoGuardado();
+  }
+}
+function leerJson(k, porDefecto){
+  const v = leer(k);
+  if (!v) return porDefecto;
+  try{ return JSON.parse(v); }catch(e){ return porDefecto; }
+}
+function mostrarAvisoGuardado(){
+  const el = document.getElementById("avisoGuardado");
+  if (el) el.style.display = "block";
+}
+
+function id(){ return Date.now() + "-" + Math.random().toString(36).slice(2,7); }
+function esc(s){ const d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+function hoyClave(){ return new Date().toISOString().slice(0,10); }
+function diaDelAño(){ const d = new Date(); return Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000); }
+function fechaLarga(){
+  // Solo la primera letra en mayúscula. Con text-transform:capitalize
+  // salía "Lunes, 7 De Septiembre", que en español está mal.
+  const t = new Date().toLocaleDateString("es-MX", { weekday:"long", day:"numeric", month:"long" });
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+function fechaCorta(ts){ return new Date(ts).toLocaleDateString("es-MX", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }); }
+
+/* ── pintar el tema ─────────────────────────────────────────────── */
+function aplicarTema(){
+  const r = document.documentElement.style;
+  r.setProperty("--bg", TEMA.bg);      r.setProperty("--main", TEMA.main);
+  r.setProperty("--main-dark", TEMA.dark); r.setProperty("--accent", TEMA.accent);
+  r.setProperty("--gold", TEMA.gold);  r.setProperty("--rose", TEMA.rose);
+  r.setProperty("--text", TEMA.text);  r.setProperty("--soft", TEMA.soft);
+  r.setProperty("--line", TEMA.line);
+  document.getElementById("metaTheme").setAttribute("content", TEMA.main);
+  document.querySelectorAll(".deco").forEach((d) => { d.textContent = TEMA.deco; });
+  document.getElementById("sobre").textContent = CAT.sobre;
+  document.title = CONFIG.para ? "Para " + CONFIG.para : "Un regalo para ti";
+}
+
+/* ── el sobre ───────────────────────────────────────────────────── */
+function pintarIntro(){
+  const nombre = CONFIG.para || state.nombre;
+  document.getElementById("introNombre").textContent = nombre || "ti";
+  document.getElementById("introSub").textContent = CAT.titulo;
+  document.getElementById("cartaNombre").textContent = nombre || "ti";
+  document.getElementById("cartaDedicatoria").textContent = CONFIG.dedicatoria || CAT.dedicatoria;
+  const firma = document.getElementById("cartaFirma");
+  firma.textContent = CONFIG.de ? "— " + CONFIG.de : "";
+  firma.style.display = CONFIG.de ? "block" : "none";
+}
+
+function chispas(){
+  const zona = document.getElementById("intro");
+  const simbolos = [TEMA.deco, "✨", "💛", "✨"];
+  for (let i = 0; i < 14; i++){
+    const s = document.createElement("span");
+    s.className = "chispa";
+    s.textContent = simbolos[i % simbolos.length];
+    s.style.left = (10 + Math.random() * 80) + "%";
+    s.style.top = (45 + Math.random() * 25) + "%";
+    s.style.fontSize = (0.7 + Math.random() * 1.1) + "rem";
+    zona.appendChild(s);
+    setTimeout(() => s.classList.add("on"), i * 55);
+    setTimeout(() => s.remove(), 2200 + i * 55);
+  }
+}
+
+function abrirSobre(){
+  document.getElementById("sobre").classList.add("abriendo");
+  chispas();
+  setTimeout(() => {
+    document.getElementById("intro").classList.add("hide");
+    document.getElementById("carta").classList.add("ver");
+  }, 780);
+  setTimeout(() => { document.getElementById("intro").style.display = "none"; }, 1400);
+}
+
+function entrar(){
+  const c = document.getElementById("carta");
+  c.classList.add("hide");
+  setTimeout(() => { c.style.display = "none"; }, 620);
+}
+
+/** Deja todo como al principio para grabar otra toma. Solo en demo. */
+function repetirToma(){
+  const intro = document.getElementById("intro");
+  const carta = document.getElementById("carta");
+  const sobre = document.getElementById("sobre");
+  carta.classList.remove("ver","hide"); carta.style.display = "";
+  sobre.classList.remove("abriendo");
+  intro.style.display = ""; intro.classList.remove("hide");
+  verTab("hoy");
+}
+
+/* ── pantalla Hoy ───────────────────────────────────────────────── */
+function pintarSaludo(){
+  const setup = document.getElementById("setupBlock");
+  const main = document.getElementById("mainHoyBlock");
+  const nombre = CONFIG.para || state.nombre;
+  if (!nombre){
+    setup.style.display = "block"; main.style.display = "none";
+    document.getElementById("greeting").textContent = "Hola " + TEMA.deco;
+  } else {
+    setup.style.display = "none"; main.style.display = "block";
+    document.getElementById("greeting").textContent = "Hola, " + nombre + " " + TEMA.deco;
+    // Solo se ofrece cambiar el nombre si NO viene fijado en la config:
+    // en un regalo, el nombre es parte del regalo.
+    document.getElementById("editNameBtn").style.display = CONFIG.para ? "none" : "block";
+  }
+}
+
+function guardarNombre(){
+  const v = document.getElementById("nameInput").value.trim();
+  if (!v) return;
+  state.nombre = v; escribir("nombre", v);
+  pintarSaludo(); pintarIntro();
+}
+
+function editarNombre(){
+  const v = prompt("¿Cómo quieres que te salude?", state.nombre);
+  if (v === null || !v.trim()) return;
+  state.nombre = v.trim(); escribir("nombre", state.nombre);
+  pintarSaludo();
+}
+
+function pintarMensaje(){ document.getElementById("dailyMessage").textContent = CAT.mensajes[state.msgIndex]; }
+function otroMensaje(){
+  let n;
+  do { n = Math.floor(Math.random() * CAT.mensajes.length); } while (n === state.msgIndex && CAT.mensajes.length > 1);
+  state.msgIndex = n;
+  // Se guarda: antes se perdía al recargar y volvía al mensaje del día.
+  escribir("msgIndex", String(n));
+  pintarMensaje();
+}
+
+function pintarMeta(){
+  const card = document.getElementById("progressCard");
+  if (!state.meta){ card.style.display = "none"; return; }
+  card.style.display = "block";
+  document.getElementById("progTitle").textContent = CAT.metaTitulo;
+  const { actual, total } = state.meta;
+  document.getElementById("progFill").style.width = Math.min(Math.max(actual / total * 100, 4), 100) + "%";
+  const faltan = Math.max(total - actual, 0);
+  document.getElementById("progCaption").textContent = faltan === 0
+    ? "¡" + actual + " de " + total + "! Ya llegaste."
+    : actual + " de " + total + " · te faltan " + faltan + ".";
+}
+
+function editarMeta(){
+  if (!state.meta) return;
+  const v = prompt("¿En cuál vas?", state.meta.actual);
+  if (v === null) return;
+  const n = parseInt(v, 10);
+  if (isNaN(n) || n < 0) return;
+  state.meta.actual = n;
+  escribir("meta", JSON.stringify(state.meta));
+  pintarMeta();
+}
+
+function pintarSiguiente(){
+  const card = document.getElementById("nextCard");
+  const p = state.recordatorios.find((r) => !r.done);
+  if (!p){ card.style.display = "none"; return; }
+  document.getElementById("nextText").textContent = p.text;
+  document.getElementById("nextTime").textContent = p.time || "";
+  card.style.display = "flex";
+}
+
+function pintarMoods(){
+  const row = document.getElementById("moodRow");
+  row.innerHTML = "";
+  const hoy = state.moodPorDia[hoyClave()];
+  MOODS.forEach((m) => {
+    const b = document.createElement("button");
+    b.className = "mood-btn" + (hoy === m.emoji ? " selected" : "");
+    b.textContent = m.emoji; b.title = m.label;
+    b.setAttribute("aria-label", m.label);
+    b.onclick = () => elegirMood(m);
+    row.appendChild(b);
+  });
+  const bloque = document.getElementById("contactBlock");
+  if (hoy){
+    const f = MOODS.find((m) => m.emoji === hoy);
+    document.getElementById("moodNote").textContent = f ? f.note : "";
+    const bajo = hoy === "😔";
+    bloque.style.display = bajo ? "block" : "none";
+    if (bajo) pintarContactos();
+  } else {
+    document.getElementById("moodNote").textContent = "";
+    bloque.style.display = "none";
+  }
+}
+
+function elegirMood(m){
+  state.moodPorDia[hoyClave()] = m.emoji;
+  escribir("moods", JSON.stringify(state.moodPorDia));
+  pintarMoods();
+}
+
+function pintarContactos(){
+  const lista = document.getElementById("contactList");
+  lista.innerHTML = "";
+  if (state.contactos.length === 0){
+    lista.innerHTML = '<p class="empty" style="padding:8px 2px;">Agrega a quien quieras tener a la mano.</p>';
+    return;
+  }
+  state.contactos.forEach((c) => {
+    const msg = encodeURIComponent("Hola " + c.nombre + ", ¿tienes un ratito?");
+    const row = document.createElement("div");
+    row.className = "contact-item";
+    row.innerHTML =
+      '<span class="name">' + esc(c.nombre) + "</span>" +
+      '<div class="actions">' +
+        '<a class="whatsapp" href="https://wa.me/' + esc(c.tel) + "?text=" + msg + '" aria-label="WhatsApp">💬</a>' +
+        '<a class="call" href="tel:+' + esc(c.tel) + '" aria-label="Llamar">📱</a>' +
+      "</div>";
+    lista.appendChild(row);
+  });
+}
+
+function agregarContacto(){
+  const nombre = prompt("¿Nombre del contacto?");
+  if (nombre === null || !nombre.trim()) return;
+  const tel = prompt("Número con código de país, sin espacios (ej. 5215512345678)");
+  if (tel === null || !tel.trim()) return;
+  state.contactos.push({ nombre: nombre.trim(), tel: tel.trim().replace(/\D/g, "") });
+  escribir("contactos", JSON.stringify(state.contactos));
+  pintarContactos();
+}
+
+function pintarCosaBuena(){
+  const el = document.getElementById("goodDisplay");
+  el.textContent = state.buenas.length === 0
+    ? "Aquí puedes guardar cositas lindas para releerlas cuando lo necesites."
+    : state.buenas[Math.min(state.buenaIndex, state.buenas.length - 1)].text;
+}
+function otraCosaBuena(){
+  if (state.buenas.length === 0) return;
+  let n;
+  do { n = Math.floor(Math.random() * state.buenas.length); } while (n === state.buenaIndex && state.buenas.length > 1);
+  state.buenaIndex = n; pintarCosaBuena();
+}
+function agregarCosaBuena(){
+  const el = document.getElementById("goodInput");
+  const t = el.value.trim();
+  if (!t) return;
+  state.buenas.push({ id:id(), text:t, ts:Date.now() });
+  el.value = "";
+  escribir("buenas", JSON.stringify(state.buenas));
+  state.buenaIndex = state.buenas.length - 1;
+  pintarCosaBuena();
+}
+
+/* ── recordatorios ──────────────────────────────────────────────── */
+function pintarRecordatorios(){
+  const l = document.getElementById("reminderList");
+  l.innerHTML = "";
+  if (state.recordatorios.length === 0){
+    l.innerHTML = '<p class="empty">Aún no hay recordatorios. Escribe el primero arriba.</p>';
+    return;
+  }
+  [...state.recordatorios].sort((a,b) => (a.done === b.done ? 0 : a.done ? 1 : -1)).forEach((r) => {
+    const it = document.createElement("div");
+    it.className = "item";
+    it.innerHTML =
+      '<div class="check ' + (r.done ? "done" : "") + '">' + (r.done ? "✓" : "") + "</div>" +
+      '<div class="item-body"><div class="item-text ' + (r.done ? "done" : "") + '">' + esc(r.text) + "</div>" +
+      (r.time ? '<div class="item-time">' + esc(r.time) + "</div>" : "") + "</div>" +
+      '<button class="item-del">Eliminar</button>';
+    it.querySelector(".check").onclick = () => alternarRecordatorio(r.id);
+    it.querySelector(".item-del").onclick = () => borrarRecordatorio(r.id);
+    l.appendChild(it);
+  });
+}
+function nuevoRecordatorio(text, time, done){
+  state.recordatorios.push({ id:id(), text, time: time || "", done: !!done });
+  escribir("recordatorios", JSON.stringify(state.recordatorios));
+  pintarRecordatorios(); pintarSiguiente();
+}
+function agregarRecordatorio(){
+  const t = document.getElementById("reminderText");
+  const h = document.getElementById("reminderTime");
+  if (!t.value.trim()) return;
+  nuevoRecordatorio(t.value.trim(), h.value.trim(), false);
+  t.value = ""; h.value = "";
+}
+function alternarRecordatorio(x){
+  const r = state.recordatorios.find((y) => y.id === x);
+  if (r) r.done = !r.done;
+  escribir("recordatorios", JSON.stringify(state.recordatorios));
+  pintarRecordatorios(); pintarSiguiente();
+}
+function borrarRecordatorio(x){
+  state.recordatorios = state.recordatorios.filter((y) => y.id !== x);
+  escribir("recordatorios", JSON.stringify(state.recordatorios));
+  pintarRecordatorios(); pintarSiguiente();
+}
+
+/* ── diario ─────────────────────────────────────────────────────── */
+function pintarDiario(){
+  const l = document.getElementById("diarioList");
+  l.innerHTML = "";
+  if (state.diario.length === 0){
+    l.innerHTML = '<p class="empty">Aún no has anotado nada. Toca un botón de arriba.</p>';
+    return;
+  }
+  [...state.diario].sort((a,b) => b.ts - a.ts).forEach((s) => {
+    const it = document.createElement("div");
+    it.className = "item";
+    it.innerHTML =
+      '<div class="item-body"><div class="item-text">' + esc(s.text) + "</div>" +
+      '<div class="item-date">' + fechaCorta(s.ts) + "</div></div>" +
+      '<button class="item-del">Eliminar</button>';
+    it.querySelector(".item-del").onclick = () => {
+      state.diario = state.diario.filter((y) => y.id !== s.id);
+      escribir("diario", JSON.stringify(state.diario));
+      pintarDiario();
+    };
+    l.appendChild(it);
+  });
+}
+function agregarDiario(text){
+  state.diario.push({ id:id(), text, ts:Date.now() });
+  escribir("diario", JSON.stringify(state.diario));
+  pintarDiario();
+}
+function otroDiario(){
+  const v = prompt("¿Qué quieres anotar?");
+  if (v === null || !v.trim()) return;
+  agregarDiario(v.trim());
+}
+async function compartirDiario(){
+  if (state.diario.length === 0){ alert("Aún no tienes nada anotado."); return; }
+  const nombre = CONFIG.para || state.nombre || "";
+  const lineas = [...state.diario].sort((a,b) => b.ts - a.ts).map((s) => "• " + fechaCorta(s.ts) + " — " + s.text);
+  const texto = CAT.diarioTitulo + (nombre ? " de " + nombre : "") + "\n\n" + lineas.join("\n");
+  if (navigator.share){
+    try{ await navigator.share({ title: CAT.diarioTitulo, text: texto }); return; }catch(e){}
+  }
+  try{
+    await navigator.clipboard.writeText(texto);
+    alert("Copiado. Ya puedes pegarlo donde quieras.");
+  }catch(e){ prompt("Copia este texto:", texto); }
+}
+
+/* ── notas ──────────────────────────────────────────────────────── */
+function pintarNotas(){
+  const l = document.getElementById("noteList");
+  l.innerHTML = "";
+  if (state.notas.length === 0){
+    l.innerHTML = '<p class="empty">Aquí puedes anotar lo que quieras recordar.</p>';
+    return;
+  }
+  [...state.notas].sort((a,b) => b.ts - a.ts).forEach((n) => {
+    const it = document.createElement("div");
+    it.className = "item";
+    it.innerHTML =
+      '<div class="item-body"><div class="item-text">' + esc(n.text) + "</div>" +
+      '<div class="item-date">' + fechaCorta(n.ts) + "</div></div>" +
+      '<button class="item-del">Eliminar</button>';
+    it.querySelector(".item-del").onclick = () => {
+      state.notas = state.notas.filter((y) => y.id !== n.id);
+      escribir("notas", JSON.stringify(state.notas));
+      pintarNotas();
+    };
+    l.appendChild(it);
+  });
+}
+function agregarNota(){
+  const el = document.getElementById("noteText");
+  if (!el.value.trim()) return;
+  state.notas.push({ id:id(), text: el.value.trim(), ts: Date.now() });
+  el.value = "";
+  escribir("notas", JSON.stringify(state.notas));
+  pintarNotas();
+}
+
+/**
+ * Respaldo descargable. Sin esto, cambiar de teléfono o limpiar el
+ * navegador borra meses de notas — que en un regalo pensado para
+ * conservarse es justo lo que más duele.
+ */
+function descargarRespaldo(){
+  const datos = {
+    version: 1, guardado: new Date().toISOString(),
+    categoria: CONFIG.categoria, nombre: CONFIG.para || state.nombre,
+    recordatorios: state.recordatorios, notas: state.notas,
+    diario: state.diario, buenas: state.buenas,
+    moodPorDia: state.moodPorDia, meta: state.meta,
+  };
+  const blob = new Blob([JSON.stringify(datos, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "respaldo-" + hoyClave() + ".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+function reiniciar(){
+  if (!confirm("¿Borrar todo y empezar de cero?")) return;
+  ["nombre","recordatorios","notas","diario","buenas","moods","meta","contactos","msgIndex"].forEach((k) => {
+    try{ localStorage.removeItem(CLAVE + k); }catch(e){}
+  });
+  location.reload();
+}
+
+/* ── navegación ─────────────────────────────────────────────────── */
+const TABS = [
+  { id:"hoy",           icono:"",        texto:"Hoy" },
+  { id:"recordatorios", icono:"🔔",      texto:"Recuerda" },
+  { id:"diario",        icono:"",        texto:"" },
+  { id:"notas",         icono:"📝",      texto:"Notas" },
+];
+function pintarNav(){
+  const nav = document.getElementById("nav");
+  nav.innerHTML = "";
+  TABS.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.dataset.tab = t.id;
+    if (i === 0) b.className = "active";
+    const icono = t.id === "hoy" ? TEMA.deco : (t.id === "diario" ? CAT.diarioIcono : t.icono);
+    const texto = t.id === "diario" ? CAT.diarioTab : t.texto;
+    b.innerHTML = '<span class="icon">' + icono + "</span>" + esc(texto);
+    b.onclick = () => verTab(t.id);
+    nav.appendChild(b);
+  });
+}
+function verTab(tab){
+  document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+  document.getElementById("screen-" + tab).classList.add("active");
+  document.querySelectorAll("#nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+  window.scrollTo(0, 0);
+}
+
+/* ── chips por categoría ────────────────────────────────────────── */
+function pintarChips(){
+  const qd = document.getElementById("quickDiario");
+  qd.innerHTML = "";
+  CAT.quickDiario.forEach((t) => {
+    const b = document.createElement("button");
+    b.className = "chip plain"; b.textContent = t;
+    b.onclick = () => agregarDiario(t);
+    qd.appendChild(b);
+  });
+  const otro = document.createElement("button");
+  otro.className = "chip"; otro.textContent = "+ Otro";
+  otro.onclick = otroDiario;
+  qd.appendChild(otro);
+
+  const qr = document.getElementById("quickReminders");
+  qr.innerHTML = "";
+  CAT.quickRecordatorios.forEach(([texto, hora]) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = "+ " + texto + (hora ? ": " + hora.toLowerCase() : "");
+    b.onclick = () => nuevoRecordatorio(texto, hora, false);
+    qr.appendChild(b);
+  });
+}
+
+/* ── contenido de muestra para grabar ───────────────────────────── */
+/* Una app vacía se ve pésima en cámara: sale "aún no tienes nada" en
+   todas las pantallas. En modo demo se llena con contenido que se ve
+   real, SIN guardarlo, para que cada toma arranque idéntica. */
+function cargarDemo(){
+  const d = CAT.demo;
+  const hace = (h) => Date.now() - h * 3600 * 1000;
+  state.recordatorios = d.recordatorios.map(([t, h, done]) => ({ id:id(), text:t, time:h, done }));
+  state.diario = d.diario.map((t, i) => ({ id:id(), text:t, ts:hace(3 + i * 9) }));
+  state.notas  = d.notas.map((t, i) => ({ id:id(), text:t, ts:hace(5 + i * 14) }));
+  state.buenas = d.buenas.map((t, i) => ({ id:id(), text:t, ts:hace(8 + i * 20) }));
+  state.moodPorDia[hoyClave()] = "😊";
+  if (!state.meta) state.meta = CAT.metaDemo || null;
+  if (state.contactos.length === 0) state.contactos = [{ nombre:"Ana", tel:"5215500000000" }];
+  document.getElementById("regrabar").style.display = "block";
+}
+
+/* ── arranque ───────────────────────────────────────────────────── */
+function init(){
+  aplicarTema();
+  document.getElementById("todayDate").textContent = fechaLarga();
+  document.getElementById("goodTitle").textContent = CAT.goodTitulo;
+  document.getElementById("titDiario").textContent = CAT.diarioTitulo;
+  document.getElementById("subDiario").textContent = CAT.diarioSub;
+
+  if (CONFIG.demo){
+    cargarDemo();
+  } else {
+    state.nombre        = leer("nombre") || "";
+    state.recordatorios = leerJson("recordatorios", []);
+    state.notas         = leerJson("notas", []);
+    state.diario        = leerJson("diario", []);
+    state.buenas        = leerJson("buenas", []);
+    state.contactos     = leerJson("contactos", CONFIG.contactos || []);
+    state.moodPorDia    = leerJson("moods", {});
+    state.meta          = leerJson("meta", CONFIG.meta);
+    const gi = parseInt(leer("msgIndex"), 10);
+    state.msgIndex = isNaN(gi) ? diaDelAño() % CAT.mensajes.length : gi % CAT.mensajes.length;
+  }
+  if (CONFIG.demo) state.msgIndex = diaDelAño() % CAT.mensajes.length;
+  state.buenaIndex = 0;
+
+  if (!guardadoOk) mostrarAvisoGuardado();
+
+  pintarNav(); pintarChips(); pintarIntro(); pintarSaludo();
+  pintarMeta(); pintarSiguiente(); pintarMensaje(); pintarMoods();
+  pintarCosaBuena(); pintarRecordatorios(); pintarDiario(); pintarNotas();
+}
+
+init();
+</script>
+</body>
+</html>

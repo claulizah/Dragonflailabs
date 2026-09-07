@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apps de regalo — DragonflAI Labs</title>
+<meta name="description" content="Una app hecha a la medida de alguien que quieres. Con su nombre, tu dedicatoria y lo que necesita a la mano. Desde $499 MXN.">
+<meta property="og:title" content="Una app hecha para una sola persona">
+<meta property="og:description" content="Con su nombre, tu dedicatoria y lo que necesita a la mano. Desde $499 MXN.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   MARCA — cambia estos valores y toda la página se reestiliza.
+   Son los mismos tokens del index.html de dragonflailabs.com.
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  /* Tomados tal cual de index.html de dragonflailabs.com, para que esta
+     página se vea parte del sitio y no algo pegado encima. */
+  --tinta:#201A2E;
+  --tinta-suave:#756B85;
+  --tinta-tenue:#9C93AC;
+  --violeta:#7A4AD6;
+  --violeta-osc:#5F35B0;
+  --coral:#D64A96;
+  --cyan:#24A88A;
+  --fondo:#F8F7F3;
+  --fondo-tenue:#F1EAF3;
+  --superficie:#FFFFFF;
+  --linea:rgba(32,26,46,.08);
+  --ala:linear-gradient(135deg,var(--cyan) 0%,var(--violeta) 55%,var(--coral) 100%);
+  --sombra:0 14px 40px rgba(32,26,46,.10);
+  --radio:16px;
+  --ancho:1080px;
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0; background:var(--fondo); color:var(--tinta);
+  font-family:'Inter',-apple-system,system-ui,sans-serif; font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{ font-family:'Space Grotesk','Inter',sans-serif; font-weight:600; line-height:1.15; text-wrap:balance; margin:0; }
+p{ margin:0; }
+a{ color:var(--violeta); }
+img{ max-width:100%; }
+
+.envoltura{ max-width:var(--ancho); margin:0 auto; padding:0 22px; }
+section{ padding:74px 0; }
+.ojo{ font-size:.76rem; letter-spacing:.16em; text-transform:uppercase; color:var(--violeta); font-weight:700; margin-bottom:12px; }
+
+/* ── barra ── */
+.barra{
+  position:sticky; top:0; z-index:50; background:rgba(251,250,255,.92);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--linea);
+}
+.barra .envoltura{ display:flex; align-items:center; justify-content:space-between; height:62px; gap:16px; }
+.marca{ display:flex; align-items:center; gap:9px; font-weight:700; color:var(--tinta); text-decoration:none; font-size:1.02rem; }
+.marca .bicho{ flex:0 0 auto; display:block; }
+.barra nav{ display:flex; gap:20px; align-items:center; }
+.barra nav a:not(.btn){ color:var(--tinta-suave); text-decoration:none; font-size:.92rem; font-weight:500; }
+.barra nav a:not(.btn):hover{ color:var(--violeta); }
+/* El :not(.btn) no es adorno: sin él, .barra nav a (0,2,1) le gana a .btn
+   (0,1,0) y el botón del menú queda con el texto del mismo color que su fondo. */
+@media (max-width:720px){ .barra nav a:not(.btn){ display:none; } }
+
+/* ── botones ── */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  background:var(--violeta); color:#fff; text-decoration:none; font-weight:600;
+  padding:13px 24px; border-radius:999px; border:none; cursor:pointer;
+  font-family:inherit; font-size:1rem; transition:transform .15s ease, background .15s ease;
+}
+.btn:hover{ background:var(--violeta-osc); transform:translateY(-1px); }
+.btn.chico{ padding:9px 18px; font-size:.9rem; }
+.btn.linea{ background:transparent; color:var(--violeta); border:1.6px solid var(--violeta); }
+.btn.linea:hover{ background:var(--violeta); color:#fff; }
+.btn.wa{ background:var(--cyan); }
+.btn.wa:hover{ background:#2FA786; }
+
+/* ── portada ── */
+.portada{ padding:60px 0 30px; }
+.portada .envoltura{ display:grid; grid-template-columns:1.05fr .95fr; gap:52px; align-items:center; }
+@media (max-width:900px){ .portada .envoltura{ grid-template-columns:1fr; gap:38px; } }
+.portada h1{ font-size:clamp(2.1rem,5vw,3.3rem); margin-bottom:18px; }
+.portada .entrada{ font-size:1.13rem; color:var(--tinta-suave); max-width:46ch; margin-bottom:26px; }
+.acciones{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+.desde{ font-size:.92rem; color:var(--tinta-suave); margin-top:16px; }
+.desde strong{ color:var(--tinta); }
+
+/* ── teléfono ── */
+.tel{
+  width:280px; max-width:100%; margin:0 auto; background:#1C1733;
+  border-radius:34px; padding:9px; box-shadow:var(--sombra);
+}
+.tel .pantalla{
+  border-radius:26px; overflow:hidden; background:#fff;
+  aspect-ratio:9/17.5; position:relative;
+}
+.tel iframe{ width:100%; height:100%; border:0; display:block; }
+.tel .respaldo{
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:24px; gap:10px;
+  background:var(--ala); color:#fff;
+}
+.tel .respaldo .sobre{ font-size:3.4rem; }
+.tel .respaldo .nom{ font-family:'Space Grotesk','Inter',sans-serif; font-size:1.7rem; font-weight:700; }
+.tel .respaldo .peq{ font-size:.86rem; opacity:.86; }
+
+/* ── pasos: sí son una secuencia, por eso van numerados ── */
+.pasos{ display:grid; grid-template-columns:repeat(3,1fr); gap:26px; }
+@media (max-width:820px){ .pasos{ grid-template-columns:1fr; gap:20px; } }
+.paso{ display:flex; gap:16px; align-items:flex-start; }
+.paso .num{
+  flex:0 0 34px; height:34px; border-radius:50%; background:var(--violeta); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.92rem;
+  font-variant-numeric:tabular-nums;
+}
+.paso h3{ font-size:1.06rem; margin-bottom:5px; }
+.paso p{ color:var(--tinta-suave); font-size:.96rem; }
+
+/* ── diseños ── */
+.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+.tab{
+  background:var(--superficie); border:1.6px solid var(--linea); color:var(--tinta-suave);
+  padding:9px 17px; border-radius:999px; font-family:inherit; font-size:.93rem;
+  font-weight:600; cursor:pointer; transition:all .15s ease;
+}
+.tab[aria-selected="true"]{ background:var(--violeta); border-color:var(--violeta); color:#fff; }
+.muestra{ display:grid; grid-template-columns:320px 1fr; gap:44px; align-items:center; }
+@media (max-width:820px){ .muestra{ grid-template-columns:1fr; gap:26px; } }
+.muestra h3{ font-size:1.5rem; margin-bottom:10px; }
+.muestra .para{ color:var(--tinta-suave); margin-bottom:18px; }
+.trae{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:9px; }
+.trae li{ display:flex; gap:10px; align-items:flex-start; font-size:.97rem; }
+.trae .tic{ color:var(--cyan); font-weight:700; flex:0 0 auto; }
+
+/* ── precio ── */
+.precio-caja{
+  background:var(--superficie); border:1px solid var(--linea); border-radius:var(--radio);
+  padding:34px 30px; box-shadow:var(--sombra); max-width:520px;
+}
+.cifra{ display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+.cifra .mon{ font-family:'Space Grotesk','Inter',sans-serif; font-size:3rem; font-weight:700; color:var(--violeta); font-variant-numeric:tabular-nums; }
+.cifra .div{ color:var(--tinta-suave); font-size:.95rem; }
+.incluye{ list-style:none; padding:0; margin:20px 0 26px; display:flex; flex-direction:column; gap:9px; }
+.incluye li{ display:flex; gap:10px; font-size:.97rem; }
+.incluye .tic{ color:var(--cyan); font-weight:700; }
+.extras{ border-top:1px solid var(--linea); padding-top:18px; margin-top:4px; }
+.extras h4{ font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--tinta-suave); margin:0 0 12px; font-weight:700; }
+.extra-fila{ display:flex; justify-content:space-between; gap:14px; font-size:.93rem; padding:5px 0; color:var(--tinta-suave); }
+.extra-fila b{ color:var(--tinta); font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+/* ── preguntas ── */
+.pregunta{ border-bottom:1px solid var(--linea); }
+.pregunta summary{
+  cursor:pointer; padding:17px 0; font-weight:600; font-size:1.02rem;
+  list-style:none; display:flex; justify-content:space-between; gap:16px; align-items:center;
+}
+.pregunta summary::-webkit-details-marker{ display:none; }
+.pregunta summary::after{ content:"+"; color:var(--violeta); font-size:1.4rem; font-weight:400; flex:0 0 auto; }
+.pregunta[open] summary::after{ content:"–"; }
+.pregunta p{ color:var(--tinta-suave); padding:0 0 17px; font-size:.97rem; max-width:68ch; }
+
+/* ── cierre ── */
+.cierre{ background:var(--ala); color:#fff; border-radius:26px; padding:52px 34px; text-align:center; }
+.cierre h2{ font-size:clamp(1.6rem,4vw,2.3rem); margin-bottom:12px; }
+.cierre p{ opacity:.9; max-width:52ch; margin:0 auto 26px; }
+.cierre .btn{ background:#fff; color:var(--violeta-osc); }
+.cierre .btn:hover{ background:#F3F1FF; }
+.cierre .btn.linea{ background:transparent; color:#fff; border-color:rgba(255,255,255,.7); }
+.cierre .btn.linea:hover{ background:rgba(255,255,255,.14); }
+
+footer{ padding:40px 0 60px; color:var(--tinta-suave); font-size:.9rem; border-top:1px solid var(--linea); }
+footer .envoltura{ display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+footer a{ color:var(--tinta-suave); text-decoration:none; margin-left:16px; }
+footer a:hover{ color:var(--violeta); }
+
+:focus-visible{ outline:2.5px solid var(--violeta); outline-offset:3px; border-radius:4px; }
+@media (prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important; } html{ scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <div class="envoltura">
+    <a class="marca" href="/"><img class="bicho" src="logo-mark.png" alt="" width="26" height="26"> DragonflAI Labs</a>
+    <nav>
+      <a href="#disenos">Diseños</a>
+      <a href="#como">Cómo funciona</a>
+      <a href="#precio">Precio</a>
+      <a class="btn chico" href="#precio">Pedir la mía</a>
+    </nav>
+  </div>
+</div>
+
+<section class="portada">
+  <div class="envoltura">
+    <div>
+      <p class="ojo">Apps de regalo</p>
+      <h1>Una app hecha para una sola persona</h1>
+      <p class="entrada">
+        Con su nombre, tu dedicatoria y lo que esa persona necesita tener a la mano.
+        Se abre como un sobre, se guarda en su teléfono como cualquier app, y no
+        necesita descargar nada de ninguna tienda.
+      </p>
+      <div class="acciones">
+        <a class="btn" href="#precio">Pedir la mía</a>
+        <a class="btn linea" href="#disenos">Ver los diseños</a>
+      </div>
+      <p class="desde">Desde <strong>$499 MXN</strong> · lista en 3 días · pago seguro con Stripe</p>
+    </div>
+    <div class="tel">
+      <div class="pantalla">
+        <div class="respaldo" id="respaldoPortada">
+          <div class="sobre">💌</div>
+          <div class="peq" style="letter-spacing:.14em;">PARA</div>
+          <div class="nom">Ana</div>
+          <div class="peq">Alguien te preparó algo.</div>
+        </div>
+        <iframe id="marcoPortada" title="Demostración de la app" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="como" style="background:var(--superficie);border-block:1px solid var(--linea);">
+  <div class="envoltura">
+    <p class="ojo">Cómo funciona</p>
+    <h2 style="font-size:1.9rem;margin-bottom:34px;">Tres pasos, y yo hago el resto</h2>
+    <div class="pasos">
+      <div class="paso">
+        <div class="num">1</div>
+        <div>
+          <h3>Eliges y pagas</h3>
+          <p>Escoges el diseño que va con la ocasión y pagas en línea. Son $499 MXN.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="num">2</div>
+        <div>
+          <h3>Me cuentas de esa persona</h3>
+          <p>Un formulario corto: su nombre, tu dedicatoria, los colores y qué quieres que tenga adentro.</p>
+        </div>
+      </div>
+      <div class="paso">
+        <div class="num">3</div>
+        <div>
+          <h3>Te llega lista para regalar</h3>
+          <p>En 3 días te mando su liga y un código QR para imprimir o mandar por WhatsApp.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="disenos">
+  <div class="envoltura">
+    <p class="ojo">Los diseños</p>
+    <h2 style="font-size:1.9rem;margin-bottom:10px;">Cinco puntos de partida</h2>
+    <p style="color:var(--tinta-suave);max-width:60ch;margin-bottom:26px;">
+      Cada uno cambia los mensajes, las secciones y los colores. Toca uno para verlo funcionando de verdad —
+      no es una imagen, es la app.
+    </p>
+
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="muestra">
+      <div class="tel">
+        <div class="pantalla">
+          <div class="respaldo" id="respaldoMuestra" style="display:none;">
+            <div class="sobre">💌</div><div class="nom">Vista previa</div>
+            <div class="peq">Sube la demo a tu sitio para verla aquí.</div>
+          </div>
+          <iframe id="marcoMuestra" title="Vista previa del diseño"></iframe>
+        </div>
+      </div>
+      <div>
+        <h3 id="mTitulo"></h3>
+        <p class="para" id="mPara"></p>
+        <ul class="trae" id="mTrae"></ul>
+        <a class="btn" href="#precio" style="margin-top:22px;">Quiero esta</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="precio" style="background:var(--superficie);border-block:1px solid var(--linea);">
+  <div class="envoltura">
+    <p class="ojo">Precio</p>
+    <h2 style="font-size:1.9rem;margin-bottom:26px;">Un precio, sin sorpresas</h2>
+    <div class="precio-caja">
+      <div class="cifra"><span class="mon">$499</span><span class="div">MXN · pago único</span></div>
+      <p style="color:var(--tinta-suave);font-size:.95rem;">No es suscripción. Se paga una vez y es de esa persona.</p>
+      <ul class="incluye">
+        <li><span class="tic">✓</span> El diseño que elijas, con su nombre y tu dedicatoria</li>
+        <li><span class="tic">✓</span> Se instala en su teléfono como app, sin tienda ni descargas</li>
+        <li><span class="tic">✓</span> Funciona sin internet una vez abierta</li>
+        <li><span class="tic">✓</span> Liga propia y código QR para imprimir o mandar</li>
+        <li><span class="tic">✓</span> Lista en 3 días</li>
+        <li><span class="tic">✓</span> Un ajuste incluido si algo no quedó como querías</li>
+      </ul>
+      <a class="btn" id="botonPago" href="#" style="width:100%;">Pedir la mía · $499</a>
+      <p style="font-size:.85rem;color:var(--tinta-suave);margin-top:12px;text-align:center;">
+        Pagas con Stripe y enseguida te aparece el formulario para personalizarla.
+      </p>
+      <div class="extras">
+        <h4>Si quieres más</h4>
+        <div class="extra-fila"><span>Tu foto o logo dentro de la app</span><b>+$150</b></div>
+        <div class="extra-fila"><span>Entrega en 24 horas</span><b>+$200</b></div>
+        <div class="extra-fila"><span>Diseño desde cero, no de plantilla</span><b>desde $900</b></div>
+      </div>
+    </div>
+    <p style="margin-top:22px;color:var(--tinta-suave);font-size:.95rem;">
+      ¿Dudas antes de pagar? <a id="ligaWa" href="#">Escríbeme por WhatsApp</a> y lo vemos.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="envoltura" style="max-width:780px;">
+    <p class="ojo">Preguntas</p>
+    <h2 style="font-size:1.9rem;margin-bottom:20px;">Lo que más me preguntan</h2>
+
+    <details class="pregunta">
+      <summary>¿Se descarga de la App Store o Google Play?</summary>
+      <p>No, y eso es a propósito. Le llega una liga; la abre, le da a "Agregar a inicio" y le queda el ícono
+      en su pantalla como cualquier otra app. Sin cuenta, sin contraseña, sin actualizaciones.</p>
+    </details>
+
+    <details class="pregunta">
+      <summary>¿Necesita internet?</summary>
+      <p>Solo la primera vez que la abre. Después funciona sin señal, porque todo lo que escribe se guarda
+      en su propio teléfono.</p>
+    </details>
+
+    <details class="pregunta">
+      <summary>¿Quién puede ver lo que escribe adentro?</summary>
+      <p>Nadie más que ella. Lo que anota no sale de su teléfono: no pasa por mis servidores ni por
+      ningún lado. Yo tampoco lo veo.</p>
+    </details>
+
+    <details class="pregunta">
+      <summary>¿Y si cambia de teléfono?</summary>
+      <p>La app trae un botón para guardar un respaldo antes de cambiarse. La liga sigue funcionando en
+      el teléfono nuevo.</p>
+    </details>
+
+    <details class="pregunta">
+      <summary>¿Puedo pedir algo que no está en los cinco diseños?</summary>
+      <p>Sí. Escríbeme por WhatsApp y me cuentas de quién es y para qué. Si sale de la plantilla, es un
+      diseño desde cero y te paso el precio antes de que pagues nada.</p>
+    </details>
+
+    <details class="pregunta">
+      <summary>¿Por cuánto tiempo va a funcionar la liga?</summary>
+      <p>Mientras yo tenga el sitio en pie, y esa es mi intención de largo plazo. Si algún día tuviera que
+      cerrarlo, te aviso con tiempo y te mando el archivo para que lo guardes o lo subas donde quieras.</p>
+    </details>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="envoltura">
+    <div class="cierre">
+      <h2>¿Para quién es la tuya?</h2>
+      <p>Alguien que está pasando por algo, alguien que cumple años, alguien que empezó un reto,
+      o alguien a quien simplemente quieres mucho.</p>
+      <div class="acciones" style="justify-content:center;">
+        <a class="btn" id="botonPago2" href="#">Pedir la mía · $499</a>
+        <a class="btn linea wa" id="ligaWa2" href="#">Preguntar por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="envoltura">
+    <span>© <span id="anio"></span> DragonflAI Labs · Querétaro, México</span>
+    <span>
+      <a href="mailto:contacto@dragonflailabs.com">contacto@dragonflailabs.com</a>
+      <a id="ligaWa3" href="#">WhatsApp</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   LO ÚNICO QUE TIENES QUE LLENAR
+   ══════════════════════════════════════════════════════════════════ */
+const AJUSTES = {
+  // Pega aquí tu Payment Link de Stripe (Productos → Payment links).
+  // En el link, pon como página de éxito:  .../pedido.html?ok=1
+  // y activa "Pasar el ID de la sesión" para poder casar pago con pedido.
+  stripe: "",
+
+  // Dónde subiste plantilla-regalo.html. Si está junto a este archivo,
+  // déjalo así.
+  demo: "./plantilla-regalo.html",
+
+  whatsapp: "524411310704",
+};
+
+/* ── los cinco diseños ─────────────────────────────────────────── */
+const DISENOS = [
+  { id:"animo", nombre:"Para levantar el ánimo", tema:"mariposa",
+    titulo:"Para levantar el ánimo",
+    para:"Para alguien que está pasando una racha pesada y no siempre lo dice.",
+    trae:["Un mensajito distinto cada día","Cajita de cosas buenas para releer","Recordatorios de lo que se le olvida","Contactos a un toque para cuando no quiere estar sola"] },
+  { id:"salud", nombre:"Acompañamiento", tema:"durazno",
+    titulo:"Acompañamiento en un tratamiento",
+    para:"Para quien tiene que acordarse de citas, estudios y cómo se ha sentido.",
+    trae:["Diario de cómo se siente, listo para compartir con su doctora","Barra de avance del tratamiento","Recordatorios de citas y estudios","Libreta para lo que no quiere olvidar"] },
+  { id:"amor", nombre:"Romántico", tema:"noche",
+    titulo:"Para alguien que quieres",
+    para:"Para un aniversario, una distancia, o porque sí.",
+    trae:["Mensajes tuyos que aparecen cada día","Sus momentos guardados","Los planes que tienen pendientes","Tu dedicatoria al abrir el sobre"] },
+  { id:"reto", nombre:"Un reto personal", tema:"bosque",
+    titulo:"Para quien empezó algo difícil",
+    para:"Un maratón, dejar un vicio, volver al gimnasio, terminar la tesis.",
+    trae:["Barra de avance hacia su meta","Bitácora de cómo le fue cada día","Sus logros guardados","Recordatorios de sus horarios"] },
+  { id:"bebe", nombre:"Nueva mamá", tema:"atardecer",
+    titulo:"Para esta etapa",
+    para:"Embarazo o recién nacido, cuando se te olvida hasta tu nombre.",
+    trae:["Cuenta regresiva semana por semana","Cómo se ha sentido, para la consulta","Recordatorios de vitaminas y citas","Cositas para recordar después"] },
+];
+
+const $ = (s) => document.querySelector(s);
+document.getElementById("anio").textContent = new Date().getFullYear();
+
+/* WhatsApp */
+const waTexto = encodeURIComponent("Hola, vi las apps de regalo en dragonflailabs.com y tengo una duda 😊");
+["ligaWa","ligaWa2","ligaWa3"].forEach((id) => {
+  const a = document.getElementById(id);
+  if (a){ a.href = "https://wa.me/" + AJUSTES.whatsapp + "?text=" + waTexto; a.target = "_blank"; a.rel = "noopener"; }
+});
+
+/* Botón de pago. Sin Payment Link puesto, NO se queda muerto: manda a
+   WhatsApp, que es peor que cobrar solo pero mucho mejor que un botón
+   que no hace nada. */
+["botonPago","botonPago2"].forEach((id) => {
+  const b = document.getElementById(id);
+  if (!b) return;
+  if (AJUSTES.stripe){
+    b.href = AJUSTES.stripe;
+  } else {
+    b.href = "https://wa.me/" + AJUSTES.whatsapp + "?text=" +
+      encodeURIComponent("Hola, quiero pedir una app de regalo 💌");
+    b.target = "_blank"; b.rel = "noopener";
+  }
+});
+
+/* Las vistas previas son la app de verdad, corriendo en un iframe. Si el
+   archivo no está subido todavía, se queda la portada dibujada a mano en
+   vez de un marco en blanco. */
+function demoUrl(diseño, nombre){
+  return AJUSTES.demo + "?para=" + encodeURIComponent(nombre) +
+         "&tema=" + diseño.tema + "&cat=" + diseño.id + "&demo=1";
+}
+function cargarMarco(marcoId, respaldoId, url){
+  const marco = document.getElementById(marcoId);
+  const resp = document.getElementById(respaldoId);
+  let cargo = false;
+  marco.addEventListener("load", () => { cargo = true; if (resp) resp.style.display = "none"; }, { once:true });
+  marco.src = url;
+  setTimeout(() => { if (!cargo && resp) resp.style.display = "flex"; }, 2500);
+}
+
+cargarMarco("marcoPortada", "respaldoPortada", demoUrl(DISENOS[0], "Ana"));
+
+const NOMBRES = { animo:"Ana", salud:"Rosa", amor:"Sofi", reto:"Luis", bebe:"Mar" };
+const tabs = document.getElementById("tabs");
+DISENOS.forEach((d, i) => {
+  const b = document.createElement("button");
+  b.className = "tab"; b.textContent = d.nombre; b.type = "button";
+  b.setAttribute("role", "tab");
+  b.setAttribute("aria-selected", i === 0 ? "true" : "false");
+  b.onclick = () => mostrar(i);
+  tabs.appendChild(b);
+});
+function mostrar(i){
+  const d = DISENOS[i];
+  [...tabs.children].forEach((b, j) => b.setAttribute("aria-selected", j === i ? "true" : "false"));
+  $("#mTitulo").textContent = d.titulo;
+  $("#mPara").textContent = d.para;
+  $("#mTrae").innerHTML = d.trae.map((t) => '<li><span class="tic">✓</span><span>' + t + "</span></li>").join("");
+  cargarMarco("marcoMuestra", "respaldoMuestra", demoUrl(d, NOMBRES[d.id]));
+}
+mostrar(0);
+</script>
+</body>
+</html>
