@@ -1,0 +1,11 @@
+REPO:  github.com/claulizah/Dragonflailabs
+SITIO: dragonflailabs.com
+TOKEN: 7517bb080d8646569c047d6b1b482162
+
+Estos 2 archivos llevan la analítica de DragonflAI Labs.
+
+  index.html   -> a la RAIZ del repo   (pagina de las apps de regalo)
+  pedido.html  -> a la RAIZ del repo   (formulario despues del pago)
+
+OJO: el index.html de esta carpeta es el de las APPS DE REGALO.
+     NO lo subas al repo Ensenai.
