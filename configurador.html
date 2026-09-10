@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurador — DragonflAI Labs (uso interno)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F3F8; --card:#FFFFFF; --plum:#6B5B95; --plum-dark:#4E4270;
+    --text:#332E45; --text-soft:#7A748F; --border:#E3E0EE; --ok:#3F8F6B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); font-family:'Work Sans',sans-serif; color:var(--text);}
+  h1,h2,.display{font-family:'Fraunces',serif; font-weight:600;}
+  #wrap{max-width:640px; margin:0 auto; padding:36px 20px 60px;}
+  h1{font-size:1.6rem; color:var(--plum-dark); margin:0 0 4px;}
+  .subtitle{color:var(--text-soft); font-size:0.95rem; margin:0 0 28px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px; margin-bottom:20px;}
+  .card h2{font-size:1.1rem; margin:0 0 4px; color:var(--plum-dark);}
+  .card .hint{font-size:0.85rem; color:var(--text-soft); margin:0 0 16px;}
+  label{display:block; font-size:0.85rem; font-weight:600; color:var(--text-soft); margin:14px 0 6px;}
+  label:first-of-type{margin-top:0;}
+  input[type="text"], input[type="date"], input[type="number"], select{
+    width:100%; padding:11px 13px; border-radius:10px; border:1.5px solid var(--border);
+    font-family:inherit; font-size:0.95rem; background:#fff;
+  }
+  .drop{
+    border:2px dashed var(--border); border-radius:14px; padding:26px 16px;
+    text-align:center; cursor:pointer; transition:border-color .15s;
+  }
+  .drop:hover, .drop.drag{ border-color:var(--plum); }
+  .drop input{display:none;}
+  .drop .filename{font-weight:600; color:var(--plum-dark); margin-top:8px; font-size:0.9rem;}
+  .drop .icon{font-size:1.8rem;}
+  .drop p{margin:6px 0 0; color:var(--text-soft); font-size:0.88rem;}
+  .row2{display:flex; gap:12px;}
+  .row2 > div{flex:1;}
+  button.primary{
+    width:100%; background:var(--plum); color:#fff; border:none; border-radius:12px;
+    padding:14px; font-size:1rem; font-weight:700; font-family:inherit; cursor:pointer; margin-top:6px;
+  }
+  button.primary:disabled{background:#C9C4DC; cursor:not-allowed;}
+  button.primary:not(:disabled):active{background:var(--plum-dark);}
+  .status{
+    margin-top:14px; padding:12px 14px; border-radius:10px; font-size:0.9rem;
+    display:none;
+  }
+  .status.ok{ background:#E9F5EF; color:var(--ok); display:block; }
+  .status.err{ background:#FBEAEA; color:#B0453F; display:block; }
+  .opt-block{
+    border-top:1px solid var(--border); margin-top:18px; padding-top:16px;
+  }
+  .opt-block .toggle-row{display:flex; align-items:center; gap:8px; cursor:pointer;}
+  .opt-block .toggle-row input{width:auto;}
+  .opt-fields{display:none; margin-top:10px;}
+  .opt-fields.show{display:block;}
+  footer{text-align:center; color:var(--text-soft); font-size:0.8rem; margin-top:10px;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>Configurador de apps-regalo</h1>
+  <p class="subtitle">Solo para ti — sube una plantilla, llena los datos y descarga el archivo ya personalizado.</p>
+
+  <div class="card">
+    <h2>1. Plantilla base</h2>
+    <p class="hint">Sube el archivo .html de la plantilla que vas a personalizar.</p>
+    <div class="drop" id="dropZone">
+      <div class="icon">📄</div>
+      <p>Toca para elegir el archivo, o arrástralo aquí</p>
+      <div class="filename" id="fileName"></div>
+      <input type="file" id="fileInput" accept=".html">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Datos de la persona</h2>
+    <p class="hint">Con esto ya no le va a preguntar el nombre al abrirla.</p>
+    <label for="nameInput">Nombre de quien la va a usar *</label>
+    <input type="text" id="nameInput" placeholder="Ej. Jeanet">
+
+    <div class="opt-block">
+      <label class="toggle-row"><input type="checkbox" id="toggleDate"> Tiene cuenta regresiva (romántico / cuenta regresiva)</label>
+      <div class="opt-fields" id="dateFields">
+        <label for="eventName">Nombre del evento</label>
+        <input type="text" id="eventName" placeholder="Ej. Nuestro reencuentro">
+        <label for="eventDate">Fecha</label>
+        <input type="date" id="eventDate">
+      </div>
+    </div>
+
+    <div class="opt-block">
+      <label class="toggle-row"><input type="checkbox" id="toggleGoal"> Tiene meta de días (reto personal)</label>
+      <div class="opt-fields" id="goalFields">
+        <label for="goalName">Nombre del reto</label>
+        <input type="text" id="goalName" placeholder="Ej. Maratón CDMX">
+        <div class="row2">
+          <div>
+            <label for="goalCurrent">Día actual</label>
+            <input type="number" id="goalCurrent" min="1" value="1">
+          </div>
+          <div>
+            <label for="goalTotal">Total de días</label>
+            <input type="number" id="goalTotal" min="1" value="30">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="primary" id="generateBtn" disabled>Generar app personalizada</button>
+  <div class="status" id="status"></div>
+
+  <footer>Uso interno · DragonflAI Labs</footer>
+</div>
+
+<script>
+let fileContent = null;
+let fileBaseName = 'app';
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const fileNameEl = document.getElementById('fileName');
+const generateBtn = document.getElementById('generateBtn');
+const statusEl = document.getElementById('status');
+const nameInput = document.getElementById('nameInput');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('drag');
+  if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', (e) => {
+  if(e.target.files.length) handleFile(e.target.files[0]);
+});
+
+function handleFile(file){
+  if(!file.name.endsWith('.html')){
+    showStatus('Ese archivo no es un .html, sube la plantilla correcta.', 'err');
+    return;
+  }
+  fileBaseName = file.name.replace(/\.html$/, '');
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    fileContent = ev.target.result;
+    fileNameEl.textContent = '✓ ' + file.name;
+    checkReady();
+  };
+  reader.onerror = () => showStatus('No se pudo leer el archivo, intenta de nuevo.', 'err');
+  reader.readAsText(file);
+}
+
+nameInput.addEventListener('input', checkReady);
+function checkReady(){
+  generateBtn.disabled = !(fileContent && nameInput.value.trim());
+}
+
+document.getElementById('toggleDate').addEventListener('change', (e) => {
+  document.getElementById('dateFields').classList.toggle('show', e.target.checked);
+});
+document.getElementById('toggleGoal').addEventListener('change', (e) => {
+  document.getElementById('goalFields').classList.toggle('show', e.target.checked);
+});
+
+function showStatus(msg, type){
+  statusEl.textContent = msg;
+  statusEl.className = 'status ' + type;
+}
+
+function jsEscape(str){
+  return String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+generateBtn.addEventListener('click', () => {
+  if(!fileContent) return;
+  let out = fileContent;
+  const name = nameInput.value.trim();
+
+  // Nombre preconfigurado
+  const presetPattern = /const PRESET_NAME = "[^"]*";/;
+  if(presetPattern.test(out)){
+    out = out.replace(presetPattern, `const PRESET_NAME = "${jsEscape(name)}";`);
+  } else {
+    showStatus('Ojo: esta plantilla no tiene la configuración PRESET_NAME (puede ser una versión antigua). Descarga de todas formas y revisa.', 'err');
+  }
+
+  // Cuenta regresiva, si aplica
+  if(document.getElementById('toggleDate').checked){
+    const evName = document.getElementById('eventName').value.trim();
+    const evDate = document.getElementById('eventDate').value;
+    if(evName && evDate){
+      const cdPattern = /countdown:\s*\{\s*name:\s*"[^"]*",\s*date:\s*"[^"]*"\s*\}/;
+      if(cdPattern.test(out)){
+        out = out.replace(cdPattern, `countdown: { name: "${jsEscape(evName)}", date: "${jsEscape(evDate)}" }`);
+      }
+    }
+  }
+
+  // Meta de reto, si aplica
+  if(document.getElementById('toggleGoal').checked){
+    const gName = document.getElementById('goalName').value.trim();
+    const gCurrent = parseInt(document.getElementById('goalCurrent').value, 10) || 1;
+    const gTotal = parseInt(document.getElementById('goalTotal').value, 10) || 30;
+    if(gName){
+      const goalPattern = /goal:\s*\{\s*name:\s*"[^"]*",\s*current:\s*\d+,\s*total:\s*\d+\s*\}/;
+      if(goalPattern.test(out)){
+        out = out.replace(goalPattern, `goal: { name: "${jsEscape(gName)}", current: ${gCurrent}, total: ${gTotal} }`);
+      }
+    }
+  }
+
+  const blob = new Blob([out], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const safeName = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${fileBaseName}-${safeName || 'app'}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showStatus(`Listo — se descargó como "${fileBaseName}-${safeName || 'app'}.html". Ya puedes subirlo a Netlify.`, 'ok');
+});
+</script>
+</body>
+</html>
