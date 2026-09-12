@@ -291,24 +291,22 @@ footer a:hover{ color:var(--violeta); }
     <p class="ojo">Precio</p>
     <h2 style="font-size:1.9rem;margin-bottom:26px;">Un precio, sin sorpresas</h2>
     <div class="precio-caja">
-      <div class="cifra"><span class="mon">$499</span><span class="div">MXN · pago único</span></div>
+      <div class="cifra-calc" id="calculadoraPrecio"><div style="background:var(--fondo);border:1.5px dashed var(--violeta);border-radius:12px;padding:10px 14px;margin-bottom:18px;font-size:.9rem;text-align:center;">🪽 Usa el código <strong>VUELA30</strong> y llévate 30% de descuento — cupos limitados a los primeros 20 pedidos</div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;"><span style="font-size:1rem;color:var(--tinta-suave);">Total</span><span id="calcTotal" style="font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--tinta);">$499</span></div></div>
       <p style="color:var(--tinta-suave);font-size:.95rem;">No es suscripción. Se paga una vez y es de esa persona.</p>
       <ul class="incluye">
         <li><span class="tic">✓</span> El diseño que elijas, con su nombre y tu dedicatoria</li>
         <li><span class="tic">✓</span> Se instala en su teléfono como app, sin tienda ni descargas</li>
-        <li><span class="tic">✓</span> Funciona sin internet una vez abierta</li>
+        <li><span class="tic">✓</span> Necesita conexión para abrir, pero lo que escribe adentro se guarda en su teléfono</li>
         <li><span class="tic">✓</span> Liga propia y código QR para imprimir o mandar</li>
         <li><span class="tic">✓</span> Lista en 3 días</li>
         <li><span class="tic">✓</span> Un ajuste incluido si algo no quedó como querías</li>
       </ul>
-      <a class="btn" id="botonPago" href="#" style="width:100%;">Pedir la mía · $499</a>
+      <label style="display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--linea);cursor:pointer;"><input type="checkbox" id="extraLogo" style="width:20px;height:20px;accent-color:var(--violeta);cursor:pointer;"><span style="flex:1;">Tu foto o logo en la app</span><span style="color:var(--tinta-suave);">+$150</span></label><label style="display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);cursor:pointer;"><input type="checkbox" id="extraExpress" style="width:20px;height:20px;accent-color:var(--violeta);cursor:pointer;"><span style="flex:1;">Entrega express (24h)</span><span style="color:var(--tinta-suave);">+$200</span></label><a id="calcBotonPagar" class="btn" href="https://buy.stripe.com/7sYbJ2bds0Yq7EYdXBdEs0j" target="_blank" rel="noopener" style="width:100%;display:block;text-align:center;margin-top:22px;">Pedir la mía</a><script>(function(){var L={base:"https://buy.stripe.com/7sYbJ2bds0Yq7EYdXBdEs0j",logo:"https://buy.stripe.com/fZucN63L0fTk1gA1aPdEs0k",express:"https://buy.stripe.com/14A4gA3L0cH87EY1aPdEs0l",both:"https://buy.stripe.com/4gMfZi4P49uW0cw7zddEs0m"};var cl=document.getElementById('extraLogo');var ce=document.getElementById('extraExpress');var t=document.getElementById('calcTotal');var b=document.getElementById('calcBotonPagar');function u(){var p=499;if(cl.checked)p+=150;if(ce.checked)p+=200;t.textContent="$"+p;var l=L.base;if(cl.checked&&ce.checked)l=L.both;else if(cl.checked)l=L.logo;else if(ce.checked)l=L.express;b.href=l;}cl.addEventListener('change',u);ce.addEventListener('change',u);})();</script>
       <p style="font-size:.85rem;color:var(--tinta-suave);margin-top:12px;text-align:center;">
         Pagas con Stripe y enseguida te aparece el formulario para personalizarla.
       </p>
       <div class="extras">
         <h4>Si quieres más</h4>
-        <div class="extra-fila"><span>Tu foto o logo dentro de la app</span><b>+$150</b></div>
-        <div class="extra-fila"><span>Entrega en 24 horas</span><b>+$200</b></div>
         <div class="extra-fila"><span>Diseño desde cero, no de plantilla</span><b>desde $900</b></div>
       </div>
     </div>
