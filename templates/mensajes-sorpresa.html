@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mensajes sorpresa 🎉</title>
+<meta name="theme-color" content="#B9633C">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Mensajes%20sorpresa%22%2C%22short_name%22%3A%22Sorpresa%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%22%2C%22background_color%22%3A%22%23FBF4EE%22%2C%22theme_color%22%3A%22%23B9633C%22%7D">
+<style>
+  :root{
+    --bg: #FBF4EE;
+    --card: #FFFFFF;
+    --plum: #C97A45;
+    --plum-dark: #B9633C;
+    --sage: #7E9E82;
+    --marigold: #C6A23A;
+    --rose: #C97A6E;
+    --text: #3A2E26;
+    --text-soft: #93816F;
+    --border: #EFE1D4;
+    --grad-flag: linear-gradient(120deg, var(--plum), var(--plum-dark));
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; min-height:100%; background:var(--bg); }
+  body{ font-family: 'Inter', Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; }
+  h1,h2,h3{ font-family: Georgia, serif; margin:0; }
+
+  .intro-overlay{
+    position:fixed; inset:0; background: var(--grad-flag); color:#fff;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:32px; z-index:50; overflow:hidden;
+  }
+  .intro-emoji{ font-size:4.5rem; animation: float 3s ease-in-out infinite; margin-bottom:14px; }
+  @keyframes float{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-14px);} }
+  .intro-title{ font-size:1.6rem; margin:6px 0 4px; }
+  .intro-sub{ opacity:.85; margin-bottom:28px; }
+  .intro-btn{
+    background:#fff; color: var(--plum-dark); border:none; padding:14px 28px;
+    border-radius:14px; font-weight:700; font-size:1rem; cursor:pointer;
+  }
+
+  #app{ display:none; max-width:520px; margin:0 auto; padding-bottom:90px; }
+  header{ padding:22px 20px 6px; }
+  header .greet{ font-size:1.4rem; margin-bottom:2px; }
+  header .sub{ color: var(--text-soft); font-size:.92rem; }
+
+  main{ padding: 8px 20px 20px; }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .section-title{ font-size:1.25rem; margin-top:18px; }
+  .section-rule{ height:1px; background: var(--border); margin:10px 0 16px; }
+  .empty{ color: var(--text-soft); font-size:.92rem; }
+
+  .card{
+    background: var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:18px; margin-bottom:16px;
+  }
+
+  .countdown-card{ text-align:center; }
+  .countdown-card h3{ font-size:1.1rem; color: var(--text-soft); font-weight:600; margin-bottom:4px; }
+  .countdown-num{ font-size:3.2rem; font-weight:700; color: var(--plum-dark); font-family: Georgia, serif; line-height:1; }
+  .countdown-label{ color: var(--text-soft); font-size:.9rem; margin-top:4px; }
+  .edit-link{ background:none; border:none; color: var(--plum-dark); font-size:.85rem; text-decoration:underline; cursor:pointer; padding:6px; }
+
+  .msg-card p{ font-size:1.05rem; line-height:1.5; margin:0 0 10px; }
+  .btn-ghost{
+    background:none; border:1.5px solid var(--plum); color: var(--plum-dark);
+    padding:10px 16px; border-radius:12px; font-weight:600; cursor:pointer; font-size:.92rem;
+  }
+  .btn-solid{
+    background: var(--grad-flag); border:none; color:#fff;
+    padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:.95rem;
+  }
+
+  nav{
+    position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--border);
+    display:flex; max-width:520px; margin:0 auto; z-index:20;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  nav button{
+    flex:1; min-width:0; background:none; padding:9px 2px 11px;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    color: var(--text-soft); font-size:.62rem; font-weight:700; letter-spacing:.02em;
+    text-transform:uppercase; border:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  nav button.active{ color: var(--plum-dark); }
+  nav .icon{ font-size:1.25rem; }
+
+  .add-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .add-row input, .add-row textarea{
+    width:100%; border:1.5px solid var(--border); border-radius:10px; padding:10px 12px;
+    font-size:.95rem; font-family:inherit; background:#fff; color:var(--text);
+  }
+  .add-row textarea{ min-height:70px; resize:vertical; }
+
+  .item{ display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid var(--border); }
+  .item-body{ flex:1; min-width:0; }
+  .item-text{ font-size:.98rem; }
+  .item-text.done{ text-decoration:line-through; color: var(--text-soft); }
+  .check{
+    width:26px; height:26px; border-radius:50%; border:2px solid var(--sage);
+    display:flex; align-items:center; justify-content:center; font-size:.85rem; color:var(--sage);
+    flex-shrink:0; cursor:pointer;
+  }
+  .check.done{ background: var(--sage); color:#fff; }
+  .item-del{ background:none; border:none; color: var(--rose); font-size:.82rem; cursor:pointer; }
+
+  .mensaje-card{ display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--border); }
+  .mensaje-icon{
+    width:52px; height:52px; border-radius:12px; flex-shrink:0; font-size:1.4rem;
+    background: var(--border); display:flex; align-items:center; justify-content:center;
+  }
+  .mensaje-info{ flex:1; min-width:0; }
+  .mensaje-nombre{ font-weight:700; color: var(--plum-dark); margin-bottom:2px; }
+  .mensaje-texto{ font-size:.92rem; color: var(--text-soft); }
+
+  .estado-banner{
+    background: var(--border); border-radius:12px; padding:10px 14px; font-size:.9rem;
+    margin-bottom:14px; text-align:center;
+  }
+  .estado-banner.revelado{ background: var(--marigold); color:#fff; font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="intro-overlay" id="introOverlay" onclick="openIntro()">
+  <div class="intro-emoji">🎉</div>
+  <p class="intro-title" id="introTitle">Para ti</p>
+  <p class="intro-sub">Un regalo de varias personas que te quieren &middot; solo tuyo</p>
+  <button class="intro-btn" onclick="openIntro()">Toca para abrir</button>
+</div>
+
+<div id="app">
+  <header>
+    <p class="greet" id="greeting">Hola 👋</p>
+    <p class="sub">Hecho especialmente para ti</p>
+  </header>
+
+  <main>
+
+    <!-- HOY -->
+    <section class="screen active" id="screen-hoy">
+      <div class="card countdown-card">
+        <h3 id="cdTitle">Tu día especial</h3>
+        <div class="countdown-num" id="cdNum">--</div>
+        <div class="countdown-label" id="cdLabel">días</div>
+        <button class="edit-link" onclick="editCountdown()">editar fecha</button>
+      </div>
+
+      <div class="card msg-card">
+        <p id="dailyMessage">...</p>
+        <button class="btn-ghost" onclick="shuffleMessage()">Otro mensajito ✨</button>
+      </div>
+
+      <div id="mensajesPreviewBox"></div>
+    </section>
+
+    <!-- RECORDATORIOS -->
+    <section class="screen" id="screen-recordatorios">
+      <h2 class="section-title">Recordatorios</h2>
+      <div class="section-rule"></div>
+      <div class="add-row">
+        <input id="reminderText" type="text" placeholder="¿Qué quieres recordar?">
+        <button class="btn-solid" style="width:100%;" onclick="addReminder()">Agregar</button>
+      </div>
+      <div id="reminderList"></div>
+    </section>
+
+    <!-- MENSAJES SORPRESA -->
+    <section class="screen" id="screen-mensajes">
+      <h2 class="section-title">Mensajes sorpresa 💌</h2>
+      <div class="section-rule"></div>
+      <p class="estado-banner" id="mensajesEstado">Se revelan el día de tu festejo.</p>
+      <div class="add-row">
+        <input id="mensajeNombre" type="text" placeholder="Nombre de quien escribe">
+        <textarea id="mensajeTexto" placeholder="Mensaje para el festejado/a..."></textarea>
+        <button class="btn-solid" style="width:100%;" onclick="addMensajeSorpresa()">Agregar mensaje</button>
+      </div>
+      <div id="mensajesList"></div>
+      <button class="edit-link" style="display:block; margin:16px auto 0;" onclick="exportarMensajesSorpresa()">Fijar mensajes en el código</button>
+    </section>
+
+    <!-- NOTAS -->
+    <section class="screen" id="screen-notas">
+      <h2 class="section-title">Tu libreta</h2>
+      <div class="section-rule"></div>
+      <div class="add-row">
+        <textarea id="noteText" placeholder="Escribe lo que quieras..."></textarea>
+        <button class="btn-solid" style="width:100%;" onclick="addNote()">Guardar nota</button>
+      </div>
+      <div id="noteList"></div>
+      <button class="edit-link" style="display:block; margin:24px auto 0;" onclick="resetApp()">Reiniciar app (borra todo)</button>
+    </section>
+
+  </main>
+
+  <nav>
+    <button class="active" data-tab="hoy" onclick="showTab('hoy')">
+      <span class="icon">🎉</span>Hoy
+    </button>
+    <button data-tab="recordatorios" onclick="showTab('recordatorios')">
+      <span class="icon">🔔</span>Recuerda
+    </button>
+    <button data-tab="mensajes" onclick="showTab('mensajes')">
+      <span class="icon">💌</span>Mensajes
+    </button>
+    <button data-tab="notas" onclick="showTab('notas')">
+      <span class="icon">📝</span>Notas
+    </button>
+  </nav>
+</div>
+
+<script>
+/* ============================================================
+   LO ÚNICO QUE HAY QUE LLENAR ANTES DE ENTREGAR CADA PEDIDO
+   ============================================================ */
+const PRESET_NAME = "";           // nombre del festejado, ej. "Vale"
+const PRESET_FESTEJO = "";        // ej. "Tu graduación", "Tu cumpleaños"
+const PRESET_FECHA = "";          // AAAA-MM-DD
+
+// Pega aquí lo que exportes desde el botón "Fijar mensajes en el código"
+// (dentro de la pestaña Mensajes) para que el festejado vea todos los
+// mensajes desde que abra la app la primera vez.
+const PRESET_MENSAJES_SORPRESA = [];
+
+/* ============================================================ */
+
+const APP_PREFIX = 'app-sorpresa-';
+
+async function safeGet(key){
+  try{ return localStorage.getItem(APP_PREFIX + key); }catch(e){ return null; }
+}
+async function safeSet(key, value){
+  try{ localStorage.setItem(APP_PREFIX + key, value); }catch(e){}
+}
+
+const MESSAGES = [
+  "Hay gente que te quiere celebrando este momento contigo, aunque no la veas ahorita.",
+  "Cada quien que te escribió aquí, lo hizo pensando en ti con cariño.",
+  "Falta menos para el día — disfruta también la espera.",
+  "Este ratito es solo tuyo, tómate tu tiempo para abrirlo.",
+  "Alguien pensó que merecías algo hecho solo para ti. Y tenía razón.",
+  "La cuenta regresiva también es parte bonita de la sorpresa.",
+  "Cada persona que dejó un mensaje aquí, se tomó un momento solo por ti.",
+  "Ya casi es tu día — se nota que te quieren celebrar bien.",
+  "No tienes que hacer nada, solo disfrutar lo que se armó para ti.",
+  "Guarda este momento, es más especial de lo que crees.",
+  "Falta poquito para que veas todo lo que prepararon para ti.",
+  "Hoy es un buen día para sentirte querido/a, aunque falte para el grande.",
+  "Cada tache en la cuenta regresiva te acerca a algo que armaron con cariño.",
+  "No estás solo/a en este momento — hay gente celebrando contigo desde ya.",
+  "Ya casi llega el día que tanto se merece festejarse."
+];
+
+let state = { name: "", reminders: [], notes: [], mensajes: [], currentMsgIndex: 0, countdown: { name: "Tu día especial", date: "" }, messagePool: [] };
+
+function dayOfYear(){
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function openIntro(){
+  document.getElementById('introOverlay').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+function showTab(tab){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.querySelector(`nav button[data-tab="${tab}"]`).classList.add('active');
+}
+
+async function init(){
+  const name = await safeGet('name');
+  const reminders = await safeGet('reminders');
+  const notes = await safeGet('notes');
+  const mensajes = await safeGet('mensajes');
+  const countdown = await safeGet('countdown');
+
+  state.name = name || PRESET_NAME || "";
+  if(!name && PRESET_NAME){ await safeSet('name', PRESET_NAME); }
+
+  try{ state.reminders = reminders ? JSON.parse(reminders) : []; }catch(e){ state.reminders = []; }
+  try{ state.notes = notes ? JSON.parse(notes) : []; }catch(e){ state.notes = []; }
+
+  try{ state.mensajes = mensajes ? JSON.parse(mensajes) : []; }catch(e){ state.mensajes = []; }
+  if(state.mensajes.length === 0 && PRESET_MENSAJES_SORPRESA.length > 0){
+    state.mensajes = PRESET_MENSAJES_SORPRESA;
+    await safeSet('mensajes', JSON.stringify(state.mensajes));
+  }
+
+  const presetCountdown = { name: PRESET_FESTEJO || "Tu día especial", date: PRESET_FECHA || "" };
+  try{ state.countdown = countdown ? JSON.parse(countdown) : presetCountdown; }catch(e){ state.countdown = presetCountdown; }
+  if(!countdown && (PRESET_FESTEJO || PRESET_FECHA)){
+    await safeSet('countdown', JSON.stringify(state.countdown));
+  }
+
+  state.messagePool = MESSAGES;
+  state.currentMsgIndex = dayOfYear() % state.messagePool.length;
+
+  renderGreeting();
+  renderCountdown();
+  renderMessage();
+  renderReminders();
+  renderNotes();
+  renderMensajesSorpresa();
+}
+
+function renderGreeting(){
+  const nombre = state.name ? state.name : '';
+  document.getElementById('greeting').textContent = nombre ? `Hola, ${nombre} 👋` : 'Hola 👋';
+  document.getElementById('introTitle').textContent = nombre ? `Para ${nombre}` : 'Para ti';
+}
+
+function renderMessage(){
+  document.getElementById('dailyMessage').textContent = state.messagePool[state.currentMsgIndex];
+}
+function shuffleMessage(){
+  let next;
+  do{ next = Math.floor(Math.random() * state.messagePool.length); }while(next === state.currentMsgIndex && state.messagePool.length > 1);
+  state.currentMsgIndex = next;
+  renderMessage();
+}
+
+function renderCountdown(){
+  document.getElementById('cdTitle').textContent = state.countdown.name || 'Tu día especial';
+  const numEl = document.getElementById('cdNum');
+  const labelEl = document.getElementById('cdLabel');
+  if(!state.countdown.date){
+    numEl.textContent = '--';
+    labelEl.textContent = 'toca "editar fecha" para ponerla';
+    return;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(state.countdown.date + 'T00:00:00');
+  const diffDays = Math.round((target - today) / 86400000);
+  if(diffDays > 0){
+    numEl.textContent = diffDays;
+    labelEl.textContent = diffDays === 1 ? 'día para el gran día' : 'días para el gran día';
+  } else if(diffDays === 0){
+    numEl.textContent = '🎉';
+    labelEl.textContent = '¡Hoy es el día!';
+  } else {
+    numEl.textContent = '✨';
+    labelEl.textContent = 'ya pasó, esperamos que la hayas pasado increíble';
+  }
+}
+
+async function editCountdown(){
+  const name = prompt('¿Cómo se llama esta fecha? (graduación, cumpleaños, etc.)', state.countdown.name);
+  if(name === null) return;
+  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || new Date().toISOString().slice(0,10));
+  if(date === null) return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())){ alert('Formato de fecha inválido, usa AAAA-MM-DD'); return; }
+  state.countdown = { name: name.trim() || 'Tu día especial', date: date.trim() };
+  await safeSet('countdown', JSON.stringify(state.countdown));
+  renderCountdown();
+  renderMensajesSorpresa();
+}
+
+function isCountdownReached(){
+  if(!state.countdown.date) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(state.countdown.date + 'T00:00:00');
+  return today >= target;
+}
+
+/* RECORDATORIOS */
+async function addReminder(){
+  const el = document.getElementById('reminderText');
+  const text = el.value.trim();
+  if(!text) return;
+  state.reminders.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, done:false });
+  el.value = '';
+  await safeSet('reminders', JSON.stringify(state.reminders));
+  renderReminders();
+}
+function renderReminders(){
+  const list = document.getElementById('reminderList');
+  list.innerHTML = '';
+  if(state.reminders.length === 0){
+    list.innerHTML = '<p class="empty">No tienes recordatorios todavía.</p>';
+    return;
+  }
+  state.reminders.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="check ${r.done ? 'done' : ''}">${r.done ? '✓' : ''}</div>
+      <div class="item-body"><div class="item-text ${r.done ? 'done' : ''}">${escapeHtml(r.text)}</div></div>
+      <button class="item-del">Eliminar</button>
+    `;
+    item.querySelector('.check').onclick = () => toggleReminder(r.id);
+    item.querySelector('.item-del').onclick = () => deleteReminder(r.id);
+    list.appendChild(item);
+  });
+}
+async function toggleReminder(id){
+  const r = state.reminders.find(x => x.id === id);
+  if(r){ r.done = !r.done; }
+  await safeSet('reminders', JSON.stringify(state.reminders));
+  renderReminders();
+}
+async function deleteReminder(id){
+  state.reminders = state.reminders.filter(x => x.id !== id);
+  await safeSet('reminders', JSON.stringify(state.reminders));
+  renderReminders();
+}
+
+/* NOTAS */
+async function addNote(){
+  const el = document.getElementById('noteText');
+  const text = el.value.trim();
+  if(!text) return;
+  state.notes.unshift({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, date: new Date().toLocaleDateString('es-MX', {day:'numeric', month:'short'}) });
+  el.value = '';
+  await safeSet('notes', JSON.stringify(state.notes));
+  renderNotes();
+}
+function renderNotes(){
+  const list = document.getElementById('noteList');
+  list.innerHTML = '';
+  if(state.notes.length === 0){
+    list.innerHTML = '<p class="empty">Aún no escribes nada aquí.</p>';
+    return;
+  }
+  state.notes.forEach(n => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="item-body">
+        <div class="item-text">${escapeHtml(n.text)}</div>
+        <div style="font-size:.78rem; color:var(--text-soft); margin-top:2px;">${n.date}</div>
+      </div>
+      <button class="item-del">Eliminar</button>
+    `;
+    item.querySelector('.item-del').onclick = () => deleteNote(n.id);
+    list.appendChild(item);
+  });
+}
+async function deleteNote(id){
+  state.notes = state.notes.filter(x => x.id !== id);
+  await safeSet('notes', JSON.stringify(state.notes));
+  renderNotes();
+}
+
+/* MENSAJES SORPRESA (varios → uno, sellados hasta la fecha) */
+async function addMensajeSorpresa(){
+  const nombreEl = document.getElementById('mensajeNombre');
+  const textoEl = document.getElementById('mensajeTexto');
+  const nombre = nombreEl.value.trim();
+  const mensaje = textoEl.value.trim();
+  if(!nombre || !mensaje){ alert('Ponle nombre y un mensaje.'); return; }
+  state.mensajes.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), nombre, mensaje });
+  nombreEl.value = ''; textoEl.value = '';
+  await safeSet('mensajes', JSON.stringify(state.mensajes));
+  renderMensajesSorpresa();
+}
+
+function renderMensajesSorpresa(){
+  const list = document.getElementById('mensajesList');
+  const estado = document.getElementById('mensajesEstado');
+  const preview = document.getElementById('mensajesPreviewBox');
+  const revelado = isCountdownReached();
+
+  estado.textContent = revelado
+    ? '¡Ya es el día! Todos los mensajes están desbloqueados 🎉'
+    : `Se revelan el ${state.countdown.date ? new Date(state.countdown.date + 'T00:00:00').toLocaleDateString('es-MX', {day:'numeric', month:'long'}) : 'día de tu festejo'}.`;
+  estado.classList.toggle('revelado', revelado);
+
+  list.innerHTML = '';
+  if(state.mensajes.length === 0){
+    list.innerHTML = '<p class="empty">Aún no hay mensajes agregados.</p>';
+  } else {
+    state.mensajes.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'mensaje-card';
+      card.innerHTML = revelado
+        ? `<div class="mensaje-icon">💌</div>
+           <div class="mensaje-info">
+             <div class="mensaje-nombre">${escapeHtml(m.nombre)}</div>
+             <div class="mensaje-texto">${escapeHtml(m.mensaje)}</div>
+           </div>
+           <button class="item-del" style="align-self:flex-start;">Eliminar</button>`
+        : `<div class="mensaje-icon">🔒</div>
+           <div class="mensaje-info">
+             <div class="mensaje-nombre">${escapeHtml(m.nombre)}</div>
+             <div class="mensaje-texto">Mensaje sellado hasta el día</div>
+           </div>
+           <button class="item-del" style="align-self:flex-start;">Eliminar</button>`;
+      card.querySelector('.item-del').onclick = () => deleteMensajeSorpresa(m.id);
+      list.appendChild(card);
+    });
+  }
+
+  // vista previa chiquita en la pestaña Hoy
+  if(state.mensajes.length > 0){
+    preview.innerHTML = revelado
+      ? `<div class="card"><p style="margin:0 0 8px; font-weight:700;">Tienes ${state.mensajes.length} mensaje${state.mensajes.length===1?'':'s'} 💌</p><button class="btn-ghost" style="width:100%;" onclick="showTab('mensajes')">Léelos</button></div>`
+      : `<div class="card"><p style="margin:0 0 8px;">Hay ${state.mensajes.length} mensaje${state.mensajes.length===1?'':'s'} sellado${state.mensajes.length===1?'':'s'} esperándote 🔒</p></div>`;
+  } else {
+    preview.innerHTML = '';
+  }
+}
+
+async function deleteMensajeSorpresa(id){
+  state.mensajes = state.mensajes.filter(m => m.id !== id);
+  await safeSet('mensajes', JSON.stringify(state.mensajes));
+  renderMensajesSorpresa();
+}
+
+function exportarMensajesSorpresa(){
+  if(state.mensajes.length === 0){
+    alert('Agrega al menos un mensaje antes de fijarlo en el código.');
+    return;
+  }
+  const codigo = `const PRESET_MENSAJES_SORPRESA = ${JSON.stringify(state.mensajes)};`;
+  prompt('Copia este texto y pégalo en el archivo, reemplazando la línea "const PRESET_MENSAJES_SORPRESA = [];" (cerca del inicio del <script>). También llena PRESET_NAME, PRESET_FESTEJO y PRESET_FECHA justo arriba. Así el festejado ve todo desde que abre la app:', codigo);
+}
+
+/* RESET */
+function resetApp(){
+  if(!confirm('¿Borrar todo (nombre, recordatorios, notas, mensajes, etc.) y empezar de cero?')) return;
+  ['name','reminders','notes','mensajes','countdown'].forEach(k => {
+    try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
+  });
+  location.reload();
+}
+
+init();
+</script>
+</body>
+</html>

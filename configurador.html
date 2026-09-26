@@ -22,10 +22,11 @@
   .card .hint{font-size:0.85rem; color:var(--text-soft); margin:0 0 16px;}
   label{display:block; font-size:0.85rem; font-weight:600; color:var(--text-soft); margin:14px 0 6px;}
   label:first-of-type{margin-top:0;}
-  input[type="text"], input[type="date"], input[type="number"], select{
+  input[type="text"], input[type="date"], input[type="number"], select, textarea{
     width:100%; padding:11px 13px; border-radius:10px; border:1.5px solid var(--border);
     font-family:inherit; font-size:0.95rem; background:#fff;
   }
+  textarea{ min-height:80px; resize:vertical; font-family:'SF Mono', Consolas, monospace; font-size:0.82rem; }
   .drop{
     border:2px dashed var(--border); border-radius:14px; padding:26px 16px;
     text-align:center; cursor:pointer; transition:border-color .15s;
@@ -49,6 +50,7 @@
   }
   .status.ok{ background:#E9F5EF; color:var(--ok); display:block; }
   .status.err{ background:#FBEAEA; color:#B0453F; display:block; }
+  .status.warn{ background:#FBF3E4; color:#9A6A1F; display:block; }
   .opt-block{
     border-top:1px solid var(--border); margin-top:18px; padding-top:16px;
   }
@@ -56,13 +58,24 @@
   .opt-block .toggle-row input{width:auto;}
   .opt-fields{display:none; margin-top:10px;}
   .opt-fields.show{display:block;}
+  #dynamicCard{ display:none; }
+  .dyn-field{ border-top:1px solid var(--border); margin-top:16px; padding-top:14px; }
+  .dyn-field:first-of-type{ border-top:none; margin-top:0; padding-top:0; }
+  .dyn-field .toggle-row{display:flex; align-items:center; gap:8px; cursor:pointer;}
+  .dyn-field .toggle-row input{width:auto;}
+  .dyn-field .const-name{ font-size:0.75rem; color:var(--text-soft); font-family:'SF Mono', Consolas, monospace; }
+  .dyn-field .opt-fields{ margin-top:8px; }
+  .badge-count{
+    display:inline-block; background:var(--plum); color:#fff; font-size:0.72rem; font-weight:700;
+    border-radius:20px; padding:2px 9px; margin-left:6px; vertical-align:middle;
+  }
   footer{text-align:center; color:var(--text-soft); font-size:0.8rem; margin-top:10px;}
 </style>
 </head>
 <body>
 <div id="wrap">
   <h1>Configurador de apps-regalo</h1>
-  <p class="subtitle">Solo para ti — sube una plantilla, llena los datos y descarga el archivo ya personalizado.</p>
+  <p class="subtitle">Solo para ti — sube una plantilla, llena los datos y descarga el archivo ya personalizado. Funciona con cualquier plantilla que use el patrón <code>PRESET_</code>.</p>
 
   <div class="card">
     <h2>1. Plantilla base</h2>
@@ -110,6 +123,41 @@
     </div>
   </div>
 
+  <div class="card" id="dynamicCard">
+    <h2>3. Contenido extra de esta plantilla <span class="badge-count" id="dynCount">0</span></h2>
+    <p class="hint">Detectado automáticamente en el archivo. Para cada uno: abre la app en tu navegador, llena el contenido con los botones normales, toca <strong>"Fijar ___ en el código"</strong>, copia lo que te da y pégalo aquí tal cual.</p>
+    <div id="dynamicFields"></div>
+  </div>
+
+  <div class="card" id="visualCard" style="display:none;">
+    <h2>4. Personalización visual (opcional)</h2>
+    <p class="hint">Todo esto es opcional — si no tocas nada, la plantilla queda con sus colores y tipografía originales.</p>
+
+    <div id="colorFields"></div>
+
+    <div class="opt-block">
+      <label class="toggle-row"><input type="checkbox" id="toggleFont"> Cambiar tipografía</label>
+      <div class="opt-fields" id="fontFields">
+        <label for="fontSelect">Elige una combinación</label>
+        <select id="fontSelect">
+          <option value="fraunces-worksans">Fraunces + Work Sans (elegante, la que ya usan la mayoría)</option>
+          <option value="spacegrotesk-inter">Space Grotesk + Inter (moderna, como el sitio principal)</option>
+          <option value="playfair-lato">Playfair Display + Lato (clásica, editorial)</option>
+          <option value="quicksand-nunito">Quicksand + Nunito (redondeada, juguetona)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="opt-block">
+      <label class="toggle-row"><input type="checkbox" id="toggleImage"> Poner una foto en la portada</label>
+      <div class="opt-fields" id="imageFields">
+        <p class="hint" style="margin-bottom:10px;">Se comprime automáticamente, no subas más de una foto pesada por las dudas.</p>
+        <input type="file" id="imageInput" accept="image/*">
+        <div id="imagePreview" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+
   <button class="primary" id="generateBtn" disabled>Generar app personalizada</button>
   <div class="status" id="status"></div>
 
@@ -119,6 +167,7 @@
 <script>
 let fileContent = null;
 let fileBaseName = 'app';
+let dynamicConsts = []; // [{ constName, fullMatch, currentValue }]
 
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
@@ -126,6 +175,9 @@ const fileNameEl = document.getElementById('fileName');
 const generateBtn = document.getElementById('generateBtn');
 const statusEl = document.getElementById('status');
 const nameInput = document.getElementById('nameInput');
+const dynamicCard = document.getElementById('dynamicCard');
+const dynamicFields = document.getElementById('dynamicFields');
+const dynCount = document.getElementById('dynCount');
 
 dropZone.addEventListener('click', () => fileInput.click());
 dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag'); });
@@ -149,10 +201,68 @@ function handleFile(file){
   reader.onload = (ev) => {
     fileContent = ev.target.result;
     fileNameEl.textContent = '✓ ' + file.name;
+    scanDynamicPresets(fileContent);
+    scanColorVars(fileContent);
+    document.getElementById('visualCard').style.display = 'block';
     checkReady();
   };
   reader.onerror = () => showStatus('No se pudo leer el archivo, intenta de nuevo.', 'err');
   reader.readAsText(file);
+}
+
+// Convierte PRESET_MENSAJES_DAMAS -> "Mensajes damas", con algunos nombres bonitos conocidos
+const LABELS_CONOCIDOS = {
+  PRESET_MENSAJES_DAMAS: 'Mensajes de la novia (Damas de honor)',
+  PRESET_LUGARES: 'Lugares (Nuestro mapa)',
+  PRESET_CHECKLIST_JUNTOS: 'Checklist de cosas juntos',
+  PRESET_MENSAJES_SORPRESA: 'Mensajes sorpresa (varios remitentes)',
+  PRESET_FESTEJO: 'Nombre de la ocasión (ej. "Tu graduación")',
+  PRESET_FECHA: 'Fecha del festejo (AAAA-MM-DD)'
+};
+function humanizeLabel(constName){
+  if(LABELS_CONOCIDOS[constName]) return LABELS_CONOCIDOS[constName];
+  return constName.replace('PRESET_', '').toLowerCase().replace(/_/g, ' ')
+    .replace(/^\w/, c => c.toUpperCase());
+}
+
+function scanDynamicPresets(text){
+  dynamicConsts = [];
+  dynamicFields.innerHTML = '';
+
+  // Busca todas las const PRESET_XXX = ...; excepto PRESET_NAME (tiene su propio campo arriba)
+  const regex = /const\s+(PRESET_(?!NAME\b)[A-Z0-9_]+)\s*=\s*([\s\S]*?);/g;
+  let m;
+  while((m = regex.exec(text)) !== null){
+    dynamicConsts.push({
+      constName: m[1],
+      fullMatch: m[0],
+      currentValue: m[2].trim()
+    });
+  }
+
+  dynCount.textContent = dynamicConsts.length;
+  dynamicCard.style.display = dynamicConsts.length ? 'block' : 'none';
+
+  dynamicConsts.forEach((item, idx) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'dyn-field';
+    const isEmpty = item.currentValue === '[]' || item.currentValue === '""' || item.currentValue === '{}';
+    wrap.innerHTML = `
+      <label class="toggle-row">
+        <input type="checkbox" id="dynToggle${idx}">
+        ${humanizeLabel(item.constName)}
+      </label>
+      <div class="const-name">${item.constName}${isEmpty ? '' : ' · ya tiene contenido, márcalo solo si lo quieres reemplazar'}</div>
+      <div class="opt-fields" id="dynFields${idx}">
+        <label for="dynInput${idx}">Pega aquí lo que copiaste del botón "Fijar en el código"</label>
+        <textarea id="dynInput${idx}" placeholder='Puede ser la línea completa, ej: const ${item.constName} = [...]; o solo el valor.'></textarea>
+      </div>
+    `;
+    dynamicFields.appendChild(wrap);
+    const toggle = wrap.querySelector(`#dynToggle${idx}`);
+    const fields = wrap.querySelector(`#dynFields${idx}`);
+    toggle.addEventListener('change', () => fields.classList.toggle('show', toggle.checked));
+  });
 }
 
 nameInput.addEventListener('input', checkReady);
@@ -160,11 +270,103 @@ function checkReady(){
   generateBtn.disabled = !(fileContent && nameInput.value.trim());
 }
 
+// ===== COLORES =====
+let colorVars = []; // [{ varName, originalValue }]
+function scanColorVars(text){
+  colorVars = [];
+  const colorFields = document.getElementById('colorFields');
+  colorFields.innerHTML = '';
+  const regex = /--([\w-]+):\s*(#[0-9A-Fa-f]{3,8});/g;
+  const seen = new Set();
+  let m;
+  while((m = regex.exec(text)) !== null){
+    if(seen.has(m[1])) continue; // por si la variable se repite
+    seen.add(m[1]);
+    colorVars.push({ varName: m[1], originalValue: m[2] });
+  }
+  colorVars.forEach((c, idx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; align-items:center; gap:10px; margin-top:10px;';
+    row.innerHTML = `
+      <input type="color" id="colorInput${idx}" value="${normalizeHexForPicker(c.originalValue)}" style="width:44px; height:36px; padding:2px; flex-shrink:0;">
+      <span style="font-size:0.85rem; font-family:'SF Mono',Consolas,monospace;">--${c.varName}</span>
+    `;
+    colorFields.appendChild(row);
+  });
+}
+function normalizeHexForPicker(hex){
+  // <input type="color"> solo acepta #RRGGBB de 6 dígitos
+  if(/^#[0-9A-Fa-f]{6}$/.test(hex)) return hex;
+  if(/^#[0-9A-Fa-f]{3}$/.test(hex)){
+    return '#' + hex.slice(1).split('').map(c => c+c).join('');
+  }
+  return '#000000';
+}
+
+// ===== FUENTES =====
+const FONT_PAIRS = {
+  'fraunces-worksans': {
+    link: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap",
+    heading: 'Fraunces', body: 'Work Sans'
+  },
+  'spacegrotesk-inter': {
+    link: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap",
+    heading: 'Space Grotesk', body: 'Inter'
+  },
+  'playfair-lato': {
+    link: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Lato:wght@400;500;600;700&display=swap",
+    heading: 'Playfair Display', body: 'Lato'
+  },
+  'quicksand-nunito': {
+    link: "https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap",
+    heading: 'Quicksand', body: 'Nunito'
+  }
+};
+function extractCurrentFonts(text){
+  const linkMatch = text.match(/<link[^>]*fonts\.googleapis\.com\/css2\?family=([^"]+)"/);
+  if(!linkMatch) return { linkTag: null, families: [] };
+  const query = decodeURIComponent(linkMatch[1]);
+  const families = [...query.matchAll(/family=([^:&]+)/g)].map(m => m[1].replace(/\+/g, ' '));
+  // el primer family= ya viene incluido antes del primer '&family='
+  const firstFamily = query.split('&')[0].split(':')[0].replace(/\+/g, ' ');
+  const allFamilies = [firstFamily, ...families].filter((v, i, a) => a.indexOf(v) === i);
+  return { linkMatch: linkMatch[0], families: allFamilies };
+}
+
+// ===== IMAGEN =====
+let processedImageDataUrl = null;
+document.getElementById('imageInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = (ev) => { img.src = ev.target.result; };
+  img.onload = () => {
+    const maxSize = 240;
+    let w = img.width, h = img.height;
+    if(w > h && w > maxSize){ h = Math.round(h * maxSize / w); w = maxSize; }
+    else if(h > maxSize){ w = Math.round(w * maxSize / h); h = maxSize; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    processedImageDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+    document.getElementById('imagePreview').innerHTML =
+      `<img src="${processedImageDataUrl}" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">`;
+  };
+  reader.readAsDataURL(file);
+});
+
 document.getElementById('toggleDate').addEventListener('change', (e) => {
   document.getElementById('dateFields').classList.toggle('show', e.target.checked);
 });
 document.getElementById('toggleGoal').addEventListener('change', (e) => {
   document.getElementById('goalFields').classList.toggle('show', e.target.checked);
+});
+document.getElementById('toggleFont').addEventListener('change', (e) => {
+  document.getElementById('fontFields').classList.toggle('show', e.target.checked);
+});
+document.getElementById('toggleImage').addEventListener('change', (e) => {
+  document.getElementById('imageFields').classList.toggle('show', e.target.checked);
 });
 
 function showStatus(msg, type){
@@ -176,17 +378,29 @@ function jsEscape(str){
   return String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
+// Limpia lo que la usuaria pegó: puede venir como "const PRESET_X = [...];"
+// o solo como "[...]" — nos quedamos solo con el valor.
+function cleanPastedValue(raw, constName){
+  let v = raw.trim();
+  const fullLinePattern = new RegExp(`^const\\s+${constName}\\s*=\\s*([\\s\\S]*?);?\\s*$`);
+  const match = v.match(fullLinePattern);
+  if(match) v = match[1].trim();
+  if(v.endsWith(';')) v = v.slice(0, -1).trim();
+  return v;
+}
+
 generateBtn.addEventListener('click', () => {
   if(!fileContent) return;
   let out = fileContent;
   const name = nameInput.value.trim();
+  let advertencias = [];
 
   // Nombre preconfigurado
   const presetPattern = /const PRESET_NAME = "[^"]*";/;
   if(presetPattern.test(out)){
     out = out.replace(presetPattern, `const PRESET_NAME = "${jsEscape(name)}";`);
   } else {
-    showStatus('Ojo: esta plantilla no tiene la configuración PRESET_NAME (puede ser una versión antigua). Descarga de todas formas y revisa.', 'err');
+    advertencias.push('esta plantilla no tiene PRESET_NAME (puede ser una versión antigua)');
   }
 
   // Cuenta regresiva, si aplica
@@ -197,6 +411,8 @@ generateBtn.addEventListener('click', () => {
       const cdPattern = /countdown:\s*\{\s*name:\s*"[^"]*",\s*date:\s*"[^"]*"\s*\}/;
       if(cdPattern.test(out)){
         out = out.replace(cdPattern, `countdown: { name: "${jsEscape(evName)}", date: "${jsEscape(evDate)}" }`);
+      } else {
+        advertencias.push('no encontré el bloque "countdown" en esta plantilla');
       }
     }
   }
@@ -210,7 +426,66 @@ generateBtn.addEventListener('click', () => {
       const goalPattern = /goal:\s*\{\s*name:\s*"[^"]*",\s*current:\s*\d+,\s*total:\s*\d+\s*\}/;
       if(goalPattern.test(out)){
         out = out.replace(goalPattern, `goal: { name: "${jsEscape(gName)}", current: ${gCurrent}, total: ${gTotal} }`);
+      } else {
+        advertencias.push('no encontré el bloque "goal" en esta plantilla');
       }
+    }
+  }
+
+  // Cualquier PRESET_ extra detectado dinámicamente
+  dynamicConsts.forEach((item, idx) => {
+    const toggle = document.getElementById(`dynToggle${idx}`);
+    const input = document.getElementById(`dynInput${idx}`);
+    if(toggle && toggle.checked && input.value.trim()){
+      const cleanValue = cleanPastedValue(input.value, item.constName);
+      const newDeclaration = `const ${item.constName} = ${cleanValue};`;
+      if(out.includes(item.fullMatch)){
+        out = out.replace(item.fullMatch, newDeclaration);
+      } else {
+        advertencias.push(`no pude ubicar de nuevo "${item.constName}" para reemplazarlo — revísalo a mano`);
+      }
+    }
+  });
+
+  // Colores personalizados
+  colorVars.forEach((c, idx) => {
+    const input = document.getElementById(`colorInput${idx}`);
+    if(input && input.value.toLowerCase() !== normalizeHexForPicker(c.originalValue).toLowerCase()){
+      const pattern = new RegExp(`--${c.varName}:\\s*${c.originalValue};`, 'g');
+      out = out.replace(pattern, `--${c.varName}: ${input.value};`);
+    }
+  });
+
+  // Fuente, si aplica
+  if(document.getElementById('toggleFont').checked){
+    const chosenKey = document.getElementById('fontSelect').value;
+    const chosen = FONT_PAIRS[chosenKey];
+    const current = extractCurrentFonts(out);
+    if(current.linkMatch && current.families.length >= 2){
+      const fullLinkPattern = /<link[^>]*fonts\.googleapis\.com\/css2\?family=[^>]*>/;
+      out = out.replace(fullLinkPattern, `<link href="${chosen.link}" rel="stylesheet">`);
+      // reemplaza los nombres de fuente usados en el CSS (heading y body)
+      current.families.slice(0, 2).forEach((fam, i) => {
+        const newFam = i === 0 ? chosen.heading : chosen.body;
+        const famPattern = new RegExp(`'${fam}'`, 'g');
+        out = out.replace(famPattern, `'${newFam}'`);
+      });
+    } else {
+      advertencias.push('no encontré las fuentes de Google Fonts en esta plantilla, no se pudo cambiar la tipografía');
+    }
+  }
+
+  // Imagen de portada, si aplica
+  if(document.getElementById('toggleImage').checked){
+    if(processedImageDataUrl){
+      const imgPattern = /(<div class="intro-badge"><img src=")data:image\/[a-zA-Z]+;base64,[^"]+(")/;
+      if(imgPattern.test(out)){
+        out = out.replace(imgPattern, `$1${processedImageDataUrl}$2`);
+      } else {
+        advertencias.push('no encontré el ícono de portada (intro-badge) en esta plantilla');
+      }
+    } else {
+      advertencias.push('marcaste "poner foto" pero no subiste ninguna imagen');
     }
   }
 
@@ -225,7 +500,11 @@ generateBtn.addEventListener('click', () => {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  showStatus(`Listo — se descargó como "${fileBaseName}-${safeName || 'app'}.html". Ya puedes subirlo a Netlify.`, 'ok');
+  if(advertencias.length){
+    showStatus(`Se descargó, pero ojo: ${advertencias.join('; ')}.`, 'warn');
+  } else {
+    showStatus(`Listo — se descargó como "${fileBaseName}-${safeName || 'app'}.html". Ya puedes subirlo a Netlify.`, 'ok');
+  }
 });
 </script>
 </body>
