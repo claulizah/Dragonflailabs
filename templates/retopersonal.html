@@ -705,8 +705,9 @@ async function safeSet(key, value){
 }
 
 function todayKey(){
+  // Hora local (no UTC): en México el día no debe cambiar a media tarde.
   const d = new Date();
-  return d.toISOString().slice(0,10);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
 function dayOfYear(){
@@ -748,7 +749,8 @@ async function init(){
   try{ state.goodThings = goodThings ? JSON.parse(goodThings) : []; }catch(e){ state.goodThings = []; }
   try{ state.moodByDate = moods ? JSON.parse(moods) : {}; }catch(e){ state.moodByDate = {}; }
   try{ state.contacts = contacts ? JSON.parse(contacts) : []; }catch(e){ state.contacts = []; }
-  try{ state.goal = goal ? JSON.parse(goal) : { name: "Tu reto", current: 1, total: 30 }; }catch(e){ state.goal = { name: "Tu reto", current: 1, total: 30 }; }
+  // Si no hay nada guardado se queda el valor inicial de "state" (el que ajusta el configurador).
+  try{ if(goal) state.goal = JSON.parse(goal); }catch(e){}
   try{ state.streakDays = streak ? JSON.parse(streak) : {}; }catch(e){ state.streakDays = {}; }
 
   state.messagePool = MESSAGES.concat(GOAL_MESSAGES.map(fillTemplate));

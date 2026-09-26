@@ -695,8 +695,9 @@ async function safeSet(key, value){
 }
 
 function todayKey(){
+  // Hora local (no UTC): en México el día no debe cambiar a media tarde.
   const d = new Date();
-  return d.toISOString().slice(0,10);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
 function dayOfYear(){
@@ -739,7 +740,8 @@ async function init(){
   try{ state.goodThings = goodThings ? JSON.parse(goodThings) : []; }catch(e){ state.goodThings = []; }
   try{ state.moodByDate = moods ? JSON.parse(moods) : {}; }catch(e){ state.moodByDate = {}; }
   try{ state.contacts = contacts ? JSON.parse(contacts) : []; }catch(e){ state.contacts = []; }
-  try{ state.countdown = countdown ? JSON.parse(countdown) : { name: "La llegada", date: "" }; }catch(e){ state.countdown = { name: "La llegada", date: "" }; }
+  // Si no hay nada guardado se queda el valor inicial de "state" (el que ajusta el configurador).
+  try{ if(countdown) state.countdown = JSON.parse(countdown); }catch(e){}
   try{ state.photos = photos ? JSON.parse(photos) : []; }catch(e){ state.photos = []; }
   try{ state.checklist = checklist ? JSON.parse(checklist) : []; }catch(e){ state.checklist = []; }
 
@@ -853,7 +855,7 @@ function renderCountdown(){
 async function editCountdown(){
   const name = prompt('¿Cómo se llama esta fecha? (aniversario, reencuentro, etc.)', state.countdown.name);
   if(name === null) return;
-  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || new Date().toISOString().slice(0,10));
+  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || todayKey());
   if(date === null) return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) { alert('Formato de fecha inválido, usa AAAA-MM-DD'); return; }
   state.countdown = { name: name.trim() || 'La llegada', date: date.trim() };

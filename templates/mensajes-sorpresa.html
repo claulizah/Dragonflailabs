@@ -299,7 +299,7 @@ async function init(){
     await safeSet('mensajes', JSON.stringify(state.mensajes));
   }
 
-  const presetCountdown = { name: PRESET_FESTEJO || "Tu día especial", date: PRESET_FECHA || "" };
+  const presetCountdown = { name: PRESET_FESTEJO || state.countdown.name, date: PRESET_FECHA || state.countdown.date };
   try{ state.countdown = countdown ? JSON.parse(countdown) : presetCountdown; }catch(e){ state.countdown = presetCountdown; }
   if(!countdown && (PRESET_FESTEJO || PRESET_FECHA)){
     await safeSet('countdown', JSON.stringify(state.countdown));
@@ -359,7 +359,7 @@ function renderCountdown(){
 async function editCountdown(){
   const name = prompt('¿Cómo se llama esta fecha? (graduación, cumpleaños, etc.)', state.countdown.name);
   if(name === null) return;
-  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || new Date().toISOString().slice(0,10));
+  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || new Date().toLocaleDateString('en-CA'));
   if(date === null) return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())){ alert('Formato de fecha inválido, usa AAAA-MM-DD'); return; }
   state.countdown = { name: name.trim() || 'Tu día especial', date: date.trim() };
@@ -524,8 +524,8 @@ function exportarMensajesSorpresa(){
     alert('Agrega al menos un mensaje antes de fijarlo en el código.');
     return;
   }
-  const codigo = `const PRESET_MENSAJES_SORPRESA = ${JSON.stringify(state.mensajes)};`;
-  prompt('Copia este texto y pégalo en el archivo, reemplazando la línea "const PRESET_MENSAJES_SORPRESA = [];" (cerca del inicio del <script>). También llena PRESET_NAME, PRESET_FESTEJO y PRESET_FECHA justo arriba. Así el festejado ve todo desde que abre la app:', codigo);
+  const codigo = 'const ' + `PRESET_MENSAJES_SORPRESA = ${JSON.stringify(state.mensajes).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
+  prompt('Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_MENSAJES_SORPRESA (cerca del inicio del <script>). También llena PRESET_NAME, PRESET_FESTEJO y PRESET_FECHA justo arriba. Así el festejado ve todo desde que abre la app:', codigo);
 }
 
 /* RESET */
