@@ -74,21 +74,26 @@ Chromium con zona horaria `America/Mexico_City` y reloj simulado a las 23:30 del
 | Cuenta regresiva · Boda (`cuentaregresiva-boda.html`) | ✅ | ✅ | `app-boda-` ✅ | PRESET_NAME ✅ | ✅ | 192 KB | ✅ | ✅ cuenta | ✅ |
 | Cuenta regresiva · Viaje (`cuentaregresiva-viaje.html`) | ✅ | ✅ | `app-viaje-` ✅ | PRESET_NAME ✅ | ✅ | 168 KB | ✅ | ✅ cuenta | ✅ |
 | Cumpleaños ⏸️ (`cumpleanos.html`) | ✅ | ✅ | `app-cumple-` ✅ | PRESET_NAME ✅ | ✅ | 97 KB | ✅ | ✅ cuenta | ✅ |
-| Damas de honor (`damashonor.html`) | ✅ | ✅ | `app-damashonor-` ✅ | PRESET_NAME, PRESET_MENSAJES_DAMAS ✅ | ✅ | 210 KB ⚠️ img 59 KB | ✅ | ✅ cuenta | ✅ |
+| Damas de honor (`damashonor.html`) | ✅ | ✅ | `app-damashonor-` ✅ | PRESET_NAME, PRESET_MENSAJES_DAMAS ✅ | ✅ | 154 KB | ✅ | ✅ cuenta | ✅ |
 | Salud (demo genérica) (`demogenerica.html`) | ✅ | ✅ | `app-compania-` ✅ | PRESET_NAME ✅ | ✅ | 149 KB | ✅ | n/a | ✅ |
 | Home Office (`homeoffice.html`) | ✅ | ✅ | `app-homeoffice-` ✅ | PRESET_NAME, PRESET_CHECKLIST_DIARIO, PRESET_RUTINA_INICIO, PRESET_RUTINA_CIERRE ✅ | ✅ | 122 KB | ✅ | n/a | ✅ |
 | Mensajes sorpresa (`mensajes-sorpresa.html`) | ✅ | ✅ | `app-sorpresa-` ✅ | PRESET_NAME, PRESET_FESTEJO, PRESET_FECHA, PRESET_MENSAJES_SORPRESA ✅ | ✅ | 23 KB | ✅ (sin `todayKey`, cuenta OK) | ✅ cuenta | ✅ |
-| Salud (Mi acompañante) (`miacompanante.html`) | ✅ | ✅ | `app-miacomp-` ✅ | ⚠️ ninguno (sin `PRESET_NAME`)  | ✅ | 168 KB | ✅ | n/a | ✅ |
-| Mi Radar (`miradar.html`) | ✅ | ✅ | `app-miradar-` ✅ | PRESET_NAME ✅ | ✅ | 226 KB ⚠️ img 62 KB | ✅ | n/a | ✅ |
+| Salud (Mi acompañante) (`miacompanante.html`) | ✅ | ✅ | `app-miacomp-` ✅ | PRESET_NAME ✅ | ✅ | 169 KB | ✅ | n/a | ✅ |
+| Mi Radar (`miradar.html`) | ✅ | ✅ | `app-miradar-` ✅ | PRESET_NAME ✅ | ✅ | 169 KB | ✅ | n/a | ✅ |
 | Mi semestre (`misemestre.html`) | ✅ | ✅ | `app-semestre-` ✅ | PRESET_NAME, PRESET_HORARIO ✅ | ✅ | 242 KB | ✅ | ✅ cuenta · ✅ meta | ✅ |
 | Nosotros dos (`nosotrosdos.html`) | ✅ | ✅ | `app-nosotrosdos-` ✅ | PRESET_NAME, PRESET_CHECKLIST_JUNTOS, PRESET_LUGARES ✅ | ✅ | 170 KB | ✅ | ✅ cuenta | ✅ |
 | Reto personal (`retopersonal.html`) | ✅ | ✅ | `app-reto-` ✅ | PRESET_NAME ✅ | ✅ | 185 KB | ✅ | ✅ meta | ✅ |
 | Romántico (`romantico.html`) | ✅ | ✅ | `app-favorita-` ✅ | PRESET_NAME ✅ | ✅ | 167 KB | ✅ | ✅ cuenta | ✅ |
 
+Redirecciones (ligas viejas): `templates/blacklist.html` → `miradar.html` y `templates/cuentaregresiva.html` → `cuentaregresiva-boda.html`. Conservan `?parámetros` y `#ancla`. Probadas en Chromium.
+
+Cerrados en esta ronda (26-sep):
+- `miacompanante.html` ya tiene `PRESET_NAME`: el configurador lo detecta y la app abre con el nombre fijado.
+- Portadas recomprimidas a paleta de 256 colores con transparencia: Damas de honor de 58 → 16 KB y Mi Radar de 61 → 18 KB. Siguen a 220px y no hay diferencia visible.
+
 Hallazgos abiertos:
-- `miacompanante.html` no tiene `PRESET_NAME`: el configurador avisa que "puede ser una versión antigua" y no puede fijar el nombre.
-- Imágenes base64 de más de 50 KB: portada de Damas de honor (59 KB) y de Mi Radar (62 KB).
 - Mi semestre pesa 242 KB porque el ícono provisional (34 KB) va 4 veces: favicon, ícono de instalación, manifest y portada. Se reduce al poner el ícono definitivo.
+- Las redirecciones no pasan los datos guardados: quien ya usaba la versión vieja (`blacklist.html` sin prefijo, `cuentaregresiva.html` con `app-cuenta-`) abre la nueva vacía.
 
 ## Próximos pasos
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ Validado; falta revisar y hacer merge del PR a `main`.

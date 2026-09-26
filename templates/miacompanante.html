@@ -652,6 +652,13 @@ const MOODS = [
   {emoji:"💪", label:"con ánimo", note:"Qué lindo, aprovecha esa energía como quieras."}
 ];
 
+// ==== CONFIGURACIÓN INICIAL ====
+// Si ya sabes el nombre de la persona, escríbelo aquí antes de subir el archivo.
+// Así la app abre directo con su nombre, sin preguntarlo.
+// Déjalo en "" (vacío) si quieres que la app pregunte el nombre al abrir.
+const PRESET_NAME = "";
+// ================================
+
 let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, cycle: { current: 1, total: 6 }, messagePool: [] };
 let storageOk = true;
 
@@ -703,7 +710,8 @@ async function init(){
   const goodThings = await safeGet('companion-goodthings');
   const contacts = await safeGet('companion-contacts');
 
-  state.name = name || "";
+  state.name = name || PRESET_NAME || "";
+  if(!name && PRESET_NAME){ await safeSet('companion-name', PRESET_NAME); }
   try{ state.reminders = reminders ? JSON.parse(reminders) : []; }catch(e){ state.reminders = []; }
   try{ state.notes = notes ? JSON.parse(notes) : []; }catch(e){ state.notes = []; }
   try{ state.symptoms = symptoms ? JSON.parse(symptoms) : []; }catch(e){ state.symptoms = []; }
