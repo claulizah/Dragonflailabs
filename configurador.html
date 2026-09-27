@@ -220,6 +220,8 @@ const LABELS_CONOCIDOS = {
   PRESET_FECHA: 'Fecha de la cuenta regresiva',
   PRESET_EVENTO: 'Título de la cuenta regresiva (ej. "La llegada de Emilia")',
   PRESET_NOVIA: 'Nombre de la novia (Damas de honor: "La boda de ___")',
+  PRESET_DE: 'Quién regala (sale como "Un regalo de ___")',
+  PRESET_DEDICATORIA: 'Dedicatoria (sale al abrir la app por primera vez)',
   PRESET_HORARIO: 'Horario de clases (Mi semestre)',
   PRESET_CHECKLIST_DIARIO: 'Checklist diario (Home Office)',
   PRESET_RUTINA_INICIO: 'Rutina de inicio de jornada (Home Office)',
@@ -264,7 +266,9 @@ function scanDynamicPresets(text){
       <div class="opt-fields" id="dynFields${idx}">
         ${item.isString
           ? `<label for="dynInput${idx}">${/FECHA$/.test(item.constName) ? 'Elige la fecha' : 'Escríbelo tal cual, sin comillas'}</label>
-             <input id="dynInput${idx}" type="${/FECHA$/.test(item.constName) ? 'date' : 'text'}">`
+             ${/DEDICATORIA$/.test(item.constName)
+                ? `<textarea id="dynInput${idx}" placeholder="Puede tener varios renglones."></textarea>`
+                : `<input id="dynInput${idx}" type="${/FECHA$/.test(item.constName) ? 'date' : 'text'}">`}`
           : `<label for="dynInput${idx}">Pega aquí lo que copiaste del botón "Fijar en el código"</label>
              <textarea id="dynInput${idx}" placeholder='Puede ser la línea completa, ej: const ${item.constName} = [...]; o solo el valor.'></textarea>`}
       </div>
