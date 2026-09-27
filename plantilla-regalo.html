@@ -586,7 +586,8 @@ function mostrarAvisoGuardado(){
 
 function id(){ return Date.now() + "-" + Math.random().toString(36).slice(2,7); }
 function esc(s){ const d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
-function hoyClave(){ return new Date().toISOString().slice(0,10); }
+// Hora local (no UTC): en México el día no debe cambiar a media tarde.
+function hoyClave(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 function diaDelAño(){ const d = new Date(); return Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000); }
 function fechaLarga(){
   // Solo la primera letra en mayúscula. Con text-transform:capitalize

@@ -256,6 +256,10 @@
     text-align:left;
   }
   .countdown-card h3{ font-size: 1.05rem; margin:0; color: var(--plum-dark); }
+  .edit-link{
+    background:none; border:none; color: var(--text-soft);
+    font-size: 0.78rem; text-decoration: underline; padding:4px; min-height:auto;
+  }
   .countdown-card .edit-link{
     background:none; border:none; color: var(--text-soft);
     font-size: 0.78rem; text-decoration: underline; padding:4px; min-height:auto;
@@ -494,6 +498,10 @@
     outline: 2.5px solid var(--plum);
     outline-offset: 2px;
   }
+
+  /* Modo armar: herramientas para quien arma la app (solo con ?armar=1 en la URL) */
+  body:not(.armando) .solo-armar{ display:none !important; }
+  .armar-banner{ position:fixed; top:0; left:0; right:0; z-index:1000; background:#1f1f1f; color:#fff; font:600 0.72rem/1.3 sans-serif; text-align:center; padding:6px 10px; letter-spacing:0.02em; }
 </style>
 </head>
 <body>
@@ -618,7 +626,10 @@
         <button class="btn-solid" onclick="addNote()">Guardar nota</button>
       </div>
       <div id="noteList"></div>
-      <button class="edit-link" style="display:block; margin:24px auto 0;" onclick="resetApp()">Reiniciar app (borra todo)</button>
+      <p style="text-align:center; font-size:0.78rem; color:var(--text-soft); margin:28px 0 6px;">
+        Hecho con 🦋 · <a href="https://regaloparati.com?ref=regalo-recibido" target="_blank" rel="noopener" style="color:var(--plum-dark); font-weight:600;">regaloparati.com</a>
+      </p>
+      <button class="edit-link" style="display:block; margin:12px auto 0;" onclick="resetApp()">Reiniciar app (borra todo)</button>
     </section>
     <!-- RAZONES -->
     <section class="screen" id="screen-sintomas">
@@ -655,6 +666,19 @@
 </div>
 
 <script>
+// ==== MODO ARMAR ====
+// Las herramientas para quien arma la app (escribir mensajes sellados, borrarlos y los
+// botones "Fijar ... en el código") solo aparecen si la URL trae ?armar=1.
+// Quien recibe la app abre la liga normal y no las ve.
+const MODO_ARMAR = new URLSearchParams(location.search).get('armar') === '1';
+if(MODO_ARMAR){
+  document.body.classList.add('armando');
+  const aviso = document.createElement('div');
+  aviso.className = 'armar-banner';
+  aviso.textContent = 'Modo armar · quien recibe no ve estas herramientas';
+  document.body.appendChild(aviso);
+}
+
 const MESSAGES = [
   "Falta menos de lo que crees para tu día.",
   "Cada año que cumples es otro capítulo bueno que empieza.",
@@ -709,8 +733,9 @@ async function safeSet(key, value){
 }
 
 function todayKey(){
+  // Hora local (no UTC): en México el día no debe cambiar a media tarde.
   const d = new Date();
-  return d.toISOString().slice(0,10);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
 function dayOfYear(){
@@ -754,7 +779,8 @@ async function init(){
   try{ state.goodThings = goodThings ? JSON.parse(goodThings) : []; }catch(e){ state.goodThings = []; }
   try{ state.moodByDate = moods ? JSON.parse(moods) : {}; }catch(e){ state.moodByDate = {}; }
   try{ state.contacts = contacts ? JSON.parse(contacts) : []; }catch(e){ state.contacts = []; }
-  try{ state.countdown = countdown ? JSON.parse(countdown) : { name: "Tu cumpleaños", date: "" }; }catch(e){ state.countdown = { name: "Tu cumpleaños", date: "" }; }
+  // Si no hay nada guardado se queda el valor inicial de "state" (el que ajusta el configurador).
+  try{ if(countdown) state.countdown = JSON.parse(countdown); }catch(e){}
   try{ state.photos = photos ? JSON.parse(photos) : []; }catch(e){ state.photos = []; }
   try{ state.capsuleMessages = capsuleMessages ? JSON.parse(capsuleMessages) : []; }catch(e){ state.capsuleMessages = []; }
   try{ state.capsuleSealed = capsuleSealed ? JSON.parse(capsuleSealed) : false; }catch(e){ state.capsuleSealed = false; }
@@ -869,7 +895,7 @@ function renderCountdown(){
 async function editCountdown(){
   const name = prompt('¿Cómo se llama esta fecha? (aniversario, reencuentro, etc.)', state.countdown.name);
   if(name === null) return;
-  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || new Date().toISOString().slice(0,10));
+  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || todayKey());
   if(date === null) return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) { alert('Formato de fecha inválido, usa AAAA-MM-DD'); return; }
   state.countdown = { name: name.trim() || 'Tu cumpleaños', date: date.trim() };

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de QR — DragonflAI Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#F4F3F8; --card:#FFFFFF; --plum:#6B5B95; --plum-dark:#4E4270;
+    --text:#332E45; --text-soft:#7A748F; --border:#E3E0EE; --ok:#3F8F6B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); font-family:'Work Sans',sans-serif; color:var(--text);}
+  h1,h2{font-family:'Fraunces',serif; font-weight:600;}
+  #wrap{max-width:520px; margin:0 auto; padding:36px 20px 60px;}
+  h1{font-size:1.5rem; color:var(--plum-dark); margin:0 0 4px;}
+  .subtitle{color:var(--text-soft); font-size:0.92rem; margin:0 0 24px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px; margin-bottom:20px;}
+  label{display:block; font-size:0.85rem; font-weight:600; color:var(--text-soft); margin:14px 0 6px;}
+  label:first-of-type{margin-top:0;}
+  input[type="text"], select{
+    width:100%; padding:11px 13px; border-radius:10px; border:1.5px solid var(--border);
+    font-family:inherit; font-size:0.95rem; background:#fff;
+  }
+  .swatch-row{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .swatch{
+    width:38px; height:38px; border-radius:50%; cursor:pointer; border:3px solid transparent;
+  }
+  .swatch.selected{ border-color: var(--text); }
+  button.primary{
+    width:100%; background:var(--plum); color:#fff; border:none; border-radius:12px;
+    padding:14px; font-size:1rem; font-weight:700; font-family:inherit; cursor:pointer; margin-top:8px;
+  }
+  button.ghost{
+    width:100%; background:none; border:1.5px solid var(--plum); color:var(--plum-dark);
+    border-radius:12px; padding:12px; font-size:0.95rem; font-weight:600; font-family:inherit; cursor:pointer; margin-top:10px;
+  }
+  #previewWrap{ text-align:center; margin-top:20px; }
+  #canvasPreview{ max-width:100%; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.12); }
+  footer{text-align:center; color:var(--text-soft); font-size:0.8rem; margin-top:10px;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>Generador de QR con marco 🦋</h1>
+  <p class="subtitle">Pega el link de la app ya entregada y genera un QR bonito para mandar por WhatsApp o imprimir.</p>
+
+  <div class="card">
+    <label for="urlInput">Link de la app *</label>
+    <input type="text" id="urlInput" placeholder="https://dragonflailabs.com/regalo/jeanet-x7f2.html">
+
+    <label for="nombreInput">Nombre a mostrar (opcional)</label>
+    <input type="text" id="nombreInput" placeholder="Ej. Para Jeanet">
+
+    <label for="mensajeInput">Texto personalizado (opcional)</label>
+    <input type="text" id="mensajeInput" placeholder="Ej. ¡Sorpresa! Escanéame 🎉 (si lo dejas vacío, pone el genérico)">
+
+    <label>Tema de color</label>
+    <div class="swatch-row" id="swatchRow"></div>
+
+    <button class="primary" id="generateBtn">Generar QR</button>
+  </div>
+
+  <div id="previewWrap" style="display:none;">
+    <canvas id="canvasPreview"></canvas>
+    <button class="ghost" id="downloadBtn">Descargar imagen</button>
+  </div>
+
+  <footer>Uso interno · DragonflAI Labs</footer>
+</div>
+
+<script>
+const TEMAS = {
+  violeta:  { fondo1:'#8B5FBF', fondo2:'#5B3A8C', acento:'#FFFFFF' },
+  rosa:     { fondo1:'#D66FA0', fondo2:'#9C3A6B', acento:'#FFFFFF' },
+  dorado:   { fondo1:'#D9A94A', fondo2:'#9C7A2E', acento:'#FFFFFF' },
+  teal:     { fondo1:'#3D9483', fondo2:'#2E7D6B', acento:'#FFFFFF' },
+  terracota:{ fondo1:'#C97A45', fondo2:'#8A4E2A', acento:'#FFFFFF' },
+  lavanda:  { fondo1:'#9B8FD6', fondo2:'#6E5FA8', acento:'#FFFFFF' }
+};
+let temaElegido = 'violeta';
+
+const swatchRow = document.getElementById('swatchRow');
+Object.entries(TEMAS).forEach(([key, val]) => {
+  const sw = document.createElement('div');
+  sw.className = 'swatch' + (key === temaElegido ? ' selected' : '');
+  sw.style.background = `linear-gradient(135deg, ${val.fondo1}, ${val.fondo2})`;
+  sw.dataset.key = key;
+  sw.onclick = () => {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+    sw.classList.add('selected');
+    temaElegido = key;
+  };
+  swatchRow.appendChild(sw);
+});
+
+document.getElementById('generateBtn').addEventListener('click', async () => {
+  const url = document.getElementById('urlInput').value.trim();
+  const nombre = document.getElementById('nombreInput').value.trim();
+  const mensaje = document.getElementById('mensajeInput').value.trim();
+  if(!url){ alert('Pega el link de la app primero.'); return; }
+
+  const tema = TEMAS[temaElegido];
+  const W = 900, H = 1150;
+  const canvas = document.getElementById('canvasPreview');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Fondo degradado
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, tema.fondo1);
+  grad.addColorStop(1, tema.fondo2);
+  ctx.fillStyle = grad;
+  roundRect(ctx, 0, 0, W, H, 40);
+  ctx.fill();
+
+  // Puntitos decorativos sutiles
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  for(let i=0;i<7;i++){
+    ctx.beginPath();
+    ctx.arc(80 + (i*130)%W, 90 + (i%3)*950, 55, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // Mariposa / encabezado
+  ctx.textAlign = 'center';
+  ctx.fillStyle = tema.acento;
+  ctx.font = '64px serif';
+  ctx.fillText('🦋', W/2, 130);
+
+  ctx.font = '600 40px Georgia, serif';
+  ctx.fillText(nombre || 'Un regalo para ti', W/2, 200);
+
+  const subtitulo = mensaje || 'Escanea para abrir tu app';
+  ctx.font = subtitulo.length > 34 ? '17px Arial, sans-serif' : '20px Arial, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  const lineasSubtitulo = wrapText(ctx, subtitulo, W/2, 235, W - 140, 24);
+
+  // Genera el QR en un canvas aparte y lo pega centrado dentro de una tarjeta blanca
+  const qrSize = 560;
+  const qrCanvas = document.createElement('canvas');
+  await QRCode.toCanvas(qrCanvas, url, {
+    width: qrSize,
+    margin: 1,
+    color: { dark: tema.fondo2, light: '#FFFFFF' }
+  });
+
+  const cardX = (W - qrSize) / 2 - 30;
+  const cardY = 280 + Math.max(0, lineasSubtitulo - 1) * 26;
+  const cardSize = qrSize + 60;
+  ctx.fillStyle = '#FFFFFF';
+  roundRect(ctx, cardX, cardY, cardSize, cardSize, 28);
+  ctx.fill();
+  ctx.drawImage(qrCanvas, cardX + 30, cardY + 30, qrSize, qrSize);
+
+  // Pie de marca
+  ctx.font = '600 26px Georgia, serif';
+  ctx.fillStyle = tema.acento;
+  ctx.fillText('DragonflAI Labs', W/2, cardY + cardSize + 70);
+  ctx.font = '16px Arial, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.fillText('dragonflailabs.com', W/2, cardY + cardSize + 100);
+
+  document.getElementById('previewWrap').style.display = 'block';
+});
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+  for(let i = 0; i < words.length; i++){
+    const testLine = line + words[i] + ' ';
+    if(ctx.measureText(testLine).width > maxWidth && line !== ''){
+      lines.push(line.trim());
+      line = words[i] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  lines.push(line.trim());
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+  return lines.length;
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const canvas = document.getElementById('canvasPreview');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'qr-dragonflailabs.png';
+  a.click();
+});
+</script>
+</body>
+</html>
