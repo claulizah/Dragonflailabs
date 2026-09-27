@@ -540,6 +540,16 @@
   .regalo-instalar ol{ margin:6px 0 10px; padding-left:20px; line-height:1.6; font-size:0.92rem; color:var(--text); }
   .regalo-instalar .fila{ display:flex; gap:8px; flex-wrap:wrap; }
   .regalo-instalar button{ background:transparent; border:1.5px solid var(--border); color:var(--text-soft); border-radius:10px; padding:8px 12px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; }
+
+  /* Cartas "Ábrelo cuando…" */
+  .carta-card{ background:var(--card); border:1.5px dashed var(--rose); border-radius:16px; padding:14px 16px; margin-bottom:12px; }
+  .carta-card.abierta{ border-style:solid; border-color:var(--border); }
+  .carta-top{ display:flex; align-items:center; gap:10px; }
+  .carta-sobre{ font-size:1.5rem; }
+  .carta-cuando{ flex:1; font-weight:700; color:var(--plum-dark); line-height:1.35; }
+  .carta-texto{ margin:10px 0 0; line-height:1.55; white-space:pre-line; color:var(--text); }
+  .carta-card .btn-ghost{ width:100%; margin-top:10px; }
+  .carta-card .item-del{ display:block; margin:8px 0 0 auto; }
 </style>
 </head>
 <body>
@@ -674,7 +684,7 @@
     <section class="screen" id="screen-sintomas">
       <h2 class="section-title">Razones para amarte</h2>
       <div class="section-rule"></div>
-      <p class="empty" style="padding-top:0;">Toca lo que te hace pensar en tu persona hoy, para releerlo cuando quieras.</p>
+      <p class="empty" style="padding-top:0;">Las razones por las que te quiero. También puedes agregar las tuyas.</p>
       <div class="quick-row">
         <button class="chip symptom" onclick="quickAddSymptom('Tu risa')">Tu risa</button>
         <button class="chip symptom" onclick="quickAddSymptom('Cómo me cuidas')">Cómo me cuidas</button>
@@ -685,6 +695,21 @@
       </div>
       <div id="symptomList"></div>
       <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="shareSymptoms()">Compartir con mi persona 💌</button>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarRazones()">Fijar razones en el código</button>
+    </section>
+
+    <!-- CARTAS "ÁBRELO CUANDO…" -->
+    <section class="screen" id="screen-cartas">
+      <h2 class="section-title">Ábrelo cuando…</h2>
+      <div class="section-rule"></div>
+      <p class="empty" style="padding-top:0;">Cartas para momentos específicos. Ábrelas solo cuando llegue ese momento.</p>
+      <div id="cartasList"></div>
+      <div class="add-row solo-armar" style="margin-top:18px;">
+        <input id="cartaCuando" type="text" placeholder="Ábrelo cuando… (ej. estés triste)" maxlength="60">
+        <textarea id="cartaTexto" placeholder="Lo que quieres que lea en ese momento..."></textarea>
+        <button class="btn-solid" style="width:100%;" onclick="addCarta()">Agregar carta</button>
+      </div>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarCartas()">Fijar cartas en el código</button>
     </section>
 
     <!-- NUESTRO MAPA -->
@@ -711,6 +736,9 @@
     </button>
     <button data-tab="sintomas" onclick="showTab('sintomas')">
       <span class="icon">💌</span>Razones
+    </button>
+    <button data-tab="cartas" onclick="showTab('cartas')">
+      <span class="icon">✉️</span>Cartas
     </button>
     <button data-tab="mapa" onclick="showTab('mapa')">
       <span class="icon">📍</span>Mapa
@@ -935,9 +963,13 @@ const PRESET_DEDICATORIA = "";   // ej. "Para que nunca se te olvide lo fuerte q
 // Cuenta regresiva ya lista al abrir: título de la tarjeta y fecha. Vacíos = la persona la configura.
 const PRESET_EVENTO = "";   // ej. "Nuestro aniversario"
 const PRESET_FECHA = "";    // AAAA-MM-DD, ej. "2026-12-24"
+// Romántico es una carta de quien regala: sus razones para amar a la persona y cartas
+// "Ábrelo cuando…" selladas. Se llenan con ?armar=1 y se fijan con los botones "Fijar".
+const PRESET_RAZONES = [];
+const PRESET_CARTAS = [];
 // ================================
 
-let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], lugares: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, capsule: { text: "", sealed: false }, messagePool: [] };
+let state = { name: "", reminders: [], notes: [], symptoms: [], cartas: [], cartasAbiertas: {}, goodThings: [], contacts: [], photos: [], lugares: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, capsule: { text: "", sealed: false }, messagePool: [] };
 let lugarFotoTemp = null;
 let storageOk = true;
 
@@ -985,6 +1017,8 @@ async function init(){
   const notes = await safeGet('companion-notes');
   const moods = await safeGet('companion-moods');
   const symptoms = await safeGet('companion-symptoms');
+  const cartas = await safeGet('companion-cartas');
+  const cartasAbiertas = await safeGet('companion-cartas-abiertas');
   const goodThings = await safeGet('companion-goodthings');
   const contacts = await safeGet('companion-contacts');
   const countdown = await safeGet('companion-countdown');
@@ -997,6 +1031,16 @@ async function init(){
   try{ state.reminders = reminders ? JSON.parse(reminders) : []; }catch(e){ state.reminders = []; }
   try{ state.notes = notes ? JSON.parse(notes) : []; }catch(e){ state.notes = []; }
   try{ state.symptoms = symptoms ? JSON.parse(symptoms) : []; }catch(e){ state.symptoms = []; }
+  if(!symptoms && PRESET_RAZONES.length > 0){
+    state.symptoms = PRESET_RAZONES.map((t, i) => ({ id: 'razon-' + i, text: t, ts: Date.now() - i }));
+    await safeSet('companion-symptoms', JSON.stringify(state.symptoms));
+  }
+  try{ state.cartas = cartas ? JSON.parse(cartas) : []; }catch(e){ state.cartas = []; }
+  if(!cartas && PRESET_CARTAS.length > 0){
+    state.cartas = PRESET_CARTAS;
+    await safeSet('companion-cartas', JSON.stringify(state.cartas));
+  }
+  try{ state.cartasAbiertas = cartasAbiertas ? JSON.parse(cartasAbiertas) : {}; }catch(e){ state.cartasAbiertas = {}; }
   try{ state.goodThings = goodThings ? JSON.parse(goodThings) : []; }catch(e){ state.goodThings = []; }
   try{ state.moodByDate = moods ? JSON.parse(moods) : {}; }catch(e){ state.moodByDate = {}; }
   try{ state.contacts = contacts ? JSON.parse(contacts) : []; }catch(e){ state.contacts = []; }
@@ -1025,6 +1069,7 @@ async function init(){
   renderGoodThing();
   renderReminders();
   renderSymptoms();
+  renderCartas();
   renderNotes();
 }
 
@@ -1558,9 +1603,79 @@ async function deleteNote(id){
   renderNotes();
 }
 
+// ---- Cartas "Ábrelo cuando…" y razones fijadas ----
+function cuandoLimpio(t){ return t.trim().replace(/^ábrelo cuando\s*/i, '').replace(/…$|\.\.\.$/, '').trim(); }
+function renderCartas(){
+  const list = document.getElementById('cartasList');
+  const tab = document.querySelector('nav button[data-tab="cartas"]');
+  // La pestaña solo aparece si hay cartas (o si quien arma está llenándolas)
+  if(tab) tab.style.display = (state.cartas.length || MODO_ARMAR) ? '' : 'none';
+  list.innerHTML = '';
+  if(state.cartas.length === 0){
+    list.innerHTML = '<p class="empty">Todavía no hay cartas.</p>';
+    return;
+  }
+  state.cartas.forEach(c => {
+    const abierta = !!state.cartasAbiertas[c.id];
+    const card = document.createElement('div');
+    card.className = 'carta-card' + (abierta ? ' abierta' : '');
+    card.innerHTML = `
+      <div class="carta-top">
+        <span class="carta-sobre">${abierta ? '💌' : '✉️'}</span>
+        <div class="carta-cuando">Ábrelo cuando ${escapeHtml(c.cuando)}</div>
+      </div>
+      ${abierta ? `<p class="carta-texto">${escapeHtml(c.texto)}</p>` : '<button class="btn-ghost">Abrir</button>'}
+      <button class="item-del solo-armar">Eliminar</button>`;
+    const abrir = card.querySelector('.btn-ghost');
+    if(abrir) abrir.onclick = () => abrirCarta(c.id);
+    card.querySelector('.item-del').onclick = () => deleteCarta(c.id);
+    list.appendChild(card);
+  });
+}
+async function abrirCarta(id){
+  const c = state.cartas.find(x => x.id === id);
+  if(!c) return;
+  if(!confirm(`¿Ya es momento? Esta carta es para cuando ${c.cuando}.`)) return;
+  state.cartasAbiertas[id] = Date.now();
+  await safeSet('companion-cartas-abiertas', JSON.stringify(state.cartasAbiertas));
+  renderCartas();
+}
+async function addCarta(){
+  const cuandoEl = document.getElementById('cartaCuando');
+  const textoEl = document.getElementById('cartaTexto');
+  const cuando = cuandoLimpio(cuandoEl.value);
+  const texto = textoEl.value.trim();
+  if(!cuando || !texto){ alert('Escribe para cuándo es la carta y lo que dice.'); return; }
+  state.cartas.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), cuando, texto });
+  cuandoEl.value = ''; textoEl.value = '';
+  await safeSet('companion-cartas', JSON.stringify(state.cartas));
+  renderCartas();
+}
+async function deleteCarta(id){
+  if(!confirm('¿Eliminar esta carta?')) return;
+  state.cartas = state.cartas.filter(c => c.id !== id);
+  await safeSet('companion-cartas', JSON.stringify(state.cartas));
+  renderCartas();
+}
+// Escapa ";" y "<" para que el configurador y el navegador no corten el valor.
+async function copiarCodigo(nombre, datos){
+  const codigo = 'const ' + `${nombre} = ${JSON.stringify(datos).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
+  const aviso = `Pégalo en el archivo reemplazando la línea de ${nombre}, o pégalo en el configurador.`;
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
+}
+function exportarCartas(){
+  if(state.cartas.length === 0){ alert('Agrega al menos una carta.'); return; }
+  copiarCodigo('PRESET_CARTAS', state.cartas);
+}
+function exportarRazones(){
+  if(state.symptoms.length === 0){ alert('Agrega al menos una razón.'); return; }
+  copiarCodigo('PRESET_RAZONES', [...state.symptoms].sort((a,b) => b.ts - a.ts).map(x => x.text));
+}
+
 function resetApp(){
   if(!confirm('¿Borrar todo (nombre, recordatorios, notas, contactos, etc.) y empezar de cero?')) return;
-  ['companion-name','companion-reminders','companion-notes','companion-symptoms','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-capsule','companion-lugares'].forEach(k => {
+  ['companion-name','companion-reminders','companion-notes','companion-symptoms','companion-cartas','companion-cartas-abiertas','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-capsule','companion-lugares'].forEach(k => {
     try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
   });
   location.reload();

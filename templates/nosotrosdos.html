@@ -541,6 +541,16 @@
   .regalo-instalar ol{ margin:6px 0 10px; padding-left:20px; line-height:1.6; font-size:0.92rem; color:var(--text); }
   .regalo-instalar .fila{ display:flex; gap:8px; flex-wrap:wrap; }
   .regalo-instalar button{ background:transparent; border:1.5px solid var(--border); color:var(--text-soft); border-radius:10px; padding:8px 12px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; }
+
+  /* Nuestra historia (línea del tiempo) */
+  .timeline{ position:relative; margin-top:6px; padding-left:22px; }
+  .timeline::before{ content:""; position:absolute; left:7px; top:6px; bottom:6px; width:2px; background:var(--border); border-radius:2px; }
+  .hito{ position:relative; margin-bottom:18px; }
+  .hito::before{ content:""; position:absolute; left:-20px; top:5px; width:12px; height:12px; border-radius:50%; background:var(--plum); box-shadow:0 0 0 3px var(--bg); }
+  .hito-fecha{ font-size:0.78rem; font-weight:700; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.04em; }
+  .hito-titulo{ font-weight:700; color:var(--plum-dark); margin:2px 0; }
+  .hito-nota{ font-size:0.92rem; color:var(--text); line-height:1.5; white-space:pre-line; }
+  .hito .item-del{ padding:4px 0; min-height:auto; }
 </style>
 </head>
 <body>
@@ -586,7 +596,17 @@
           <button class="goto" onclick="showTab('recordatorios')">ver todos</button>
         </div>
 
-        <div class="card countdown-card">
+        <div class="card countdown-card" id="juntosCard">
+          <div class="cd-top">
+            <h3>Llevamos juntos</h3>
+            <button class="edit-link" onclick="editDesde()">editar</button>
+          </div>
+          <p class="cd-number" id="juntosNumber">--</p>
+          <p class="cd-caption" id="juntosCaption">Toca "editar" para poner desde cuándo están juntos.</p>
+          <button class="edit-link" id="agregarCdBtn" style="display:none; margin:12px auto 0;" onclick="editCountdown()">+ Agregar una cuenta regresiva (aniversario, viaje…)</button>
+        </div>
+
+        <div class="card countdown-card" id="cdCard" style="display:none;">
           <div class="cd-top">
             <h3 id="cdTitle">Nuestra fecha especial</h3>
             <button class="edit-link" onclick="editCountdown()">editar</button>
@@ -671,21 +691,19 @@
       </p>
       <button class="edit-link" style="display:block; margin:12px auto 0;" onclick="resetApp()">Reiniciar app (borra todo)</button>
     </section>
-    <!-- RAZONES -->
-    <section class="screen" id="screen-sintomas">
-      <h2 class="section-title">Razones para amarte</h2>
+    <!-- NUESTRA HISTORIA -->
+    <section class="screen" id="screen-historia">
+      <h2 class="section-title">Nuestra historia</h2>
       <div class="section-rule"></div>
-      <p class="empty" style="padding-top:0;">Toca lo que te hace pensar en tu persona hoy, para releerlo cuando quieras.</p>
-      <div class="quick-row">
-        <button class="chip symptom" onclick="quickAddSymptom('Tu risa')">Tu risa</button>
-        <button class="chip symptom" onclick="quickAddSymptom('Cómo me cuidas')">Cómo me cuidas</button>
-        <button class="chip symptom" onclick="quickAddSymptom('Nuestros planes juntos')">Nuestros planes juntos</button>
-        <button class="chip symptom" onclick="quickAddSymptom('Lo bien que me escuchas')">Lo bien que me escuchas</button>
-        <button class="chip symptom" onclick="quickAddSymptom('Cómo me haces sentir')">Cómo me haces sentir</button>
-        <button class="chip symptom" onclick="addCustomSymptom()">+ Otro</button>
+      <p class="empty" style="padding-top:0;">Los momentos que los trajeron hasta aquí: la primera cita, el primer viaje, el día que…</p>
+      <div class="add-row">
+        <input id="historiaTitulo" type="text" placeholder="¿Qué pasó? (ej. Nuestra primera cita)" maxlength="80">
+        <input id="historiaFecha" type="date" aria-label="Fecha">
+        <textarea id="historiaNota" placeholder="Un detalle para no olvidarlo (opcional)"></textarea>
+        <button class="btn-solid" style="width:100%;" onclick="addHistoria()">Agregar momento</button>
       </div>
-      <div id="symptomList"></div>
-      <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="shareSymptoms()">Compartir con mi persona 💌</button>
+      <div id="historiaList" class="timeline"></div>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarHistoria()">Fijar historia en el código</button>
     </section>
 
     <!-- NUESTRO MAPA -->
@@ -726,8 +744,8 @@
     <button data-tab="recordatorios" onclick="showTab('recordatorios')">
       <span class="icon">🔔</span>Recuerda
     </button>
-    <button data-tab="sintomas" onclick="showTab('sintomas')">
-      <span class="icon">💌</span>Razones
+    <button data-tab="historia" onclick="showTab('historia')">
+      <span class="icon">📖</span>Historia
     </button>
     <button data-tab="mapa" onclick="showTab('mapa')">
       <span class="icon">📍</span>Mapa
@@ -907,32 +925,32 @@ function pintarRegalo(){
 setTimeout(pintarRegalo, 0);
 
 const MESSAGES = [
-  "Cada mensaje tuyo me alegra el día, aunque sea uno chiquito.",
-  "No importa la distancia, te siento cerquita cuando pienso en ti.",
-  "Eres de las mejores cosas que me han pasado.",
-  "Hoy también te elijo, como todos los días.",
-  "Contigo hasta lo aburrido se vuelve mi cosa favorita.",
-  "Me encanta pensar en la próxima vez que nos vamos a ver.",
-  "Eres mi persona favorita para contarle hasta lo más tonto del día.",
-  "No hay distancia que le gane a las ganas que tengo de verte.",
-  "Gracias por hacerme sentir en casa, aunque estemos lejos.",
-  "Te extraño de una forma que ni yo me la explico bien.",
-  "Cada día contigo, aunque sea a distancia, vale la pena.",
-  "Eres la razón por la que sonrío viendo el celular como boba.",
-  "Contar los días para verte se ha vuelto mi pasatiempo favorito.",
-  "Me haces sentir que todo va a estar bien, aunque estés lejos.",
-  "Nuestra distancia se siente más corta cada día que sigues aquí.",
-  "Eres mi lugar seguro, aunque sea a través de una pantalla.",
-  "No me cansaría nunca de las buenas noches contigo.",
-  "Te pienso en los momentos más random del día, y me encanta.",
-  "Contigo todo se siente posible, hasta lo de sostener algo a distancia.",
-  "Eres mi persona favorita para planear el futuro.",
-  "Gracias por elegirme aunque no sea siempre fácil.",
-  "Me encanta lo nuestro, hasta en los días difíciles.",
-  "Nada me hace más feliz que un mensaje tuyo apenas despierto.",
-  "Contigo aprendí que el amor también se sostiene con paciencia.",
-  "Eres mi persona favorita, hoy y siempre.",
-  "Me emociona cada plan chiquito que hacemos para vernos."
+  "Lo nuestro se construye un día a la vez, y hoy también cuenta.",
+  "Somos mejor equipo de lo que creemos.",
+  "Nuestros días más normales son de nuestros favoritos.",
+  "Hoy también nos elegimos.",
+  "Juntos hasta lo aburrido se vuelve divertido.",
+  "Nos toca planear la siguiente aventura.",
+  "Lo que tenemos no es suerte: lo cuidamos entre los dos.",
+  "Tenemos más recuerdos buenos de los que alcanzamos a contar.",
+  "Nos entendemos hasta sin decir nada.",
+  "Lo mejor de nuestra historia todavía no pasa.",
+  "Somos nuestro lugar seguro.",
+  "Reírnos juntos sigue siendo nuestro plan favorito.",
+  "Nos hemos visto en días buenos y malos, y aquí seguimos.",
+  "Cualquier lugar se vuelve nuestro cuando vamos juntos.",
+  "Lo nuestro se nota en los detalles chiquitos.",
+  "Hoy es buen día para decirnos algo bonito.",
+  "Aprendimos a querernos también en los días difíciles.",
+  "Nuestra lista de cosas por hacer juntos sigue creciendo, y qué bueno.",
+  "Nos tocó encontrarnos, y nos toca seguir eligiéndonos.",
+  "Somos nuestro equipo favorito.",
+  "Cualquier plan es mejor si es de los dos.",
+  "Lo que construimos juntos vale cada esfuerzo.",
+  "Nuestra historia es de las buenas.",
+  "Nos gusta cuidarnos, y se nota.",
+  "Seguimos teniendo mil cosas por contarnos.",
+  "Juntos, hoy y lo que venga."
 ];
 
 const MOODS = [
@@ -956,12 +974,16 @@ const PRESET_DEDICATORIA = "";   // ej. "Para que nunca se te olvide lo fuerte q
 // vean lo mismo desde que abran su copia (uno lo llena, el otro también lo ve).
 const PRESET_CHECKLIST_JUNTOS = [];
 const PRESET_LUGARES = [];
-// Cuenta regresiva ya lista al abrir: título de la tarjeta y fecha. Vacíos = la persona la configura.
+// Cuenta regresiva OPCIONAL (aniversario, viaje…). Vacíos = la tarjeta no aparece hasta que la agreguen.
 const PRESET_EVENTO = "";   // ej. "Nuestro aniversario"
 const PRESET_FECHA = "";    // AAAA-MM-DD, ej. "2026-12-24"
+// Desde cuándo están juntos: arriba en Hoy sale "Llevamos X días juntos". Vacío = lo ponen ellos.
+const PRESET_DESDE = "";    // AAAA-MM-DD, ej. "2023-02-14"
+// Momentos de "Nuestra historia" (pestaña Historia). Se fijan con "Fijar historia en el código".
+const PRESET_HISTORIA = [];
 // ================================
 
-let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], lugares: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, capsule: { text: "", sealed: false }, messagePool: [] };
+let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], lugares: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, desde: "", historia: [], capsule: { text: "", sealed: false }, messagePool: [] };
 let lugarFotoTemp = null;
 let storageOk = true;
 
@@ -1012,6 +1034,8 @@ async function init(){
   const goodThings = await safeGet('companion-goodthings');
   const contacts = await safeGet('companion-contacts');
   const countdown = await safeGet('companion-countdown');
+  const desde = await safeGet('companion-desde');
+  const historia = await safeGet('companion-historia');
   const photos = await safeGet('companion-photos');
   const capsule = await safeGet('companion-capsule');
   const lugares = await safeGet('companion-lugares');
@@ -1032,6 +1056,13 @@ async function init(){
     state.countdown = { name: PRESET_EVENTO || state.countdown.name, date: PRESET_FECHA || state.countdown.date };
     await safeSet('companion-countdown', JSON.stringify(state.countdown));
   }
+  state.desde = desde || PRESET_DESDE || "";
+  if(!desde && PRESET_DESDE){ await safeSet('companion-desde', PRESET_DESDE); }
+  try{ state.historia = historia ? JSON.parse(historia) : []; }catch(e){ state.historia = []; }
+  if(!historia && PRESET_HISTORIA.length > 0){
+    state.historia = PRESET_HISTORIA;
+    await safeSet('companion-historia', JSON.stringify(state.historia));
+  }
   try{ state.photos = photos ? JSON.parse(photos) : []; }catch(e){ state.photos = []; }
   try{ state.capsule = capsule ? JSON.parse(capsule) : { text: "", sealed: false }; }catch(e){ state.capsule = { text: "", sealed: false }; }
   try{ state.lugares = lugares ? JSON.parse(lugares) : []; }catch(e){ state.lugares = []; }
@@ -1049,7 +1080,9 @@ async function init(){
   state.currentMsgIndex = dayOfYear() % state.messagePool.length;
 
   renderGreeting();
+  renderJuntos();
   renderCountdown();
+  renderHistoria();
   renderPhotos();
   renderCapsule();
   renderLugares();
@@ -1133,6 +1166,9 @@ function animateNumber(el, target){
 }
 
 function renderCountdown(){
+  // La cuenta regresiva es opcional: sin fecha, la tarjeta no aparece y queda el botón para agregarla.
+  document.getElementById('cdCard').style.display = state.countdown.date ? '' : 'none';
+  document.getElementById('agregarCdBtn').style.display = state.countdown.date ? 'none' : 'block';
   document.getElementById('cdTitle').textContent = state.countdown.name || 'Nuestra fecha especial';
   const numberEl = document.getElementById('cdNumber');
   if(!state.countdown.date){
@@ -1157,11 +1193,18 @@ function renderCountdown(){
 
 async function editCountdown(){
   const r = await pedir({ titulo: 'Cuenta regresiva', campos: [
-    { etiqueta: '¿Cómo se llama esta fecha? (aniversario, reencuentro, etc.)', valor: state.countdown.name },
-    { etiqueta: 'Fecha', tipo: 'date', valor: state.countdown.date || todayKey() }
+    { etiqueta: '¿Cómo se llama esta fecha? (ej. Nuestro aniversario, El viaje a Oaxaca)', valor: state.countdown.name },
+    { etiqueta: 'Fecha (bórrala para quitar la cuenta regresiva)', tipo: 'date', valor: state.countdown.date || todayKey() }
   ] });
   if(!r) return;
   const [name, date] = r;
+  if(!date.trim()){
+    state.countdown = { name: name.trim() || 'Nuestra fecha especial', date: '' };
+    await safeSet('companion-countdown', JSON.stringify(state.countdown));
+    renderCountdown();
+    renderCapsule();
+    return;
+  }
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) { alert('Formato de fecha inválido, usa AAAA-MM-DD'); return; }
   state.countdown = { name: name.trim() || 'Nuestra fecha especial', date: date.trim() };
   await safeSet('companion-countdown', JSON.stringify(state.countdown));
@@ -1386,6 +1429,18 @@ async function shareChecklist(){
   }
 }
 
+// La cápsula se abre en la fecha de la cuenta regresiva o, si no hay, en su próximo aniversario.
+// La fecha se guarda al sellarla para que no se mueva después.
+function fechaCapsula(){
+  if(state.countdown.date) return state.countdown.date;
+  return proximoAniversario();
+}
+function capsulaAbierta(){
+  const abre = state.capsule.abre || state.countdown.date;
+  if(!abre) return false;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  return hoy >= new Date(abre + 'T00:00:00');
+}
 function isCountdownReached(){
   if(!state.countdown.date) return false;
   const today = new Date(); today.setHours(0,0,0,0);
@@ -1402,16 +1457,17 @@ function renderCapsule(){
     `;
     return;
   }
-  if(isCountdownReached()){
+  if(capsulaAbierta()){
     el.innerHTML = `
       <div class="capsule-open">
         <p>${escapeHtml(state.capsule.text)}</p>
       </div>
     `;
   } else {
-    const dateLabel = state.countdown.date
-      ? new Date(state.countdown.date + 'T00:00:00').toLocaleDateString('es-MX', { day:'numeric', month:'long' })
-      : 'tu fecha especial';
+    const abre = state.capsule.abre || state.countdown.date;
+    const dateLabel = abre
+      ? new Date(abre + 'T00:00:00').toLocaleDateString('es-MX', { day:'numeric', month:'long' })
+      : 'su fecha especial';
     el.innerHTML = `
       <div class="capsule-sealed">
         <div class="lock">🔒</div>
@@ -1424,8 +1480,11 @@ function renderCapsule(){
 async function sealCapsule(){
   const text = document.getElementById('capsuleText').value.trim();
   if(!text) return;
-  if(!confirm('Una vez sellada no vas a poder editarla hasta que llegue la fecha. ¿Sellar ahora?')) return;
-  state.capsule = { text, sealed: true };
+  const abre = fechaCapsula();
+  if(!abre){ alert('Primero pongan desde cuándo están juntos o una cuenta regresiva: la cápsula se abre ese día.'); return; }
+  const cuando = new Date(abre + 'T00:00:00').toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
+  if(!confirm(`Se va a abrir el ${cuando} y no se podrá editar antes. ¿Sellar ahora?`)) return;
+  state.capsule = { text, sealed: true, abre };
   await safeSet('companion-capsule', JSON.stringify(state.capsule));
   renderCapsule();
 }
@@ -1590,6 +1649,7 @@ async function deleteReminder(id){
 
 function renderSymptoms(){
   const list = document.getElementById('symptomList');
+  if(!list) return;  // Nosotros dos ya no tiene la sección de razones
   list.innerHTML = '';
   if(state.symptoms.length === 0){
     list.innerHTML = '<p class="empty">Aún no has anotado nada. Toca un botón de arriba cuando sientas algo.</p>';
@@ -1693,9 +1753,95 @@ async function deleteNote(id){
   renderNotes();
 }
 
+// ---- Llevamos X días juntos ----
+function proximoAniversario(){
+  if(!state.desde) return null;
+  const [y, m, d] = state.desde.split('-').map(Number);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  let fecha = new Date(hoy.getFullYear(), m - 1, d);
+  if(fecha < hoy) fecha = new Date(hoy.getFullYear() + 1, m - 1, d);
+  return `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
+}
+function renderJuntos(){
+  const num = document.getElementById('juntosNumber');
+  const cap = document.getElementById('juntosCaption');
+  if(!state.desde){ num.textContent = '--'; cap.textContent = 'Toca "editar" para poner desde cuándo están juntos.'; return; }
+  const inicio = new Date(state.desde + 'T00:00:00');
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const dias = Math.round((hoy - inicio) / 86400000);
+  if(dias < 0){ num.textContent = '--'; cap.textContent = 'Esa fecha todavía no llega. Toca "editar".'; return; }
+  let anios = hoy.getFullYear() - inicio.getFullYear();
+  let meses = hoy.getMonth() - inicio.getMonth();
+  if(hoy.getDate() < inicio.getDate()) meses--;
+  if(meses < 0){ anios--; meses += 12; }
+  animateNumber(num, dias);
+  const desdeTxt = inicio.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
+  if(anios > 0 && hoy.getMonth() === inicio.getMonth() && hoy.getDate() === inicio.getDate()){
+    cap.textContent = `¡Hoy cumplen ${anios} ${anios === 1 ? 'año' : 'años'} juntos! 🎉`;
+    return;
+  }
+  const tiempo = [anios ? `${anios} ${anios === 1 ? 'año' : 'años'}` : '', meses ? `${meses} ${meses === 1 ? 'mes' : 'meses'}` : ''].filter(Boolean).join(' y ');
+  cap.textContent = `${dias === 1 ? 'día' : 'días'} juntos · desde el ${desdeTxt}${tiempo ? ` (${tiempo})` : ''}`;
+}
+async function editDesde(){
+  const r = await pedir({ titulo: 'Llevamos juntos', campos: [{ etiqueta: '¿Desde cuándo están juntos?', tipo: 'date', valor: state.desde || '' }] });
+  if(!r) return;
+  state.desde = r[0].trim();
+  await safeSet('companion-desde', state.desde);
+  renderJuntos();
+}
+
+// ---- Nuestra historia ----
+function renderHistoria(){
+  const list = document.getElementById('historiaList');
+  list.innerHTML = '';
+  if(state.historia.length === 0){
+    list.innerHTML = '<p class="empty" style="margin-left:-22px;">Todavía no hay momentos. Empiecen por el primero: ¿cómo se conocieron?</p>';
+    return;
+  }
+  const orden = [...state.historia].sort((a, b) => (a.fecha || '9999').localeCompare(b.fecha || '9999'));
+  orden.forEach(h => {
+    const item = document.createElement('div');
+    item.className = 'hito';
+    const fecha = h.fecha ? new Date(h.fecha + 'T00:00:00').toLocaleDateString('es-MX', { day:'numeric', month:'short', year:'numeric' }) : 'Sin fecha';
+    item.innerHTML = `
+      <div class="hito-fecha">${escapeHtml(fecha)}</div>
+      <div class="hito-titulo">${escapeHtml(h.titulo)}</div>
+      ${h.nota ? `<div class="hito-nota">${escapeHtml(h.nota)}</div>` : ''}
+      <button class="item-del">Eliminar</button>`;
+    item.querySelector('.item-del').onclick = () => deleteHistoria(h.id);
+    list.appendChild(item);
+  });
+}
+async function addHistoria(){
+  const tEl = document.getElementById('historiaTitulo');
+  const fEl = document.getElementById('historiaFecha');
+  const nEl = document.getElementById('historiaNota');
+  const titulo = tEl.value.trim();
+  if(!titulo){ tEl.focus(); return; }
+  state.historia.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), titulo, fecha: fEl.value || '', nota: nEl.value.trim() });
+  tEl.value = ''; fEl.value = ''; nEl.value = '';
+  await safeSet('companion-historia', JSON.stringify(state.historia));
+  renderHistoria();
+}
+async function deleteHistoria(id){
+  if(!confirm('¿Eliminar este momento?')) return;
+  state.historia = state.historia.filter(h => h.id !== id);
+  await safeSet('companion-historia', JSON.stringify(state.historia));
+  renderHistoria();
+}
+async function exportarHistoria(){
+  if(state.historia.length === 0){ alert('Agrega al menos un momento.'); return; }
+  // "const " separado y ";"/"<" escapados, igual que los demás botones "Fijar"
+  const codigo = 'const ' + `PRESET_HISTORIA = ${JSON.stringify(state.historia).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
+  const aviso = 'Pégalo en el archivo reemplazando la línea de PRESET_HISTORIA, o pégalo en el configurador.';
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
+}
+
 function resetApp(){
   if(!confirm('¿Borrar todo (nombre, recordatorios, notas, contactos, etc.) y empezar de cero?')) return;
-  ['companion-name','companion-reminders','companion-notes','companion-symptoms','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-capsule','companion-lugares','companion-checklist'].forEach(k => {
+  ['companion-name','companion-reminders','companion-notes','companion-symptoms','companion-desde','companion-historia','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-capsule','companion-lugares','companion-checklist'].forEach(k => {
     try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
   });
   location.reload();
