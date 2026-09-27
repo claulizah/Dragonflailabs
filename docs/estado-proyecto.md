@@ -55,7 +55,7 @@ El desarrollo se hace en **Claude Code**, directo sobre el repo, que es la fuent
 
 **Estado por plantilla:**
 - **Integrados**: escritorio con pollito (Home Office, 27-sep; también en favicon e ícono de instalación), maleta (Viaje, 27-sep; reemplaza al reloj de arena genérico), carriola (Bebé, 26-sep), mancuerna (Reto), rosa (Romántico), estetoscopio (Salud), moneda (Adulta funcional), anillos (Boda), ojo Boho/Celestial (Mi Radar), ramo Boho/Wedding (Damas), candado con llave (Nosotros dos).
-- **Elegidos, por integrar**: Mi semestre → pila de libros pastel (hoy tiene un ícono provisional, emoji 📚). Mensajes sorpresa → sobre con gatito: ya está en `assets/iconos/sorpresa-sobre-gatito-220.png` y entra con el punto 8 de la revisión UX.
+- **Elegidos, por integrar**: Mi semestre → pila de libros pastel (hoy tiene un ícono provisional, emoji 📚). Mensajes sorpresa → sobre con gatito: integrado el 27-sep (portada, favicon e ícono de instalación).
 - **Guardados sin usar todavía** (`assets/iconos/`): post-it, reloj de arena y sobre con conejito.
 - **Bebé (integrado 26-sep)**: la portada es la **carriola rosa/lila con capota azul**, del set kawaii "sticker" (contorno café grueso, pastel vivo). Está en `assets/iconos/bebe-carriola-220.png` (220×219, 9 KB) e incrustada como portada de `cuentaregresiva-bebe.html`. El favicon y el ícono de instalación siguen siendo los anteriores. Del mismo set hay íconos para usar adentro de la app: biberón, pañal, zapatitos, cuna, móvil, body, torre de aros, luna, arcoíris, carriola de gajos.
 - **Cumpleaños (íconos reservados, mismo set sticker)**: pastel con vela (candidato a portada), gorrito, globos, regalo.
