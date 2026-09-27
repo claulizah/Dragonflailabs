@@ -736,7 +736,8 @@ function exportarMensajesSorpresa(){
     return;
   }
   const codigo = 'const ' + `PRESET_MENSAJES_SORPRESA = ${JSON.stringify(state.mensajes).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
-  mostrarTexto('Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_MENSAJES_SORPRESA (cerca del inicio del <script>). También llena PRESET_NAME, PRESET_FESTEJO y PRESET_FECHA justo arriba. Así el festejado ve todo desde que abre la app:', codigo);
+  const aviso = 'Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_MENSAJES_SORPRESA (cerca del inicio del <script>). También llena PRESET_NAME, PRESET_FESTEJO y PRESET_FECHA justo arriba. Así el festejado ve todo desde que abre la app:';
+  navigator.clipboard.writeText(codigo).then(() => alert('Copiado ✓\n\n' + aviso), () => mostrarTexto(aviso, codigo));
 }
 
 /* RESET */

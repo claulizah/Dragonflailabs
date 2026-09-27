@@ -725,6 +725,7 @@
     <section class="screen" id="screen-juntos">
       <h2 class="section-title">Cosas por hacer juntos</h2>
       <div class="section-rule"></div>
+      <p class="empty" style="padding:0 0 10px;">Empezamos con ideas de citas. Palomeen las que ya hicieron, borren las que no y agreguen las suyas.</p>
       <p class="checklist-caption" id="checklistCaption">Aún no agregan pendientes.</p>
       <div class="prog-track" style="margin-bottom:18px;"><div class="prog-fill" id="checklistFill"></div></div>
       <div class="add-row">
@@ -983,6 +984,29 @@ const PRESET_DESDE = "";    // AAAA-MM-DD, ej. "2023-02-14"
 const PRESET_HISTORIA = [];
 // ================================
 
+// Ideas de citas: lista sugerida de la pestaña Juntos si no hay PRESET_CHECKLIST_JUNTOS.
+const DEFAULT_IDEAS_CITAS = [
+  "Noche de película en casa con cobijas",
+  "Picnic en un parque",
+  "Cocinar juntos una receta nueva",
+  "Cena temática de la cocina de otro país",
+  "Ir a un mercado a probar algo que nunca hayamos comido",
+  "Ver el atardecer desde un mirador",
+  "Museo en domingo",
+  "Noche de juegos de mesa",
+  "Escape room",
+  "Paseo en bici",
+  "Café en un lugar nuevo",
+  "Karaoke",
+  "Playlist compartida para bailar en casa",
+  "Escribirnos una carta y leerla en voz alta",
+  "Recrear nuestra primera cita",
+  "Clase de baile o de cerámica",
+  "Voluntariado juntos",
+  "Ver las estrellas lejos de la ciudad",
+  "Maratón de la serie favorita del otro"
+];
+
 let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], lugares: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, desde: "", historia: [], capsule: { text: "", sealed: false }, messagePool: [] };
 let lugarFotoTemp = null;
 let storageOk = true;
@@ -1071,8 +1095,8 @@ async function init(){
     await safeSet('companion-lugares', JSON.stringify(state.lugares));
   }
   try{ state.checklist = checklist ? JSON.parse(checklist) : []; }catch(e){ state.checklist = []; }
-  if(state.checklist.length === 0 && PRESET_CHECKLIST_JUNTOS.length > 0){
-    state.checklist = PRESET_CHECKLIST_JUNTOS;
+  if(!checklist){
+    state.checklist = PRESET_CHECKLIST_JUNTOS.length ? PRESET_CHECKLIST_JUNTOS : DEFAULT_IDEAS_CITAS.map((x, n) => typeof x === 'string' ? { id: 'lista-' + n, text: x, done: false } : { id: 'lista-' + n, text: x.text, grupo: x.grupo, done: false });
     await safeSet('companion-checklist', JSON.stringify(state.checklist));
   }
 
@@ -1335,7 +1359,8 @@ function exportarLugares(){
     return;
   }
   const codigo = 'const ' + `PRESET_LUGARES = ${JSON.stringify(state.lugares).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
-  mostrarTexto('Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_LUGARES (cerca del inicio del <script>). Nota: si agregaste fotos, este texto puede ser muy largo.', codigo);
+  const aviso = 'Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_LUGARES (cerca del inicio del <script>). Nota: si agregaste fotos, este texto puede ser muy largo.';
+  navigator.clipboard.writeText(codigo).then(() => alert('Copiado ✓\n\n' + aviso), () => mostrarTexto(aviso, codigo));
 }
 
 function renderChecklist(){
@@ -1402,7 +1427,8 @@ function exportarChecklistJuntos(){
     return;
   }
   const codigo = 'const ' + `PRESET_CHECKLIST_JUNTOS = ${JSON.stringify(state.checklist).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
-  mostrarTexto('Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_CHECKLIST_JUNTOS (cerca del inicio del <script>):', codigo);
+  const aviso = 'Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_CHECKLIST_JUNTOS (cerca del inicio del <script>):';
+  navigator.clipboard.writeText(codigo).then(() => alert('Copiado ✓\n\n' + aviso), () => mostrarTexto(aviso, codigo));
 }
 
 async function shareChecklist(){

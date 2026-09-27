@@ -635,8 +635,9 @@
     </section>
     <!-- PREPARATIVOS -->
     <section class="screen" id="screen-sintomas">
-      <h2 class="section-title">Preparativos</h2>
+      <h2 class="section-title">Checklist de viaje</h2>
       <div class="section-rule"></div>
+      <p class="empty" style="padding:0 0 10px;">Tu checklist de viaje. Borra lo que no aplique y agrega lo tuyo.</p>
       <p class="checklist-caption" id="checklistCaption">Aún no agregas pendientes.</p>
       <div class="prog-track" style="margin-bottom:18px;"><div class="prog-fill" id="checklistFill"></div></div>
       <div class="add-row">
@@ -645,6 +646,7 @@
       </div>
       <div id="checklistItems"></div>
       <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="shareChecklist()">Compartir mis preparativos 📋</button>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarLista()">Fijar lista en el código</button>
     </section>
     <!-- DIARIO -->
     <section class="screen" id="screen-diario">
@@ -892,7 +894,32 @@ const PRESET_DEDICATORIA = "";   // ej. "Para que nunca se te olvide lo fuerte q
 // Cuenta regresiva ya lista al abrir: título de la tarjeta y fecha. Vacíos = la persona la configura.
 const PRESET_EVENTO = "";   // ej. "Nuestro viaje a Oaxaca"
 const PRESET_FECHA = "";    // AAAA-MM-DD, ej. "2026-12-24"
+// Checklist de viaje (pestaña Prepara). Vacío = sale la lista sugerida de abajo (DEFAULT_CHECKLIST_VIAJE).
+// Se edita en la app y se fija con "Fijar lista en el código" (con ?armar=1).
+const PRESET_CHECKLIST_VIAJE = [];
 // ================================
+
+// Lista sugerida para la primera apertura. Quien recibe la app puede palomear, borrar y agregar.
+const DEFAULT_CHECKLIST_VIAJE = [
+  "Pasaporte o INE vigente",
+  "Copia de tus documentos en la nube",
+  "Boletos y reservaciones a la mano",
+  "Seguro de viaje",
+  "Avisar al banco que vas a viajar",
+  "Algo de efectivo en moneda local",
+  "Cargadores, power bank y adaptador de corriente",
+  "Medicinas y botiquín básico",
+  "Ropa según el clima del destino",
+  "Traje de baño",
+  "Bloqueador y lentes de sol",
+  "Artículos de higiene en envases de viaje",
+  "Audífonos",
+  "Etiqueta con tus datos en la maleta",
+  "Lista de contactos de emergencia",
+  "Check-in en línea un día antes",
+  "Encargar plantas o mascotas",
+  "Sacar la basura y vaciar el refri"
+];
 
 let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestro viaje", date: "" }, messagePool: [] };
 let storageOk = true;
@@ -964,6 +991,10 @@ async function init(){
   }
   try{ state.photos = photos ? JSON.parse(photos) : []; }catch(e){ state.photos = []; }
   try{ state.checklist = checklist ? JSON.parse(checklist) : []; }catch(e){ state.checklist = []; }
+  if(!checklist){
+    state.checklist = (PRESET_CHECKLIST_VIAJE.length ? PRESET_CHECKLIST_VIAJE : DEFAULT_CHECKLIST_VIAJE).map((x, n) => typeof x === 'string' ? { id: 'lista-' + n, text: x, done: false } : { id: 'lista-' + n, text: x.text, grupo: x.grupo, done: false });
+    await safeSet('companion-checklist', JSON.stringify(state.checklist));
+  }
 
   state.messagePool = MESSAGES;
   state.currentMsgIndex = dayOfYear() % state.messagePool.length;
@@ -1357,6 +1388,16 @@ async function deleteChecklistItem(id){
   state.checklist = state.checklist.filter(x => x.id !== id);
   await safeSet('companion-checklist', JSON.stringify(state.checklist));
   renderChecklist();
+}
+
+// "Fijar lista en el código": exporta la lista actual (sin palomitas) para pegarla en PRESET_CHECKLIST_VIAJE.
+async function exportarLista(){
+  if(state.checklist.length === 0){ alert('La lista está vacía.'); return; }
+  const datos = state.checklist.map(i => i.grupo ? { text: i.text, grupo: i.grupo } : i.text);
+  const codigo = 'const ' + `PRESET_CHECKLIST_VIAJE = ${JSON.stringify(datos).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
+  const aviso = 'Pégalo en el archivo reemplazando la línea de PRESET_CHECKLIST_VIAJE, o pégalo en el configurador.';
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
 }
 
 async function shareChecklist(){

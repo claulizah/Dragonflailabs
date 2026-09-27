@@ -1168,7 +1168,8 @@ function exportarMensajesDamas(){
     return;
   }
   const codigo = 'const ' + `PRESET_MENSAJES_DAMAS = ${JSON.stringify(state.mensajesDamas).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
-  mostrarTexto('Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_MENSAJES_DAMAS (cerca del inicio del <script>). Así todas las damas van a ver estos mismos mensajes desde que abran su copia:', codigo);
+  const aviso = 'Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_MENSAJES_DAMAS (cerca del inicio del <script>). Así todas las damas van a ver estos mismos mensajes desde que abran su copia:';
+  navigator.clipboard.writeText(codigo).then(() => alert('Copiado ✓\n\n' + aviso), () => mostrarTexto(aviso, codigo));
 }
 
 function resizeImage(file, maxDim, quality){

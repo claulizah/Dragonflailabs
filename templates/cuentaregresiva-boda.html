@@ -635,8 +635,9 @@
     </section>
     <!-- PREPARATIVOS -->
     <section class="screen" id="screen-sintomas">
-      <h2 class="section-title">Preparativos</h2>
+      <h2 class="section-title">Pendientes del último mes</h2>
       <div class="section-rule"></div>
+      <p class="empty" style="padding:0 0 10px;">Lo que suele quedar para el último mes. Borra lo que no aplique y agrega lo tuyo.</p>
       <p class="checklist-caption" id="checklistCaption">Aún no agregas pendientes.</p>
       <div class="prog-track" style="margin-bottom:18px;"><div class="prog-fill" id="checklistFill"></div></div>
       <div class="add-row">
@@ -645,6 +646,7 @@
       </div>
       <div id="checklistItems"></div>
       <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="shareChecklist()">Compartir mis preparativos 📋</button>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarLista()">Fijar lista en el código</button>
     </section>
     <!-- DIARIO -->
     <section class="screen" id="screen-diario">
@@ -892,7 +894,32 @@ const PRESET_DEDICATORIA = "";   // ej. "Para que nunca se te olvide lo fuerte q
 // Cuenta regresiva ya lista al abrir: título de la tarjeta y fecha. Vacíos = la persona la configura.
 const PRESET_EVENTO = "";   // ej. "La boda de Ana y Luis"
 const PRESET_FECHA = "";    // AAAA-MM-DD, ej. "2026-12-24"
+// Pendientes del último mes (pestaña Prepara). Vacío = sale la lista sugerida de abajo (DEFAULT_ULTIMO_MES).
+// Se edita en la app y se fija con "Fijar lista en el código" (con ?armar=1).
+const PRESET_ULTIMO_MES = [];
 // ================================
+
+// Lista sugerida para la primera apertura. Quien recibe la app puede palomear, borrar y agregar.
+const DEFAULT_ULTIMO_MES = [
+  "Confirmar el número final de invitados",
+  "Entregar la lista de mesas al salón",
+  "Última prueba del vestido o del traje",
+  "Confirmar horarios con fotógrafo, música y banquete",
+  "Liquidar proveedores y asignar quién entrega cada sobre ese día",
+  "Armar el cronograma del día y compartirlo",
+  "Ensayar la entrada y la salida con la música",
+  "Confirmar quién recibe regalos y sobres ese día",
+  "Si es al aire libre: plan B por lluvia",
+  "Amoldar los zapatos",
+  "Prueba de peinado y maquillaje",
+  "Recoger los anillos",
+  "Kit de emergencia: costurero, curitas y analgésico",
+  "Confirmar el transporte",
+  "Escribir los votos",
+  "Elegir a alguien que coordine el día",
+  "Empacar para la luna de miel",
+  "Dormir bien la última semana"
+];
 
 let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra boda", date: "" }, messagePool: [] };
 let storageOk = true;
@@ -964,6 +991,10 @@ async function init(){
   }
   try{ state.photos = photos ? JSON.parse(photos) : []; }catch(e){ state.photos = []; }
   try{ state.checklist = checklist ? JSON.parse(checklist) : []; }catch(e){ state.checklist = []; }
+  if(!checklist){
+    state.checklist = (PRESET_ULTIMO_MES.length ? PRESET_ULTIMO_MES : DEFAULT_ULTIMO_MES).map((x, n) => typeof x === 'string' ? { id: 'lista-' + n, text: x, done: false } : { id: 'lista-' + n, text: x.text, grupo: x.grupo, done: false });
+    await safeSet('companion-checklist', JSON.stringify(state.checklist));
+  }
 
   state.messagePool = MESSAGES;
   state.currentMsgIndex = dayOfYear() % state.messagePool.length;
@@ -1357,6 +1388,16 @@ async function deleteChecklistItem(id){
   state.checklist = state.checklist.filter(x => x.id !== id);
   await safeSet('companion-checklist', JSON.stringify(state.checklist));
   renderChecklist();
+}
+
+// "Fijar lista en el código": exporta la lista actual (sin palomitas) para pegarla en PRESET_ULTIMO_MES.
+async function exportarLista(){
+  if(state.checklist.length === 0){ alert('La lista está vacía.'); return; }
+  const datos = state.checklist.map(i => i.grupo ? { text: i.text, grupo: i.grupo } : i.text);
+  const codigo = 'const ' + `PRESET_ULTIMO_MES = ${JSON.stringify(datos).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
+  const aviso = 'Pégalo en el archivo reemplazando la línea de PRESET_ULTIMO_MES, o pégalo en el configurador.';
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
 }
 
 async function shareChecklist(){

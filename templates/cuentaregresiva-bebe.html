@@ -510,6 +510,11 @@
   .regalo-instalar ol{ margin:6px 0 10px; padding-left:20px; line-height:1.6; font-size:0.92rem; color:var(--text); }
   .regalo-instalar .fila{ display:flex; gap:8px; flex-wrap:wrap; }
   .regalo-instalar button{ background:transparent; border:1.5px solid var(--border); color:var(--text-soft); border-radius:10px; padding:8px 12px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; }
+
+  /* Secciones de la maleta del hospital */
+  .lista-grupo{ font-size:0.8rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-soft); margin:18px 0 2px; }
+  .lista-grupo:first-child{ margin-top:4px; }
+  #checklistGrupo{ font-family:inherit; font-size:1rem; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border); background:var(--card); color:var(--text); }
 </style>
 </head>
 <body>
@@ -635,16 +640,23 @@
     </section>
     <!-- PREPARATIVOS -->
     <section class="screen" id="screen-sintomas">
-      <h2 class="section-title">Preparativos</h2>
+      <h2 class="section-title">Maleta del hospital</h2>
       <div class="section-rule"></div>
+      <p class="empty" style="padding:0 0 10px;">Empezamos con la maleta del hospital. Borra lo que no necesites y agrega lo tuyo.</p>
       <p class="checklist-caption" id="checklistCaption">Aún no agregas pendientes.</p>
       <div class="prog-track" style="margin-bottom:18px;"><div class="prog-fill" id="checklistFill"></div></div>
       <div class="add-row">
+        <select id="checklistGrupo" aria-label="Sección">
+          <option value="mama">Para mamá</option>
+          <option value="bebe">Para el bebé</option>
+          <option value="">Otro pendiente</option>
+        </select>
         <input id="checklistText" type="text" placeholder="¿Qué falta hacer?">
         <button class="btn-solid" style="width:100%;" onclick="addChecklistItem()">Agregar pendiente</button>
       </div>
       <div id="checklistItems"></div>
       <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="shareChecklist()">Compartir mis preparativos 📋</button>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarLista()">Fijar lista en el código</button>
     </section>
     <!-- DIARIO -->
     <section class="screen" id="screen-diario">
@@ -893,7 +905,31 @@ const PRESET_DEDICATORIA = "";   // ej. "Para que nunca se te olvide lo fuerte q
 // Cuenta regresiva ya lista al abrir: título de la tarjeta y fecha. Vacíos = la persona la configura.
 const PRESET_EVENTO = "";   // ej. "La llegada de Emilia"
 const PRESET_FECHA = "";    // AAAA-MM-DD, ej. "2026-12-24"
+// Maleta del hospital (pestaña Prepara). Vacío = sale la lista sugerida de abajo (DEFAULT_MALETA_HOSPITAL).
+// Se edita en la app y se fija con "Fijar lista en el código" (con ?armar=1).
+const PRESET_MALETA_HOSPITAL = [];
 // ================================
+
+// Lista sugerida para la primera apertura. Quien recibe la app puede palomear, borrar y agregar.
+const DEFAULT_MALETA_HOSPITAL = [
+  {"text": "Carpeta con INE, póliza, plan de parto y estudios impresos (por si falla el celular)", "grupo": "mama"},
+  {"text": "Bata o pijama que abra al frente", "grupo": "mama"},
+  {"text": "2 o 3 brasieres de lactancia", "grupo": "mama"},
+  {"text": "Crema para pezones", "grupo": "mama"},
+  {"text": "Toallas sanitarias maternales", "grupo": "mama"},
+  {"text": "Calzones cómodos o desechables", "grupo": "mama"},
+  {"text": "Pantuflas y calcetines", "grupo": "mama"},
+  {"text": "Cepillo de dientes, shampoo y liga para el pelo", "grupo": "mama"},
+  {"text": "Cargador de celular con cable largo", "grupo": "mama"},
+  {"text": "Snacks ligeros para ti y tu acompañante", "grupo": "mama"},
+  {"text": "Ropa cómoda para salir del hospital", "grupo": "mama"},
+  {"text": "3 mamelucos o bodies", "grupo": "bebe"},
+  {"text": "Gorrito y calcetines", "grupo": "bebe"},
+  {"text": "Cobijita", "grupo": "bebe"},
+  {"text": "Pañales de recién nacido y toallitas", "grupo": "bebe"},
+  {"text": "Conjunto para salir del hospital", "grupo": "bebe"},
+  {"text": "Silla para el auto ya instalada", "grupo": "bebe"}
+];
 
 let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "La llegada", date: "" }, messagePool: [] };
 let storageOk = true;
@@ -965,6 +1001,10 @@ async function init(){
   }
   try{ state.photos = photos ? JSON.parse(photos) : []; }catch(e){ state.photos = []; }
   try{ state.checklist = checklist ? JSON.parse(checklist) : []; }catch(e){ state.checklist = []; }
+  if(!checklist){
+    state.checklist = (PRESET_MALETA_HOSPITAL.length ? PRESET_MALETA_HOSPITAL : DEFAULT_MALETA_HOSPITAL).map((x, n) => typeof x === 'string' ? { id: 'lista-' + n, text: x, done: false } : { id: 'lista-' + n, text: x.text, grupo: x.grupo, done: false });
+    await safeSet('companion-checklist', JSON.stringify(state.checklist));
+  }
 
   state.messagePool = MESSAGES;
   state.currentMsgIndex = dayOfYear() % state.messagePool.length;
@@ -1320,8 +1360,22 @@ function renderChecklist(){
   fill.style.width = Math.max(pct, 4) + '%';
   caption.textContent = `${pct}% completado · ${doneCount} de ${state.checklist.length} pendientes`;
 
-  const sorted = [...state.checklist].sort((a,b) => (a.done === b.done) ? 0 : (a.done ? 1 : -1));
+  // Secciones de la maleta: primero mamá, luego bebé, al final lo demás
+  const GRUPOS = [['mama', 'Para mamá'], ['bebe', 'Para el bebé'], ['', 'Otros pendientes']];
+  const sorted = [...state.checklist].sort((a,b) => {
+    const ga = GRUPOS.findIndex(g => g[0] === (a.grupo || '')), gb = GRUPOS.findIndex(g => g[0] === (b.grupo || ''));
+    if(ga !== gb) return ga - gb;
+    return (a.done === b.done) ? 0 : (a.done ? 1 : -1);
+  });
+  let grupoActual = null;
   sorted.forEach(i => {
+    if((i.grupo || '') !== grupoActual){
+      grupoActual = i.grupo || '';
+      const h = document.createElement('h3');
+      h.className = 'lista-grupo';
+      h.textContent = GRUPOS.find(g => g[0] === grupoActual)[1];
+      list.appendChild(h);
+    }
     const item = document.createElement('div');
     item.className = 'item';
     item.innerHTML = `
@@ -1341,7 +1395,8 @@ async function addChecklistItem(){
   const el = document.getElementById('checklistText');
   const text = el.value.trim();
   if(!text) return;
-  state.checklist.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, done:false });
+  const grupo = document.getElementById('checklistGrupo').value;
+  state.checklist.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, grupo: grupo || undefined, done:false });
   el.value = '';
   await safeSet('companion-checklist', JSON.stringify(state.checklist));
   renderChecklist();
@@ -1358,6 +1413,16 @@ async function deleteChecklistItem(id){
   state.checklist = state.checklist.filter(x => x.id !== id);
   await safeSet('companion-checklist', JSON.stringify(state.checklist));
   renderChecklist();
+}
+
+// "Fijar lista en el código": exporta la lista actual (sin palomitas) para pegarla en PRESET_MALETA_HOSPITAL.
+async function exportarLista(){
+  if(state.checklist.length === 0){ alert('La lista está vacía.'); return; }
+  const datos = state.checklist.map(i => i.grupo ? { text: i.text, grupo: i.grupo } : i.text);
+  const codigo = 'const ' + `PRESET_MALETA_HOSPITAL = ${JSON.stringify(datos).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
+  const aviso = 'Pégalo en el archivo reemplazando la línea de PRESET_MALETA_HOSPITAL, o pégalo en el configurador.';
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
 }
 
 async function shareChecklist(){
