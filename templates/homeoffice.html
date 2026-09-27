@@ -361,6 +361,10 @@
   .mov-tag.cobrar{ color: var(--sage); }
   .monto{ font-size:0.92rem; color: var(--marigold); font-weight:700; white-space:nowrap; margin-top:3px; }
   .chip.light{ border-style: solid; border-color: var(--border); color: var(--text); }
+
+  /* Modo armar: herramientas para quien arma la app (solo con ?armar=1 en la URL) */
+  body:not(.armando) .solo-armar{ display:none !important; }
+  .armar-banner{ position:fixed; top:0; left:0; right:0; z-index:1000; background:#1f1f1f; color:#fff; font:600 0.72rem/1.3 sans-serif; text-align:center; padding:6px 10px; letter-spacing:0.02em; }
 </style>
 </head>
 <body>
@@ -415,7 +419,7 @@
             <input id="checkInput" type="text" placeholder="Agregar algo al checklist diario..." maxlength="80">
             <button class="btn-solid" onclick="addCheckItem()">+</button>
           </div>
-          <button class="edit-link" style="display:block; margin:12px auto 0;" onclick="exportarChecklist()">Fijar checklist en el código</button>
+          <button class="edit-link solo-armar" style="display:block; margin:12px auto 0;" onclick="exportarChecklist()">Fijar checklist en el código</button>
         </div>
 
         <div class="card next-card" id="nextPagoCard" style="display:none;">
@@ -443,7 +447,7 @@
         <input id="rutinaInicioInput" type="text" placeholder="Agregar paso..." maxlength="80">
         <button class="btn-solid" onclick="addRutina('inicio')">+</button>
       </div>
-      <button class="edit-link" style="display:block; margin:12px auto 0;" onclick="exportarRutina('inicio')">Fijar rutina de inicio en el código</button>
+      <button class="edit-link solo-armar" style="display:block; margin:12px auto 0;" onclick="exportarRutina('inicio')">Fijar rutina de inicio en el código</button>
 
       <h2 class="section-title" style="margin-top:30px;">Rutina de cierre</h2>
       <div class="section-rule"></div>
@@ -453,7 +457,7 @@
         <input id="rutinaCierreInput" type="text" placeholder="Agregar paso..." maxlength="80">
         <button class="btn-solid" onclick="addRutina('cierre')">+</button>
       </div>
-      <button class="edit-link" style="display:block; margin:12px auto 0;" onclick="exportarRutina('cierre')">Fijar rutina de cierre en el código</button>
+      <button class="edit-link solo-armar" style="display:block; margin:12px auto 0;" onclick="exportarRutina('cierre')">Fijar rutina de cierre en el código</button>
 
       <h2 class="section-title" style="margin-top:30px;">Mis últimas jornadas</h2>
       <div class="section-rule"></div>
@@ -526,6 +530,19 @@
 </div>
 
 <script>
+// ==== MODO ARMAR ====
+// Las herramientas para quien arma la app (escribir mensajes sellados, borrarlos y los
+// botones "Fijar ... en el código") solo aparecen si la URL trae ?armar=1.
+// Quien recibe la app abre la liga normal y no las ve.
+const MODO_ARMAR = new URLSearchParams(location.search).get('armar') === '1';
+if(MODO_ARMAR){
+  document.body.classList.add('armando');
+  const aviso = document.createElement('div');
+  aviso.className = 'armar-banner';
+  aviso.textContent = 'Modo armar · quien recibe no ve estas herramientas';
+  document.body.appendChild(aviso);
+}
+
 const MESSAGES = [
   "Trabajar desde casa también es trabajar. No dejes que nadie te diga lo contrario.",
   "Hoy te cambiaste la pijama de arriba. De abajo, nadie tiene por qué saberlo.",

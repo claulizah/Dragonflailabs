@@ -37,6 +37,7 @@ El desarrollo se hace en **Claude Code**, directo sobre el repo, que es la fuent
 ## Arquitectura técnica
 - Un `.html` por plantilla, sin backend. Usa `localStorage` con un `APP_PREFIX` único por plantilla.
 - Personalización con `const PRESET_XXX = ...;` y el botón "Fijar ___ en el código".
+- **Modo armar**: las herramientas para quien arma (botones "Fijar", formularios de mensajes sellados, borrar mensajes) llevan la clase `solo-armar` y solo aparecen si la URL trae `?armar=1`. Toda herramienta nueva de armado debe llevar esa clase.
 - `configurador.html` detecta:
   - cualquier `PRESET_`;
   - las variables de color `--nombre: #hex`;
@@ -67,23 +68,25 @@ El desarrollo se hace en **Claude Code**, directo sobre el repo, que es la fuent
 ## Validación de las 15 plantillas (26-sep, rama `claude/inspiring-mendel-w9sdyd`)
 Chromium con zona horaria `America/Mexico_City` y reloj simulado a las 23:30 del 26-sep (en UTC ya es 27). "Sobrevive recarga" = se edita la cuenta regresiva o la meta desde la app, se recarga y se confirma que sigue igual. La misma prueba contra `main` marca ❌ en fecha, pie, `.edit-link` y "hoy" (da 27-sep).
 
-| Plantilla | Fecha local | Pie | `APP_PREFIX` | `PRESET_` (1 vez c/u) | `.edit-link` | Peso | Hoy a las 23:30 | Sobrevive recarga | Consola |
-|---|---|---|---|---|---|---|---|---|---|
-| Adulta funcional (`adultafuncional.html`) | ✅ | ✅ | `app-adulta-` ✅ | PRESET_NAME ✅ | ✅ | 141 KB | ✅ | ✅ meta | ✅ |
-| Cuenta regresiva · Bebé (`cuentaregresiva-bebe.html`) | ✅ | ✅ | `app-bebe-` ✅ | PRESET_NAME ✅ | ✅ | 139 KB | ✅ | ✅ cuenta | ✅ |
-| Cuenta regresiva · Boda (`cuentaregresiva-boda.html`) | ✅ | ✅ | `app-boda-` ✅ | PRESET_NAME ✅ | ✅ | 192 KB | ✅ | ✅ cuenta | ✅ |
-| Cuenta regresiva · Viaje (`cuentaregresiva-viaje.html`) | ✅ | ✅ | `app-viaje-` ✅ | PRESET_NAME ✅ | ✅ | 168 KB | ✅ | ✅ cuenta | ✅ |
-| Cumpleaños ⏸️ (`cumpleanos.html`) | ✅ | ✅ | `app-cumple-` ✅ | PRESET_NAME ✅ | ✅ | 97 KB | ✅ | ✅ cuenta | ✅ |
-| Damas de honor (`damashonor.html`) | ✅ | ✅ | `app-damashonor-` ✅ | PRESET_NAME, PRESET_MENSAJES_DAMAS ✅ | ✅ | 154 KB | ✅ | ✅ cuenta | ✅ |
-| Salud (demo genérica) (`demogenerica.html`) | ✅ | ✅ | `app-compania-` ✅ | PRESET_NAME ✅ | ✅ | 149 KB | ✅ | n/a | ✅ |
-| Home Office (`homeoffice.html`) | ✅ | ✅ | `app-homeoffice-` ✅ | PRESET_NAME, PRESET_CHECKLIST_DIARIO, PRESET_RUTINA_INICIO, PRESET_RUTINA_CIERRE ✅ | ✅ | 122 KB | ✅ | n/a | ✅ |
-| Mensajes sorpresa (`mensajes-sorpresa.html`) | ✅ | ✅ | `app-sorpresa-` ✅ | PRESET_NAME, PRESET_FESTEJO, PRESET_FECHA, PRESET_MENSAJES_SORPRESA ✅ | ✅ | 23 KB | ✅ (sin `todayKey`, cuenta OK) | ✅ cuenta | ✅ |
-| Salud (Mi acompañante) (`miacompanante.html`) | ✅ | ✅ | `app-miacomp-` ✅ | PRESET_NAME ✅ | ✅ | 169 KB | ✅ | n/a | ✅ |
-| Mi Radar (`miradar.html`) | ✅ | ✅ | `app-miradar-` ✅ | PRESET_NAME ✅ | ✅ | 169 KB | ✅ | n/a | ✅ |
-| Mi semestre (`misemestre.html`) | ✅ | ✅ | `app-semestre-` ✅ | PRESET_NAME, PRESET_HORARIO ✅ | ✅ | 242 KB | ✅ | ✅ cuenta · ✅ meta | ✅ |
-| Nosotros dos (`nosotrosdos.html`) | ✅ | ✅ | `app-nosotrosdos-` ✅ | PRESET_NAME, PRESET_CHECKLIST_JUNTOS, PRESET_LUGARES ✅ | ✅ | 170 KB | ✅ | ✅ cuenta | ✅ |
-| Reto personal (`retopersonal.html`) | ✅ | ✅ | `app-reto-` ✅ | PRESET_NAME ✅ | ✅ | 185 KB | ✅ | ✅ meta | ✅ |
-| Romántico (`romantico.html`) | ✅ | ✅ | `app-favorita-` ✅ | PRESET_NAME ✅ | ✅ | 167 KB | ✅ | ✅ cuenta | ✅ |
+| Plantilla | Fecha local | Pie | `APP_PREFIX` | `PRESET_` (1 vez c/u) | `.edit-link` | Peso | Hoy a las 23:30 | Sobrevive recarga | Sin herramientas de armado visibles | Fecha precargada | Consola |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Adulta funcional (`adultafuncional.html`) | ✅ | ✅ | `app-adulta-` ✅ | PRESET_NAME ✅ | ✅ | 142 KB | ✅ | ✅ meta | ✅ (no tiene) | n/a (sin cuenta regresiva) | ✅ |
+| Cuenta regresiva · Bebé (`cuentaregresiva-bebe.html`) | ✅ | ✅ | `app-bebe-` ✅ | PRESET_NAME, PRESET_EVENTO, PRESET_FECHA ✅ | ✅ | 141 KB | ✅ | ✅ cuenta | ✅ (no tiene) | ✅ "La llegada; de <Emilia>" · 24-dic (vía PRESET_FECHA) | ✅ |
+| Cuenta regresiva · Boda (`cuentaregresiva-boda.html`) | ✅ | ✅ | `app-boda-` ✅ | PRESET_NAME, PRESET_EVENTO, PRESET_FECHA ✅ | ✅ | 193 KB | ✅ | ✅ cuenta | ✅ (no tiene) | ✅ "La llegada; de <Emilia>" · 24-dic (vía PRESET_FECHA) | ✅ |
+| Cuenta regresiva · Viaje (`cuentaregresiva-viaje.html`) | ✅ | ✅ | `app-viaje-` ✅ | PRESET_NAME, PRESET_EVENTO, PRESET_FECHA ✅ | ✅ | 170 KB | ✅ | ✅ cuenta | ✅ (no tiene) | ✅ "La llegada; de <Emilia>" · 24-dic (vía PRESET_FECHA) | ✅ |
+| Cumpleaños ⏸️ (`cumpleanos.html`) | ✅ | ✅ | `app-cumple-` ✅ | PRESET_NAME ✅ | ✅ | 98 KB | ✅ | ✅ cuenta | ✅ (no tiene) | ✅ "Fin de prueba" · 24-dic (vía campo "Cuenta regresiva") | ✅ |
+| Damas de honor (`damashonor.html`) | ✅ | ✅ | `app-damashonor-` ✅ | PRESET_NAME, PRESET_MENSAJES_DAMAS, PRESET_NOVIA, PRESET_FECHA ✅ | ✅ | 155 KB | ✅ | ✅ cuenta | ✅ (2 ocultas; visibles con ?armar=1) | ✅ "La boda de Ana" · 24-dic (vía PRESET_FECHA) | ✅ |
+| Salud (demo genérica) (`demogenerica.html`) | ✅ | ✅ | `app-compania-` ✅ | PRESET_NAME ✅ | ✅ | 150 KB | ✅ | n/a | ✅ (no tiene) | n/a (sin cuenta regresiva) | ✅ |
+| Home Office (`homeoffice.html`) | ✅ | ✅ | `app-homeoffice-` ✅ | PRESET_NAME, PRESET_CHECKLIST_DIARIO, PRESET_RUTINA_INICIO, PRESET_RUTINA_CIERRE ✅ | ✅ | 123 KB | ✅ | n/a | ✅ (3 ocultas; visibles con ?armar=1) | n/a (sin cuenta regresiva) | ✅ |
+| Mensajes sorpresa (`mensajes-sorpresa.html`) | ✅ | ✅ | `app-sorpresa-` ✅ | PRESET_NAME, PRESET_FESTEJO, PRESET_FECHA, PRESET_MENSAJES_SORPRESA ✅ | ✅ | 24 KB | ✅ (sin `todayKey`, cuenta OK) | ✅ cuenta | ✅ (2 ocultas; visibles con ?armar=1) | ✅ "Tu graduación" · 24-dic (vía PRESET_FECHA) | ✅ |
+| Salud (Mi acompañante) (`miacompanante.html`) | ✅ | ✅ | `app-miacomp-` ✅ | PRESET_NAME ✅ | ✅ | 169 KB | ✅ | n/a | ✅ (no tiene) | n/a (sin cuenta regresiva) | ✅ |
+| Mi Radar (`miradar.html`) | ✅ | ✅ | `app-miradar-` ✅ | PRESET_NAME ✅ | ✅ | 170 KB | ✅ | n/a | ✅ (no tiene) | n/a (sin cuenta regresiva) | ✅ |
+| Mi semestre (`misemestre.html`) | ✅ | ✅ | `app-semestre-` ✅ | PRESET_NAME, PRESET_HORARIO ✅ | ✅ | 243 KB | ✅ | ✅ cuenta · ✅ meta | ✅ (1 ocultas; visibles con ?armar=1) | ✅ "Fin de prueba" · 24-dic (vía campo "Cuenta regresiva") | ✅ |
+| Nosotros dos (`nosotrosdos.html`) | ✅ | ✅ | `app-nosotrosdos-` ✅ | PRESET_NAME, PRESET_CHECKLIST_JUNTOS, PRESET_LUGARES, PRESET_EVENTO, PRESET_FECHA ✅ | ✅ | 171 KB | ✅ | ✅ cuenta | ✅ (2 ocultas; visibles con ?armar=1) | ✅ "La llegada; de <Emilia>" · 24-dic (vía PRESET_FECHA) | ✅ |
+| Reto personal (`retopersonal.html`) | ✅ | ✅ | `app-reto-` ✅ | PRESET_NAME ✅ | ✅ | 186 KB | ✅ | ✅ meta | ✅ (no tiene) | n/a (sin cuenta regresiva) | ✅ |
+| Romántico (`romantico.html`) | ✅ | ✅ | `app-favorita-` ✅ | PRESET_NAME, PRESET_EVENTO, PRESET_FECHA ✅ | ✅ | 168 KB | ✅ | ✅ cuenta | ✅ (no tiene) | ✅ "La llegada; de <Emilia>" · 24-dic (vía PRESET_FECHA) | ✅ |
+
+"Sin herramientas de armado visibles": se abre sin `?armar=1` y se confirma que no se ve ningún botón "Fijar", ni el formulario de mensajes sellados, ni "Eliminar" en mensajes sellados. Con `?armar=1` sí aparecen, junto con el aviso "Modo armar". "Fecha precargada": se sube la plantilla al `configurador.html` real, se llenan fecha y título (con `;` y `<` de prueba), se descarga, se abre y se recarga. La cuenta regresiva debe decir lo mismo las dos veces.
 
 Redirecciones (ligas viejas): `templates/blacklist.html` → `miradar.html` y `templates/cuentaregresiva.html` → `cuentaregresiva-boda.html`. Conservan `?parámetros` y `#ancla`. Probadas en Chromium.
 
@@ -94,6 +97,32 @@ Cerrados en esta ronda (26-sep):
 Hallazgos abiertos:
 - Mi semestre pesa 242 KB porque el ícono provisional (34 KB) va 4 veces: favicon, ícono de instalación, manifest y portada. Se reduce al poner el ícono definitivo.
 - Las redirecciones no pasan los datos guardados: quien ya usaba la versión vieja (`blacklist.html` sin prefijo, `cuentaregresiva.html` con `app-cuenta-`) abre la nueva vacía.
+
+## Revisión UX (27-sep, vista de celular, como quien recibe y como quien compra)
+
+### Parte 1: en el PR #1, antes del merge ✅
+1. **Modo "quien arma" vs. "quien recibe"** ✅
+   - Mismo mecanismo en las 15 plantillas: la clase `solo-armar` y la constante `MODO_ARMAR`. Las herramientas solo aparecen si la URL trae `?armar=1`, y en ese modo sale un aviso negro arriba.
+   - Ocultos para quien recibe: los botones "Fijar ___ en el código" (Mensajes sorpresa, Damas, Home Office, Mi semestre y Nosotros dos), el formulario para escribir mensajes sellados (Mensajes sorpresa y Damas) y el botón "Eliminar" de cada mensaje sellado.
+   - El configurador explica que hay que abrir la plantilla con `?armar=1`.
+2. **Fecha precargada** ✅
+   - `PRESET_EVENTO` y `PRESET_FECHA` en Bebé, Boda, Viaje, Romántico y Nosotros dos.
+   - Se guardan en la primera apertura y no se pisan al recargar.
+   - El configurador ahora muestra un campo de texto o de fecha para las constantes de texto, sin comillas. Antes, escribir `2026-12-24` sin comillas rompía el archivo.
+3. **Íconos** ✅
+   - Diario de Boda y Viaje: 🤰 → 📔.
+   - Emoji principal (encabezado, "Hola, ___", pestaña Hoy, marca de agua): 🍼 Bebé, 💍 Boda, ✈️ Viaje, 💐 Damas.
+   - `<title>` de Bebé: "Ya viene el bebé 🍼".
+   - El nombre al instalar ya no dice "Cuenta regresiva": ahora dice Ya viene el bebé, Nuestra boda, Nuestro viaje y Damas de honor.
+4. **Damas de honor** ✅: la tarjeta dice "La boda de ___" con `PRESET_NOVIA`, y además tiene `PRESET_FECHA`.
+
+### Parte 2: PR nuevo después del merge (propuesta pendiente de aprobación)
+5. Dedicatoria de quien regala (`PRESET_DEDICATORIA`, `PRESET_DE`).
+6. Aviso "Guárdala en tu pantalla de inicio".
+7. Listas precargadas: maleta del hospital, checklist de viaje, último mes de boda e ideas de citas.
+8. Mensajes sorpresa al nivel de las demás (portada con sobre con gatito, encabezado de color, `apple-touch-icon`).
+9. Diferenciar Romántico y Nosotros dos (solo propuesta, no se cambia sin consultar).
+10. Modal propio en lugar de los `prompt()` nativos.
 
 ## Próximos pasos
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ Validado; falta revisar y hacer merge del PR a `main`.

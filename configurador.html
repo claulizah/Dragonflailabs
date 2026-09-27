@@ -125,7 +125,7 @@
 
   <div class="card" id="dynamicCard">
     <h2>3. Contenido extra de esta plantilla <span class="badge-count" id="dynCount">0</span></h2>
-    <p class="hint">Detectado automáticamente en el archivo. Para cada uno: abre la app en tu navegador, llena el contenido con los botones normales, toca <strong>"Fijar ___ en el código"</strong>, copia lo que te da y pégalo aquí tal cual.</p>
+    <p class="hint">Detectado automáticamente en el archivo. Para cada uno: abre la app en tu navegador, llena el contenido con los botones normales, toca <strong>"Fijar ___ en el código"</strong>, copia lo que te da y pégalo aquí tal cual.<br><br><strong>Importante:</strong> abre la plantilla con <code>?armar=1</code> al final de la liga (ej. <code>damashonor.html?armar=1</code>). Solo así aparecen los formularios de mensajes sellados y los botones "Fijar". Quien recibe la app abre la liga normal y no los ve. Los campos de texto o fecha (como el título y la fecha de la cuenta regresiva) se escriben directo aquí, sin comillas.</p>
     <div id="dynamicFields"></div>
   </div>
 
@@ -217,7 +217,9 @@ const LABELS_CONOCIDOS = {
   PRESET_CHECKLIST_JUNTOS: 'Checklist de cosas juntos',
   PRESET_MENSAJES_SORPRESA: 'Mensajes sorpresa (varios remitentes)',
   PRESET_FESTEJO: 'Nombre de la ocasión (ej. "Tu graduación")',
-  PRESET_FECHA: 'Fecha del festejo (AAAA-MM-DD)',
+  PRESET_FECHA: 'Fecha de la cuenta regresiva',
+  PRESET_EVENTO: 'Título de la cuenta regresiva (ej. "La llegada de Emilia")',
+  PRESET_NOVIA: 'Nombre de la novia (Damas de honor: "La boda de ___")',
   PRESET_HORARIO: 'Horario de clases (Mi semestre)',
   PRESET_CHECKLIST_DIARIO: 'Checklist diario (Home Office)',
   PRESET_RUTINA_INICIO: 'Rutina de inicio de jornada (Home Office)',
@@ -240,7 +242,9 @@ function scanDynamicPresets(text){
     dynamicConsts.push({
       constName: m[1],
       fullMatch: m[0],
-      currentValue: m[2].trim()
+      currentValue: m[2].trim(),
+      // Las constantes de texto ("...") se llenan con un campo normal, sin comillas
+      isString: m[2].trim().startsWith('"')
     });
   }
 
@@ -258,8 +262,11 @@ function scanDynamicPresets(text){
       </label>
       <div class="const-name">${item.constName}${isEmpty ? '' : ' · ya tiene contenido, márcalo solo si lo quieres reemplazar'}</div>
       <div class="opt-fields" id="dynFields${idx}">
-        <label for="dynInput${idx}">Pega aquí lo que copiaste del botón "Fijar en el código"</label>
-        <textarea id="dynInput${idx}" placeholder='Puede ser la línea completa, ej: const ${item.constName} = [...]; o solo el valor.'></textarea>
+        ${item.isString
+          ? `<label for="dynInput${idx}">${/FECHA$/.test(item.constName) ? 'Elige la fecha' : 'Escríbelo tal cual, sin comillas'}</label>
+             <input id="dynInput${idx}" type="${/FECHA$/.test(item.constName) ? 'date' : 'text'}">`
+          : `<label for="dynInput${idx}">Pega aquí lo que copiaste del botón "Fijar en el código"</label>
+             <textarea id="dynInput${idx}" placeholder='Puede ser la línea completa, ej: const ${item.constName} = [...]; o solo el valor.'></textarea>`}
       </div>
     `;
     dynamicFields.appendChild(wrap);
@@ -441,7 +448,10 @@ generateBtn.addEventListener('click', () => {
     const toggle = document.getElementById(`dynToggle${idx}`);
     const input = document.getElementById(`dynInput${idx}`);
     if(toggle && toggle.checked && input.value.trim()){
-      const cleanValue = cleanPastedValue(input.value, item.constName);
+      // Texto: se convierte a cadena JS; ";" y "<" escapados para no cortar la detección ni el <script>
+      const cleanValue = item.isString
+        ? JSON.stringify(input.value.trim()).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')
+        : cleanPastedValue(input.value, item.constName);
       const newDeclaration = `const ${item.constName} = ${cleanValue};`;
       if(out.includes(item.fullMatch)){
         out = out.replace(item.fullMatch, newDeclaration);
