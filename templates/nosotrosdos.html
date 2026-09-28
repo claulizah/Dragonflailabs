@@ -139,6 +139,26 @@
     color: var(--plum-dark);
     margin: 0 0 18px;
   }
+  .hito-card{
+    text-align: center;
+    background: linear-gradient(160deg, var(--card), var(--bg));
+    border: 2px solid var(--marigold);
+    position: relative;
+    overflow: hidden;
+  }
+  .hito-card .hito-confetti{
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.5;
+  }
+  .hito-card .hito-emoji{ font-size: 2.6rem; margin-bottom: 6px; }
+  .hito-card .hito-title{
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    color: var(--plum-dark);
+    margin: 0 0 6px;
+  }
+  .hito-card .hito-sub{ font-size: 0.9rem; color: var(--text-soft); margin: 0; }
   button{
     font-family: inherit;
     cursor: pointer;
@@ -589,6 +609,14 @@
           <p class="cd-number" id="juntosNumber">--</p>
           <p class="cd-caption" id="juntosCaption">Toca "editar" para poner desde cuándo están juntos.</p>
           <button class="edit-link" id="agregarCdBtn" style="display:none; margin:12px auto 0;" onclick="editCountdown()">+ Agregar una cuenta regresiva (aniversario, viaje…)</button>
+        </div>
+
+        <div class="card hito-card" id="hitoCard" style="display:none;">
+          <span class="hito-confetti" style="top:8px; left:12px;">🎉</span>
+          <span class="hito-confetti" style="top:14px; right:16px;">✨</span>
+          <div class="hito-emoji">🎉</div>
+          <p class="hito-title" id="hitoTitle"></p>
+          <p class="hito-sub" id="hitoSub"></p>
         </div>
 
         <div class="card countdown-card" id="cdCard" style="display:none;">
@@ -1703,26 +1731,58 @@ function proximoAniversario(){
   if(fecha < hoy) fecha = new Date(hoy.getFullYear() + 1, m - 1, d);
   return `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
 }
+// Hitos automáticos: 100 días, 6 meses, y cada año en adelante (1, 2, 3...).
+// Se detectan solos a partir de "desde cuándo están juntos", sin que nadie los programe.
+function detectarHito(dias, anios, hoy, inicio){
+  if(dias === 100) return '¡Hoy cumplen 100 días juntos!';
+  const seisMeses = new Date(inicio);
+  seisMeses.setMonth(seisMeses.getMonth() + 6);
+  if(hoy.getFullYear() === seisMeses.getFullYear() && hoy.getMonth() === seisMeses.getMonth() && hoy.getDate() === seisMeses.getDate()){
+    return '¡Hoy cumplen 6 meses juntos!';
+  }
+  if(anios > 0 && hoy.getMonth() === inicio.getMonth() && hoy.getDate() === inicio.getDate()){
+    return `¡Hoy cumplen ${anios} ${anios === 1 ? 'año' : 'años'} juntos!`;
+  }
+  return null;
+}
+
 function renderJuntos(){
   const num = document.getElementById('juntosNumber');
   const cap = document.getElementById('juntosCaption');
-  if(!state.desde){ num.textContent = '--'; cap.textContent = 'Toca "editar" para poner desde cuándo están juntos.'; return; }
+  const juntosCard = document.getElementById('juntosCard');
+  const hitoCard = document.getElementById('hitoCard');
+  if(!state.desde){
+    num.textContent = '--'; cap.textContent = 'Toca "editar" para poner desde cuándo están juntos.';
+    juntosCard.style.display = 'block'; hitoCard.style.display = 'none';
+    return;
+  }
   const inicio = new Date(state.desde + 'T00:00:00');
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   const dias = Math.round((hoy - inicio) / 86400000);
-  if(dias < 0){ num.textContent = '--'; cap.textContent = 'Esa fecha todavía no llega. Toca "editar".'; return; }
+  if(dias < 0){
+    num.textContent = '--'; cap.textContent = 'Esa fecha todavía no llega. Toca "editar".';
+    juntosCard.style.display = 'block'; hitoCard.style.display = 'none';
+    return;
+  }
   let anios = hoy.getFullYear() - inicio.getFullYear();
   let meses = hoy.getMonth() - inicio.getMonth();
   if(hoy.getDate() < inicio.getDate()) meses--;
   if(meses < 0){ anios--; meses += 12; }
   animateNumber(num, dias);
   const desdeTxt = inicio.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
-  if(anios > 0 && hoy.getMonth() === inicio.getMonth() && hoy.getDate() === inicio.getDate()){
-    cap.textContent = `¡Hoy cumplen ${anios} ${anios === 1 ? 'año' : 'años'} juntos! 🎉`;
-    return;
-  }
   const tiempo = [anios ? `${anios} ${anios === 1 ? 'año' : 'años'}` : '', meses ? `${meses} ${meses === 1 ? 'mes' : 'meses'}` : ''].filter(Boolean).join(' y ');
   cap.textContent = `${dias === 1 ? 'día' : 'días'} juntos · desde el ${desdeTxt}${tiempo ? ` (${tiempo})` : ''}`;
+
+  const hito = detectarHito(dias, anios, hoy, inicio);
+  if(hito){
+    juntosCard.style.display = 'none';
+    hitoCard.style.display = 'block';
+    document.getElementById('hitoTitle').textContent = hito;
+    document.getElementById('hitoSub').textContent = `Desde el ${desdeTxt}.`;
+  } else {
+    juntosCard.style.display = 'block';
+    hitoCard.style.display = 'none';
+  }
 }
 async function editDesde(){
   const r = await pedir({ titulo: 'Llevamos juntos', campos: [{ etiqueta: '¿Desde cuándo están juntos?', tipo: 'date', valor: state.desde || '' }] });

@@ -575,6 +575,15 @@
           <p class="cd-caption" id="cdCaption">Configura tu fecha especial</p>
         </div>
 
+        <div class="card next-card" id="proximoEventoCard" style="display:none;">
+          <div>
+            <p class="label">Ahora</p>
+            <p class="text" id="proximoEventoText"></p>
+            <span class="time" id="proximoEventoHora"></span>
+          </div>
+          <button class="goto" onclick="showTab('itinerario')">ver todo</button>
+        </div>
+
         <div class="card msg-card">
           <p id="dailyMessage">...</p>
           <button class="btn-ghost" onclick="shuffleMessage()">Otro mensajito 💐</button>
@@ -657,6 +666,19 @@
       <div id="checklistItems"></div>
       <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="shareChecklist()">Compartir mis preparativos 📋</button>
     </section>
+    <!-- ITINERARIO -->
+    <section class="screen" id="screen-itinerario">
+      <h2 class="section-title">Itinerario del día</h2>
+      <div class="section-rule"></div>
+      <p class="hint">El horario del gran día, para que nadie tenga que preguntar por WhatsApp.</p>
+      <div id="itinerarioList"></div>
+      <div class="two-col add-row">
+        <input id="itinHora" type="time" value="12:00">
+        <input id="itinEvento" type="text" placeholder="¿Qué pasa a esa hora?" maxlength="60">
+      </div>
+      <button class="btn-solid" style="width:100%; margin:-10px 0 20px;" onclick="addItinerarioItem()">Agregar al itinerario</button>
+      <button class="edit-link solo-armar" style="display:block; margin:0 auto 16px;" onclick="exportarItinerario()">Fijar itinerario en el código</button>
+    </section>
     <!-- DIARIO -->
     <section class="screen" id="screen-diario">
       <h2 class="section-title">Mensajes de la novia 💌</h2>
@@ -682,6 +704,9 @@
     </button>
     <button data-tab="sintomas" onclick="showTab('sintomas')">
       <span class="icon">📋</span>Tareas
+    </button>
+    <button data-tab="itinerario" onclick="showTab('itinerario')">
+      <span class="icon">🗓️</span>Itinerario
     </button>
     <button data-tab="diario" onclick="showTab('diario')">
       <span class="icon">💌</span>Mensajes
@@ -904,9 +929,22 @@ const PRESET_MENSAJES_DAMAS = [];
 // Nombre de la novia: la cuenta regresiva dice "La boda de ___". Y la fecha de la boda.
 const PRESET_NOVIA = "";    // ej. "Ana"
 const PRESET_FECHA = "";    // AAAA-MM-DD, ej. "2026-12-24"
+// Itinerario del día de la boda. Llénalo en la app y usa "Fijar itinerario en el código".
+// Vacío = sale el horario sugerido de abajo (DEFAULT_ITINERARIO_BODA).
+const PRESET_ITINERARIO_BODA = [];
 // ================================
 
-let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], mensajesDamas: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "La boda", date: "" }, messagePool: [] };
+const DEFAULT_ITINERARIO_BODA = [
+  { hora: "12:00", evento: "Arreglo y maquillaje" },
+  { hora: "15:00", evento: "Sesión de fotos" },
+  { hora: "17:00", evento: "Ceremonia" },
+  { hora: "18:30", evento: "Cóctel" },
+  { hora: "20:00", evento: "Recepción y banquete" },
+  { hora: "21:30", evento: "Primer baile" },
+  { hora: "22:00", evento: "Fiesta" }
+];
+
+let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], mensajesDamas: [], itinerario: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "La boda", date: "" }, messagePool: [] };
 let storageOk = true;
 
 const APP_PREFIX = 'app-damashonor-';
@@ -959,6 +997,7 @@ async function init(){
   const photos = await safeGet('companion-photos');
   const checklist = await safeGet('companion-checklist');
   const mensajesDamas = await safeGet('companion-mensajesdamas');
+  const itinerario = await safeGet('companion-itinerario');
 
   state.name = name || PRESET_NAME || "";
   if(!name && PRESET_NAME){ await safeSet('companion-name', PRESET_NAME); }
@@ -982,14 +1021,22 @@ async function init(){
     state.mensajesDamas = PRESET_MENSAJES_DAMAS;
     await safeSet('companion-mensajesdamas', JSON.stringify(state.mensajesDamas));
   }
+  try{ state.itinerario = itinerario ? JSON.parse(itinerario) : null; }catch(e){ state.itinerario = null; }
+  if(!state.itinerario){
+    state.itinerario = (PRESET_ITINERARIO_BODA.length ? PRESET_ITINERARIO_BODA : DEFAULT_ITINERARIO_BODA)
+      .map((x, n) => ({ id: 'itin-' + n, hora: x.hora, evento: x.evento }));
+    await safeSet('companion-itinerario', JSON.stringify(state.itinerario));
+  }
 
   state.messagePool = MESSAGES;
   state.currentMsgIndex = dayOfYear() % state.messagePool.length;
 
   renderGreeting();
   renderCountdown();
+  renderProximoEvento();
   renderPhotos();
   renderChecklist();
+  renderItinerario();
   renderNextReminder();
   renderMessage();
   renderMoods();
@@ -1102,6 +1149,7 @@ async function editCountdown(){
   state.countdown = { name: name.trim() || 'La boda', date: date.trim() };
   await safeSet('companion-countdown', JSON.stringify(state.countdown));
   renderCountdown();
+  renderProximoEvento();
 }
 
 function isCountdownReached(){
@@ -1469,6 +1517,72 @@ async function shareChecklist(){
   }
 }
 
+// ---- Itinerario del día de la boda ----
+function renderItinerario(){
+  const list = document.getElementById('itinerarioList');
+  list.innerHTML = '';
+  if(state.itinerario.length === 0){
+    list.innerHTML = '<p class="empty">Aún no agregas ningún bloque. Agrega el primero abajo.</p>';
+    return;
+  }
+  const sorted = [...state.itinerario].sort((a,b) => a.hora.localeCompare(b.hora));
+  sorted.forEach(i => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="item-body">
+        <div class="item-text"><strong>${escapeHtml(i.hora)}</strong> — ${escapeHtml(i.evento)}</div>
+      </div>
+      <button class="item-del" data-id="${i.id}">Eliminar</button>
+    `;
+    item.querySelector('.item-del').onclick = () => deleteItinerarioItem(i.id);
+    list.appendChild(item);
+  });
+}
+
+async function addItinerarioItem(){
+  const horaEl = document.getElementById('itinHora');
+  const eventoEl = document.getElementById('itinEvento');
+  const hora = horaEl.value;
+  const evento = eventoEl.value.trim();
+  if(!hora || !evento) return;
+  state.itinerario.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), hora, evento });
+  eventoEl.value = '';
+  await safeSet('companion-itinerario', JSON.stringify(state.itinerario));
+  renderItinerario();
+  renderProximoEvento();
+}
+
+async function deleteItinerarioItem(id){
+  state.itinerario = state.itinerario.filter(x => x.id !== id);
+  await safeSet('companion-itinerario', JSON.stringify(state.itinerario));
+  renderItinerario();
+  renderProximoEvento();
+}
+
+async function exportarItinerario(){
+  if(state.itinerario.length === 0){ alert('El itinerario está vacío.'); return; }
+  const datos = [...state.itinerario].sort((a,b) => a.hora.localeCompare(b.hora)).map(i => ({ hora: i.hora, evento: i.evento }));
+  const codigo = 'const ' + `PRESET_ITINERARIO_BODA = ${JSON.stringify(datos).replace(/;/g, ';').replace(/</g, '<')};`;
+  const aviso = 'Pégalo en el archivo reemplazando la línea de PRESET_ITINERARIO_BODA, o pégalo en el configurador.';
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
+}
+
+// En la pestaña Hoy: si hoy es el día de la boda, muestra el siguiente bloque del itinerario.
+function renderProximoEvento(){
+  const card = document.getElementById('proximoEventoCard');
+  const esHoy = state.countdown.date && state.countdown.date === todayKey();
+  if(!esHoy || state.itinerario.length === 0){ card.style.display = 'none'; return; }
+  const ahora = new Date();
+  const horaActual = String(ahora.getHours()).padStart(2,'0') + ':' + String(ahora.getMinutes()).padStart(2,'0');
+  const sorted = [...state.itinerario].sort((a,b) => a.hora.localeCompare(b.hora));
+  const siguiente = sorted.find(i => i.hora >= horaActual) || sorted[sorted.length - 1];
+  document.getElementById('proximoEventoText').textContent = siguiente.evento;
+  document.getElementById('proximoEventoHora').textContent = siguiente.hora;
+  card.style.display = 'flex';
+}
+
 function renderSymptoms(){
   const list = document.getElementById('symptomList');
   if(!list) return;
@@ -1577,7 +1691,7 @@ async function deleteNote(id){
 
 function resetApp(){
   if(!confirm('¿Borrar todo (nombre, recordatorios, notas, contactos, etc.) y empezar de cero?')) return;
-  ['companion-name','companion-reminders','companion-notes','companion-checklist','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-mensajesdamas'].forEach(k => {
+  ['companion-name','companion-reminders','companion-notes','companion-checklist','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-mensajesdamas','companion-itinerario'].forEach(k => {
     try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
   });
   location.reload();
