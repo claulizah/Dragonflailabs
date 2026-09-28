@@ -413,21 +413,6 @@
     min-height: 40px;
   }
   .chip:active{ background: #FCE8F1; }
-  .chip.symptom{ border-style: solid; border-color: var(--border); color: var(--text); }
-  .chip.symptom:active{ background: var(--bg); }
-  .item.stamp{
-    position: relative;
-    background: linear-gradient(0deg, var(--bg), var(--card));
-    border: 1.5px dashed var(--rose);
-    border-radius: 14px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-  }
-  .item.stamp .item-text{ font-weight: 600; }
-  .item.stamp::after{
-    content: "🌹";
-    position: absolute; top: 8px; right: 10px; font-size: 1rem; opacity: 0.5;
-  }
   .intro-overlay{
     position: fixed; inset: 0; z-index: 999;
     background: radial-gradient(120% 90% at 50% 0%, var(--plum) 0%, var(--plum-dark) 62%, #16110f 100%);
@@ -1007,7 +992,7 @@ const DEFAULT_IDEAS_CITAS = [
   "Maratón de la serie favorita del otro"
 ];
 
-let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], lugares: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, desde: "", historia: [], capsule: { text: "", sealed: false }, messagePool: [] };
+let state = { name: "", reminders: [], notes: [], goodThings: [], contacts: [], photos: [], lugares: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, desde: "", historia: [], capsule: { text: "", sealed: false }, messagePool: [] };
 let lugarFotoTemp = null;
 let storageOk = true;
 
@@ -1054,7 +1039,6 @@ async function init(){
   const reminders = await safeGet('companion-reminders');
   const notes = await safeGet('companion-notes');
   const moods = await safeGet('companion-moods');
-  const symptoms = await safeGet('companion-symptoms');
   const goodThings = await safeGet('companion-goodthings');
   const contacts = await safeGet('companion-contacts');
   const countdown = await safeGet('companion-countdown');
@@ -1069,7 +1053,6 @@ async function init(){
   if(!name && PRESET_NAME){ await safeSet('companion-name', PRESET_NAME); }
   try{ state.reminders = reminders ? JSON.parse(reminders) : []; }catch(e){ state.reminders = []; }
   try{ state.notes = notes ? JSON.parse(notes) : []; }catch(e){ state.notes = []; }
-  try{ state.symptoms = symptoms ? JSON.parse(symptoms) : []; }catch(e){ state.symptoms = []; }
   try{ state.goodThings = goodThings ? JSON.parse(goodThings) : []; }catch(e){ state.goodThings = []; }
   try{ state.moodByDate = moods ? JSON.parse(moods) : {}; }catch(e){ state.moodByDate = {}; }
   try{ state.contacts = contacts ? JSON.parse(contacts) : []; }catch(e){ state.contacts = []; }
@@ -1116,7 +1099,6 @@ async function init(){
   renderMoods();
   renderGoodThing();
   renderReminders();
-  renderSymptoms();
   renderNotes();
 }
 
@@ -1671,73 +1653,6 @@ async function deleteReminder(id){
   await safeSet('companion-reminders', JSON.stringify(state.reminders));
   renderReminders();
   renderNextReminder();
-}
-
-function renderSymptoms(){
-  const list = document.getElementById('symptomList');
-  if(!list) return;  // Nosotros dos ya no tiene la sección de razones
-  list.innerHTML = '';
-  if(state.symptoms.length === 0){
-    list.innerHTML = '<p class="empty">Aún no has anotado nada. Toca un botón de arriba cuando sientas algo.</p>';
-    return;
-  }
-  const sorted = [...state.symptoms].sort((a,b) => b.ts - a.ts);
-  sorted.forEach(s => {
-    const item = document.createElement('div');
-    item.className = 'item stamp';
-    item.innerHTML = `
-      <div class="item-body">
-        <div class="item-text">${escapeHtml(s.text)}</div>
-        <div class="item-date">${formatShort(s.ts)}</div>
-      </div>
-      <button class="item-del" data-id="${s.id}">Eliminar</button>
-    `;
-    item.querySelector('.item-del').onclick = () => deleteSymptom(s.id);
-    list.appendChild(item);
-  });
-}
-
-async function quickAddSymptom(text){
-  state.symptoms.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, ts: Date.now() });
-  await safeSet('companion-symptoms', JSON.stringify(state.symptoms));
-  renderSymptoms();
-}
-
-async function addCustomSymptom(){
-  const val = await pedirUno('¿Qué quieres anotar?', '');
-  if(val === null) return;
-  const trimmed = val.trim();
-  if(!trimmed) return;
-  await quickAddSymptom(trimmed);
-}
-
-async function deleteSymptom(id){
-  state.symptoms = state.symptoms.filter(x => x.id !== id);
-  await safeSet('companion-symptoms', JSON.stringify(state.symptoms));
-  renderSymptoms();
-}
-
-async function shareSymptoms(){
-  if(state.symptoms.length === 0){
-    alert('Aún no tienes nada anotado en el diario.');
-    return;
-  }
-  const sorted = [...state.symptoms].sort((a,b) => b.ts - a.ts);
-  const lines = sorted.map(s => `• ${formatShort(s.ts)} — ${s.text}`);
-  const text = `Razones para amar a ${state.name}\n\n${lines.join('\n')}`;
-
-  if(navigator.share){
-    try{
-      await navigator.share({ title: 'Razones para amarte', text });
-      return;
-    }catch(e){ /* si cancela el share, sigue al respaldo */ }
-  }
-  try{
-    await navigator.clipboard.writeText(text);
-    alert('Copiado. Ahora puedes pegarlo en WhatsApp, notas o donde quieras.');
-  }catch(e){
-    mostrarTexto('Copia este texto', text);
-  }
 }
 
 function renderNotes(){
