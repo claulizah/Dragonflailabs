@@ -25,10 +25,11 @@ Por qué existe: el punto 9 de la revisión UX (diferenciar Romántico y Nosotro
 
 **27-sep:** el PR #1 ya está en `main` (merge `15fe010`) y GitHub Pages lo publicó sin errores. Las copias sueltas que no traían los fixes ya no hacen falta: la versión buena es la de `main`.
 
-## Plantillas (15 archivos)
+## Plantillas (20 archivos)
 | Plantilla | Función distintiva |
 |---|---|
-| Salud (`miacompanante`/`demogenerica`) | Diario de síntomas + preguntas para el doctor |
+| Salud (`miacompanante`) | Diario de síntomas + preguntas para el doctor |
+| Salud, demo genérica (`demogenerica`) | ⏸️ **Pausada el 28-sep**: se quita del catálogo de venta (nunca estuvo referenciada por nombre en el sitio de ventas — la categoría "Acompañamiento" se cumple con `miacompanante`). El archivo se queda en el repo por si se retoma. |
 | Reto personal | Mapa de recaídas (✓/✗ por día) |
 | Romántico | Nuestro mapa (lugares con foto/nota) |
 | Cuenta regresiva ×3 (`-bebe`, `-boda`, `-viaje`) | Diario y mensajes propios, `APP_PREFIX` único |
@@ -36,10 +37,15 @@ Por qué existe: el punto 9 de la revisión UX (diferenciar Romántico y Nosotro
 | Adulta funcional | Generador de excusas + pagos del mes + racha + tarjeta compartible |
 | Mi Radar | Red flags de vida, paleta morado/dorado |
 | Damas de honor | Checklist + mensajes de la novia sellados |
-| Nosotros dos | Fotos + cápsula + mapa + checklist juntos |
+| Nosotros dos | Fotos + cápsula + mapa + checklist juntos. Paleta cambiada el 28-sep a azul grisáceo `#5C7A8A` (antes compartía la de Romántico) |
 | Mensajes sorpresa | Cuenta regresiva + mensajes sellados de varios remitentes |
 | Mi semestre | Tareas, horario, racha de estudio, cuenta regresiva |
 | Home Office | Checklist diario, rutinas, facturas/gastos |
+| **Mi changarro desde cero** (`changarro.html`, nueva 28-sep) | Checklist de lanzamiento, registro de ventas, racha de días activa. Mostaza `#C1861F` |
+| **Mini CRM de pedidos y clientas** (`minicrm.html`, nueva 28-sep) | Pedidos con estatus (nuevo/proceso/entregado), fichas de clientas con aviso de "hace cuánto no le escribes". Magenta `#C23B75` |
+| **Calendario de contenido** (`calendariocontenido.html`, nueva 28-sep) | Banco de ideas por categoría, checklist "antes de publicar", racha de días publicando. Turquesa `#1E9E8E` |
+| **Meta de ventas del mes** (`metaventas.html`, nueva 28-sep) | Barra de progreso hacia la meta, registro de ventas, historial de meses (cumplida/no cumplida, archiva solo al cambiar de mes). Azul cielo `#2568C4` |
+| **Sanando de una ruptura** (`sanandoruptura.html`, nueva 28-sep) | Contador ascendente desde la fecha, diario libre, cartas selladas escritas a una misma ("Ábrelo cuando…", sin `solo-armar`: se escriben en cualquier momento), chips "Ya no permito". Gris lavanda `#7C6F8C` |
 
 ## Arquitectura técnica
 - Un `.html` por plantilla, sin backend. Usa `localStorage` con un `APP_PREFIX` único por plantilla.
@@ -68,6 +74,13 @@ Por qué existe: el punto 9 de la revisión UX (diferenciar Romántico y Nosotro
 - **Cumpleaños (íconos reservados, mismo set sticker)**: pastel con vela (candidato a portada), gorrito, globos, regalo.
 - **Viaje (resuelto 27-sep)**: maleta rosa con asas.
 - El set beige/salvia se queda para plantillas de paleta neutra o boho.
+- **Las 5 plantillas nuevas (28-sep) tienen ícono placeholder**, a propósito: un SVG liviano (círculo de color + el emoji sugerido en la propuesta) en vez de clipart. Claudia revisa y pasa el ícono definitivo de cada una después, igual que con las demás:
+  - Mi changarro desde cero → 🚀 sobre mostaza `#C1861F`
+  - Mini CRM de pedidos y clientas → 📋 sobre magenta `#C23B75`
+  - Calendario de contenido → 📸 sobre turquesa `#1E9E8E`
+  - Meta de ventas del mes → 📈 sobre azul cielo `#2568C4`
+  - Sanando de una ruptura → 🌱 sobre gris lavanda `#7C6F8C`
+- **Observación (no se tocó, cae en la regla de aprobación)**: Nosotros dos ya no comparte color con Romántico, pero **sí sigue compartiendo el emoji 🌹** en cabecera, saludo y decoraciones — es el ícono elegido en la diferenciación del punto 9 y no formaba parte de esta aprobación de color, así que se quedó igual.
 
 ## Ideas diseñadas, no construidas
 - **Fan de artista**: checklist, cuenta regresiva a concierto y cartas de la fan hacia el artista. Regla firme: nunca "frases que el artista diría" ni letras de canciones.
@@ -147,9 +160,25 @@ El commit de íconos (`b7ab85f`) no incluyó todo lo que decía su mensaje. Esto
 | 4 | Modo armar sigue ocultando lo nuevo de la parte 2 | ✅ Probado con Playwright en las 15 plantillas sin `?armar=1`: cero elementos `.solo-armar` visibles y `body` nunca trae la clase `armando`. La dedicatoria y el aviso de instalar no dependen de `MODO_ARMAR` (es correcto: son para quien recibe, no herramientas de armado). El botón "+ Agregar cuenta regresiva" de Nosotros dos tampoco lleva `solo-armar` a propósito: es una función de la pareja, no de quien arma. |
 | 5 | Probar el flujo desde el navegador integrado de WhatsApp e Instagram | ✅ con aclaración: no hay forma de abrir un WhatsApp/Instagram real en este entorno, así que se emuló su user-agent (iOS y Android) sobre Chromium con Playwright. Con eso se confirmó: la detección de navegador in-app (`Instagram`, `FBAN`, `WhatsApp` en el user-agent de iOS) muestra correctamente el aviso "copia la liga y ábrela en Safari" con botón para copiar; en Android muestra los pasos de Chrome; el modal propio (`pedir()`) abre y guarda bien bajo esos user-agents, sin disparar ningún `alert()`/`prompt()` nativo; "Ya la guardé" persiste en `localStorage` y no vuelve a salir tras recargar. Esto no reemplaza probarlo en un celular real la primera vez que alguien reciba un regalo, pero cubre lo que se podía revisar desde aquí. |
 
+## 5 plantillas nuevas + limpieza aprobadas (28-sep-2026)
+Claudia propuso 5 plantillas y 3 fixes de catálogo/paleta bajo la regla "esto lo decide Claudia", y dio su aprobación final explícita para las tres. Se construyeron directo sobre la rama de trabajo (no necesitan PR nuevo aparte, van en el mismo que los pendientes técnicos).
+
+**Las 5 plantillas** (ver la tabla de "Plantillas" arriba para el detalle de cada una): reusan toda la infraestructura ya probada — modal propio, dedicatoria/aviso de instalar, pie de referidos, modo armar, `localStorage` con `APP_PREFIX` único. Por pedido explícito de Claudia, esta ronda entrega **solo la estructura funcional** (pestañas, `PRESET_`, mecánica, `localStorage`, modo armar, dedicatoria): los íconos son placeholder (ver sección "Íconos"), a la espera de que Claudia mande los definitivos.
+
+**Limpieza de catálogo/paleta:**
+- `demogenerica.html` pausada del catálogo de venta. Se revisó `index.html`, `regalos.html`, `pedido.html` y `catalogo.html`: ninguno referencia el archivo por nombre (el sitio de ventas fulfilla por categorías genéricas, no por archivo), así que no hubo nada que desconectar en código. El archivo se queda en `templates/`.
+- `nosotrosdos.html` cambia de paleta a azul grisáceo (`--plum: #5C7A8A`, `--plum-dark: #3D515C` calculado para mantener la misma proporción de oscurecido que el resto de las plantillas), en CSS, `theme-color` y el `theme_color` del manifest. Ya no comparte identidad visual con Romántico (antes: `#A9776D`/`#734E46`, idéntico). No se tocó el ícono/artwork de la portada (bitmap, fuera de lo aprobado) ni el emoji 🌹 (elegido en la diferenciación del punto 9, no parte de esta aprobación).
+
+**Validado:**
+- Sintaxis JS, balance de llaves/paréntesis/corchetes y peso (`<50 KB` por imagen) en las 22 plantillas.
+- Modo armar: cero herramientas `.solo-armar` visibles sin `?armar=1` en las 22; con `?armar=1` si aparecen ("Fijar checklist/ideas en el código") en las plantillas que las tienen.
+- Flujo completo con Playwright en cada plantilla nueva: nombre/negocio, registro de ventas y racha (Mi changarro), pedidos con estatus + clientas con aviso de "hace cuánto no le escribes" (Mini CRM), banco de ideas por categoría + checklist de publicar + racha (Calendario de contenido), meta con barra de progreso + historial (Meta de ventas), contador ascendente + cartas selladas + límites (Sanando de una ruptura).
+- `configurador.html` detecta correctamente los `PRESET_` nuevos (`PRESET_NEGOCIO`, `PRESET_CHECKLIST_LANZAMIENTO`, `PRESET_IDEAS_CONTENIDO`, `PRESET_META_VENTAS`, `PRESET_LIMITES`) con etiquetas propias en `LABELS_CONOCIDOS`; probado subiendo `changarro.html`.
+
 ## Próximos pasos
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ PR #1 mergeado el 27-sep; Pages lo publicó bien. La revisión UX parte 2 va en el PR nuevo.
-2. ~~Integrar la carriola en Bebé.~~ ~~Home Office y Mensajes sorpresa.~~ Falta el ícono de Mi semestre (pila de libros pastel).
+2. ~~Integrar la carriola en Bebé.~~ ~~Home Office y Mensajes sorpresa.~~ Falta el ícono de Mi semestre (pila de libros pastel) y los 5 íconos placeholder de las plantillas nuevas (28-sep).
 3. ~~Decidir el ícono de Viaje.~~ Maleta, integrada el 27-sep.
 4. **Esto lo decide Claudia** — Decidir si se retoma Cumpleaños y cómo (falta definir si la "línea de su vida" la arma una persona o varias). No se programa hasta que Claudia lo confirme; ver "Regla: 'esto lo decide Claudia'" arriba.
 5. Construir "Fan de artista" y "Tareas de hijos" si se sigue esa línea.
+6. Agregar las 5 plantillas nuevas al catálogo de venta (`index.html`/sitio) cuando Claudia decida cómo presentarlas — hoy solo existen como archivo en `templates/`.
