@@ -435,6 +435,8 @@
         <div class="card setup-card">
           <h3 style="margin-top:0;">¿Cómo te llamas?</h3>
           <input id="nameInput" type="text" placeholder="Tu nombre" maxlength="30">
+          <h3>¿Cómo se llama tu negocio?</h3>
+          <input id="negocioInput" type="text" placeholder="Nombre de tu negocio (opcional)" maxlength="40">
           <button class="btn-solid" style="width:100%;" onclick="saveSetup()">Guardar</button>
         </div>
       </div>
@@ -694,6 +696,8 @@ const MESSAGES = [
 
 // ==== CONFIGURACIÓN INICIAL ====
 const PRESET_NAME = "";
+// Nombre del negocio. Vacío = la app lo pregunta al abrir (es opcional).
+const PRESET_NEGOCIO = "";
 // Meta de ventas del mes. Vacío = la app la pregunta la primera vez (número, sin signo de $).
 const PRESET_META_VENTAS = "";
 // Dedicatoria de quien regala: sale en una tarjetita después de "Toca para abrir"
@@ -702,7 +706,7 @@ const PRESET_DE = "";
 const PRESET_DEDICATORIA = "";
 // ================================
 
-let state = { name: "", metaMonto: 0, mesActual: "", ventas: [], historial: [], notes: [], currentMsgIndex: 0 };
+let state = { name: "", negocio: "", metaMonto: 0, mesActual: "", ventas: [], historial: [], notes: [], currentMsgIndex: 0 };
 let storageOk = true;
 
 const APP_PREFIX = 'app-metaventas-';
@@ -729,6 +733,9 @@ async function init(){
   const name = await safeGet('name');
   state.name = name || PRESET_NAME || "";
   if(!name && PRESET_NAME){ await safeSet('name', PRESET_NAME); }
+  const negocio = await safeGet('negocio');
+  state.negocio = negocio || PRESET_NEGOCIO || "";
+  if(!negocio && PRESET_NEGOCIO){ await safeSet('negocio', PRESET_NEGOCIO); }
 
   const metaGuardada = await safeGet('meta-monto');
   state.metaMonto = metaGuardada != null ? parseFloat(metaGuardada) : (parseFloat(PRESET_META_VENTAS) || 0);
@@ -763,6 +770,7 @@ async function init(){
 function renderGreeting(){
   const setupBlock = document.getElementById('setupBlock');
   const mainBlock = document.getElementById('mainHoyBlock');
+  const negocioTag = document.getElementById('negocioTag');
   if(!state.name){
     setupBlock.style.display = 'block';
     mainBlock.style.display = 'none';
@@ -774,13 +782,17 @@ function renderGreeting(){
     document.getElementById('editNameBtn').style.display = 'block';
     document.getElementById('introTitle').textContent = `Para: ${state.name}`;
   }
+  if(state.negocio){ negocioTag.textContent = state.negocio; negocioTag.style.display = 'block'; }
+  else negocioTag.style.display = 'none';
 }
 
 async function saveSetup(){
   const name = document.getElementById('nameInput').value.trim();
+  const negocio = document.getElementById('negocioInput').value.trim();
   if(!name) return;
-  state.name = name;
+  state.name = name; state.negocio = negocio;
   await safeSet('name', name);
+  await safeSet('negocio', negocio);
   renderGreeting();
 }
 
@@ -936,8 +948,8 @@ async function deleteNote(id){
 }
 
 function resetApp(){
-  if(!confirm('¿Borrar todo (nombre, meta, ventas, historial, notas) y empezar de cero?')) return;
-  ['name','meta-monto','mes-actual','ventas','historial','notes'].forEach(k => {
+  if(!confirm('¿Borrar todo (nombre, negocio, meta, ventas, historial, notas) y empezar de cero?')) return;
+  ['name','negocio','meta-monto','mes-actual','ventas','historial','notes'].forEach(k => {
     try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
   });
   location.reload();

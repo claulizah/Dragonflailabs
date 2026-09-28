@@ -167,13 +167,31 @@ Claudia propuso 5 plantillas y 3 fixes de catálogo/paleta bajo la regla "esto l
 
 **Limpieza de catálogo/paleta:**
 - `demogenerica.html` pausada del catálogo de venta. Se revisó `index.html`, `regalos.html`, `pedido.html` y `catalogo.html`: ninguno referencia el archivo por nombre (el sitio de ventas fulfilla por categorías genéricas, no por archivo), así que no hubo nada que desconectar en código. El archivo se queda en `templates/`.
-- `nosotrosdos.html` cambia de paleta a azul grisáceo (`--plum: #5C7A8A`, `--plum-dark: #3D515C` calculado para mantener la misma proporción de oscurecido que el resto de las plantillas), en CSS, `theme-color` y el `theme_color` del manifest. Ya no comparte identidad visual con Romántico (antes: `#A9776D`/`#734E46`, idéntico). No se tocó el ícono/artwork de la portada (bitmap, fuera de lo aprobado) ni el emoji 🌹 (elegido en la diferenciación del punto 9, no parte de esta aprobación).
+- `nosotrosdos.html` cambia de paleta a azul grisáceo (`--plum: #5C7A8A`, `--plum-dark: #3D515C` calculado para mantener la misma proporción de oscurecido que el resto de las plantillas), en CSS, `theme-color` y el `theme_color` del manifest. Ya no comparte identidad visual con Romántico (antes: `#A9776D`/`#734E46`, idéntico). No se tocó el ícono/artwork de la portada (bitmap, fuera de lo aprobado). El emoji 🌹 se cambió después, ver la ronda del 28-sep siguiente.
 
 **Validado:**
 - Sintaxis JS, balance de llaves/paréntesis/corchetes y peso (`<50 KB` por imagen) en las 22 plantillas.
 - Modo armar: cero herramientas `.solo-armar` visibles sin `?armar=1` en las 22; con `?armar=1` si aparecen ("Fijar checklist/ideas en el código") en las plantillas que las tienen.
 - Flujo completo con Playwright en cada plantilla nueva: nombre/negocio, registro de ventas y racha (Mi changarro), pedidos con estatus + clientas con aviso de "hace cuánto no le escribes" (Mini CRM), banco de ideas por categoría + checklist de publicar + racha (Calendario de contenido), meta con barra de progreso + historial (Meta de ventas), contador ascendente + cartas selladas + límites (Sanando de una ruptura).
 - `configurador.html` detecta correctamente los `PRESET_` nuevos (`PRESET_NEGOCIO`, `PRESET_CHECKLIST_LANZAMIENTO`, `PRESET_IDEAS_CONTENIDO`, `PRESET_META_VENTAS`, `PRESET_LIMITES`) con etiquetas propias en `LABELS_CONOCIDOS`; probado subiendo `changarro.html`.
+
+## 7 mejoras aprobadas, segunda ronda (28-sep-2026)
+Claudia aprobó 7 puntos: 3 ya definidos por completo (se construyeron directo) y 4 nuevos sobre Damas de honor y Nosotros dos que son construcciones nuevas — para esos, la regla "esto lo decide Claudia" pide propuesta antes de programar el detalle fino.
+
+**Construidos (1-3):**
+1. `PRESET_NEGOCIO` en `metaventas.html` — mismo patrón que `changarro`/`minicrm`/`calendariocontenido`: campo en el setup inicial, `negocioTag` en la cabecera, se limpia con "Reiniciar app".
+2. Chips de "Ya no permito" en `sanandoruptura.html` reemplazados por los 3 ejemplos exactos que dio Claudia ("Que me busque solo cuando le conviene", "Minimizar lo que sentí", "Compararme con alguien más") — menos presuntuosos sobre la historia de quien la usa que los genéricos anteriores.
+3. Emoji de `nosotrosdos.html` cambiado de 🌹 (compartido con Romántico) a **⏳**, en cabecera, saludo, decoraciones y nav — se eligió sobre 🏡 porque encaja con el contador de días juntos y la cápsula del tiempo, que son el corazón de la app. De paso se corrigió un bug del mismo tipo que Damas/Mi Radar: el manifest y el `apple-mobile-web-app-title` decían "Mi favorita" (nombre viejo) en vez de "Nosotros dos".
+
+**Construidos con luz verde directa (4 y 6):**
+4. **Itinerario del día de la boda** (Damas de honor) — pestaña nueva "Itinerario" (🗓️), con el horario precargado que aprobó Claudia (arreglo, fotos, ceremonia, cóctel, recepción, primer baile, fiesta), editable/agregable, ordenado por hora, con "Fijar itinerario en el código" (`solo-armar`). Si `PRESET_FECHA` es hoy, en Hoy aparece una tarjeta "Ahora: [evento] · [hora]" con el siguiente bloque.
+6. **Hitos automáticos** (Nosotros dos) — se detectan solos a partir de "desde cuándo están juntos": 100 días, 6 meses y cada año en adelante (1, 2, 3...). El día exacto de un hito, la tarjeta "Llevamos juntos" se reemplaza por una tarjeta de celebración (`#hitoCard`, confeti + el mensaje) sin botón de compartir, tal como se aprobó. Al día siguiente vuelve sola a la tarjeta normal.
+
+**5 y 7, construidos con los copys aprobados:**
+5. **Cierre del círculo** (Damas de honor) — dentro de la pestaña Mensajes, una segunda sección ("Cierre del círculo 💌") que solo aparece cuando ya pasó la fecha de la boda (reusa `isCountdownReached()`). Libro de firmas compartido: cada quien deja nombre + mensaje para la novia (su nombre se detecta solo de `PRESET_NOVIA`/el título de la cuenta regresiva), lista con fecha y botón eliminar, y el botón **"Armar recuerdo para [novia] 💌"** arma y copia el texto final con el formato aprobado.
+7. **Mini-diario de gratitud** (Nosotros dos) — reemplaza por completo el check-in de ánimo (se quitan los emojis de MOODS y el atajo de WhatsApp) y se fusiona con "Recuerditos" en una sola tarjeta: "¿Qué agradeces hoy de tu persona? 💕", campo + botón "Guardar", lista con fecha y botón eliminar por entrada (ya no hay vista barajada). Los recuerditos que ya existían se conservan (mismo storage `companion-goodthings`, solo cambia cómo se muestran). Se quitaron también los contactos de emergencia (nombre, teléfono, botón "+ Agregar a tu persona") por quedarse sin ningún disparador — mismo criterio que la limpieza de `shareSymptoms()`. Las claves viejas (`companion-moods`, `companion-contacts`) se quedan en "Reiniciar app" para limpiar datos de quien ya las tenía guardadas.
+
+**Con esto, los 7 puntos aprobados el 28-sep quedan construidos.**
 
 ## Próximos pasos
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ PR #1 mergeado el 27-sep; Pages lo publicó bien. La revisión UX parte 2 va en el PR nuevo.
