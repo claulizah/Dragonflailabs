@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Calendario de contenido 📸</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Calendario de contenido">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E9E8E">
+<!-- Ícono provisional (SVG con emoji). Claudia manda el ícono definitivo después. -->
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48cmVjdCB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgcng9JzIyJyBmaWxsPScjMUU5RThFJy8+PHRleHQgeD0nNTAnIHk9JzY4JyBmb250LXNpemU9JzU2JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz7wn5O4PC90ZXh0Pjwvc3ZnPg==">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48cmVjdCB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgcng9JzIyJyBmaWxsPScjMUU5RThFJy8+PHRleHQgeD0nNTAnIHk9JzY4JyBmb250LXNpemU9JzU2JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz7wn5O4PC90ZXh0Pjwvc3ZnPg==">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkNhbGVuZGFyaW8gZGUgY29udGVuaWRvIiwgInNob3J0X25hbWUiOiAiQ2FsZW5kYXJpbyBkZSBjb250ZW5pZG8iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiI0YwRkFGOCIsICJ0aGVtZV9jb2xvciI6ICIjMUU5RThFIiwgInN0YXJ0X3VybCI6ICIuIn0=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root{
+    --bg: #F0FAF8;
+    --card: #FFFFFF;
+    --plum: #1E9E8E;
+    --plum-dark: #146A60;
+    --sage: #1E9E8E;
+    --marigold: #4FC3B4;
+    --rose: #B0433A;
+    --text: #20302E;
+    --text-soft: #7C948F;
+    --border: #DCEEEA;
+    --grad-flag: linear-gradient(120deg, var(--plum), var(--plum-dark));
+  }
+  *{ box-sizing: border-box; }
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Work Sans', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,h2,h3, .display{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  #app{
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 78px;
+  }
+  header{
+    padding: 30px 22px 18px;
+    position: relative;
+    overflow: hidden;
+    background: var(--grad-flag);
+    border-radius: 0 0 28px 28px;
+    box-shadow: 0 8px 18px -12px rgba(0,0,0,0.35);
+  }
+  .header-tag{
+    display: inline-block;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .bfly{
+    position: absolute;
+    font-size: 1.8rem;
+    opacity: 0.55;
+    animation: flutter 4s ease-in-out infinite;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12));
+  }
+  @media (prefers-reduced-motion: reduce){ .bfly{ animation: none; } }
+  .bfly.b1{ top: 6px; right: 26px; animation-delay: 0s; }
+  .bfly.b2{ top: 46px; right: 70px; font-size: 1.1rem; animation-delay: 1.2s; }
+  .bfly.b3{ top: 12px; right: 96px; font-size: 0.9rem; animation-delay: 2.1s; opacity: 0.22; }
+  @keyframes flutter{
+    0%,100%{ transform: translateY(0) rotate(-4deg); }
+    50%{ transform: translateY(-6px) rotate(6deg); }
+  }
+  header .greeting{
+    font-size: 1.55rem;
+    color: #fff;
+    margin: 0 0 2px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  header .date{
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.85);
+    margin: 0;
+    text-transform: capitalize;
+  }
+  header .negocio-tag{
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.85);
+    margin: 4px 0 0;
+  }
+  .edit-name{
+    background:none; border:none; color: rgba(255,255,255,0.8);
+    font-size: 0.8rem; text-decoration: underline;
+    padding: 8px 0 0; min-height: auto;
+  }
+  main{
+    flex: 1;
+    padding: 6px 22px 24px;
+  }
+  .screen{ display: none; animation: fade .25s ease; }
+  .screen.active{ display: block; }
+  @media (prefers-reduced-motion: reduce){ .screen{ animation: none; } }
+  @keyframes fade{ from{ opacity:0; transform: translateY(4px);} to{opacity:1; transform:none;} }
+
+  .card{
+    background: var(--card);
+    border-radius: 20px;
+    padding: 24px 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 18px -10px rgba(0,0,0,0.12);
+  }
+  .msg-card{
+    border-left: 5px solid var(--plum);
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .msg-card::before{
+    content: "📸";
+    position: absolute;
+    top: -14px; right: -10px;
+    font-size: 4.2rem;
+    opacity: 0.07;
+    transform: rotate(12deg);
+  }
+  .msg-card p{
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    line-height: 1.45;
+    color: var(--plum-dark);
+    margin: 0 0 18px;
+  }
+  button{
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .12s ease;
+  }
+  button:active{ transform: scale(0.96); }
+  .btn-ghost{
+    background: transparent;
+    color: var(--plum);
+    border: 1.5px solid var(--plum);
+    padding: 10px 16px;
+    font-weight: 700;
+    min-height: 44px;
+  }
+  .btn-ghost:active{ background: var(--plum); color: #fff; }
+  .btn-solid{
+    background: var(--grad-flag);
+    color: #fff;
+    padding: 12px 18px;
+    font-weight: 700;
+    min-height: 48px;
+    box-shadow: 0 6px 16px -6px rgba(0,0,0,0.35);
+  }
+  .btn-solid:active{ filter: brightness(0.92); }
+  .edit-link{
+    background:none; border:none; color: var(--text-soft);
+    font-size: 0.78rem; text-decoration: underline; padding:4px; min-height:auto;
+  }
+
+  .section-title{
+    font-size: 1.15rem;
+    margin: 4px 0 6px;
+    color: var(--plum-dark);
+  }
+  .section-rule{
+    width: 34px; height: 3px; border-radius: 2px;
+    background: var(--marigold);
+    margin: 0 0 18px;
+  }
+  .setup-card input{
+    width:100%;
+    font-size: 1.05rem;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    font-family: inherit;
+    margin-bottom: 14px;
+  }
+  .add-row{ display:flex; flex-direction:column; gap: 10px; margin-bottom: 20px; }
+  .add-row input, .add-row textarea, .add-row select{
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    resize: none;
+    width: 100%;
+  }
+  .add-row textarea{ min-height: 90px; }
+  .two-col{ display:flex; gap:10px; }
+  .two-col > *{ flex:1; min-width:0; }
+
+  .empty{
+    color: var(--text-soft);
+    font-size: 0.98rem;
+    padding: 18px 4px;
+    line-height: 1.5;
+  }
+  .item{
+    display:flex; align-items:flex-start; gap: 12px;
+    padding: 14px 2px;
+    border-bottom: 1px solid var(--border);
+  }
+  .item:last-child{ border-bottom: none; }
+  .check{
+    width: 26px; height: 26px; flex-shrink:0;
+    border-radius: 50%;
+    border: 2px solid var(--sage);
+    margin-top: 2px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 0.85rem; color: var(--sage); cursor:pointer;
+  }
+  .check.done{ background: var(--sage); color:#fff; }
+  .item-body{ flex:1; min-width:0; }
+  .item-text{ font-size: 1.02rem; line-height:1.4; word-wrap: break-word; }
+  .item-text.done{ text-decoration: line-through; color: var(--text-soft); }
+  .item-date, .item-time{ font-size: 0.82rem; color: var(--text-soft); margin-top: 2px; }
+  .item-del{
+    background: none; border:none; color: var(--rose);
+    font-size: 0.85rem; font-weight:600; padding: 6px 4px; min-height: 32px;
+  }
+  .quick-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 14px; }
+  .chip{
+    background: var(--card);
+    border: 1.5px dashed var(--plum);
+    color: var(--plum-dark);
+    padding: 9px 14px;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    min-height: 40px;
+  }
+  .chip.selected{ background: var(--plum); color:#fff; border-style: solid; }
+
+  .next-card{ margin-bottom: 18px; border-left: 5px solid var(--rose); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .next-card .label{ font-size: 0.8rem; color: var(--text-soft); margin:0 0 4px; }
+  .next-card .text{ font-size: 1rem; font-weight:600; color: var(--text); margin:0; }
+  .next-card .goto{ background:none; border:none; color: var(--plum); font-size:0.85rem; font-weight:600; text-decoration:underline; padding:6px; min-height:auto; flex-shrink:0; }
+
+  .progress-card{ margin-bottom: 18px; }
+  .prog-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 10px; }
+  .progress-card h3{ font-size: 1.05rem; margin:0; color: var(--plum-dark); }
+  .prog-count{ font-weight:700; color: var(--marigold); }
+  .prog-track{ background: var(--border); border-radius: 999px; height: 12px; overflow: hidden; }
+  .prog-fill{ background: linear-gradient(90deg, var(--plum), var(--marigold)); height: 100%; border-radius: 999px; transition: width .4s ease; }
+  @media (prefers-reduced-motion: reduce){ .prog-fill{ transition:none; } }
+  .prog-caption{ font-size: 0.82rem; color: var(--text-soft); margin: 8px 0 0; }
+  .inline-add{ display:flex; gap:8px; margin-top: 12px; }
+  .inline-add input{ flex:1; min-width:0; font-family:inherit; font-size:0.95rem; padding: 11px 13px; border-radius:12px; border:1.5px solid var(--border); background: var(--card); color: var(--text); }
+  .inline-add .btn-solid{ min-width: 48px; padding: 0 14px; font-size: 1.2rem; }
+  .hint{ font-size: 0.88rem; color: var(--text-soft); margin: -8px 0 8px; line-height:1.45; }
+
+  .streak-card{ text-align:center; margin-bottom: 18px; border-left: 5px solid var(--sage); }
+  .streak-number{ font-family:'Fraunces', serif; font-size: 2.4rem; color: var(--plum-dark); margin: 4px 0; }
+  .streak-caption{ font-size: 0.88rem; color: var(--text-soft); margin: 0; }
+
+  
+  .idea-tag{ display:inline-block; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; padding:3px 9px; border-radius:999px; background:#E1F4F1; color: var(--plum-dark); margin-bottom:4px; }
+  .cat-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+
+
+  /* Modo armar: herramientas para quien arma la app (solo con ?armar=1 en la URL) */
+  body:not(.armando) .solo-armar{ display:none !important; }
+  .armar-banner{ position:fixed; top:0; left:0; right:0; z-index:1000; background:#1f1f1f; color:#fff; font:600 0.72rem/1.3 sans-serif; text-align:center; padding:6px 10px; letter-spacing:0.02em; }
+
+  /* Modal propio (reemplaza a los prompt() del navegador) */
+  .modal-fondo{ position:fixed; inset:0; z-index:1001; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal-caja{ background:var(--card); color:var(--text); width:100%; max-width:440px; border-radius:20px; padding:22px 20px 18px; box-shadow:0 20px 40px -12px rgba(0,0,0,0.4); animation: modalIn .18s ease; }
+  @keyframes modalIn{ from{ opacity:0; transform: translateY(8px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .modal-caja{ animation:none; } }
+  .modal-caja h3{ margin:0 0 14px; font-size:1.1rem; color:var(--plum-dark); line-height:1.3; }
+  .modal-campo{ display:block; margin-bottom:12px; }
+  .modal-campo span{ display:block; font-size:0.82rem; color:var(--text-soft); font-weight:600; margin-bottom:5px; }
+  .modal-campo input, .modal-campo textarea{ width:100%; box-sizing:border-box; font-family:inherit; font-size:1rem; padding:11px 13px; border-radius:12px; border:1.5px solid var(--border); background:var(--card); color:var(--text); }
+  .modal-campo textarea{ min-height:140px; font-size:0.82rem; resize:vertical; }
+  .modal-botones{ display:flex; gap:10px; margin-top:6px; }
+  .modal-botones button{ flex:1; min-height:46px; border-radius:12px; font-family:inherit; font-weight:700; font-size:0.95rem; cursor:pointer; }
+  .modal-ok{ background:var(--plum); color:#fff; border:none; }
+  .modal-cancel{ background:transparent; color:var(--text-soft); border:1.5px solid var(--border); }
+
+  /* Dedicatoria de quien regala y aviso para instalar */
+  .regalo-dedic{ text-align:center; padding:28px 22px 20px; }
+  .regalo-dedic .de{ font-size:0.74rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-soft); font-weight:700; margin:0 0 14px; }
+  .regalo-dedic .txt{ font-size:1.2rem; line-height:1.55; color:var(--plum-dark); margin:0 0 22px; white-space:pre-line; }
+  .regalo-dedic .modal-ok{ width:100%; min-height:48px; border-radius:12px; font-family:inherit; font-weight:700; font-size:0.98rem; cursor:pointer; }
+  .regalo-card{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:14px 18px; margin:0 0 16px; box-shadow:0 4px 18px -12px rgba(0,0,0,0.15); }
+  .regalo-card summary{ cursor:pointer; font-weight:700; color:var(--plum-dark); list-style:none; font-size:0.95rem; }
+  .regalo-card summary::-webkit-details-marker{ display:none; }
+  .regalo-card summary::after{ content:" ▾"; color:var(--text-soft); font-weight:400; }
+  .regalo-card[open] summary::after{ content:" ▴"; }
+  .regalo-card .txt{ margin:10px 0 0; line-height:1.55; color:var(--text); white-space:pre-line; }
+  .regalo-instalar h4{ margin:0 0 4px; font-size:1rem; color:var(--plum-dark); }
+  .regalo-instalar p{ margin:0 0 6px; font-size:0.9rem; color:var(--text-soft); line-height:1.45; }
+  .regalo-instalar ol{ margin:6px 0 10px; padding-left:20px; line-height:1.6; font-size:0.92rem; color:var(--text); }
+  .regalo-instalar .fila{ display:flex; gap:8px; flex-wrap:wrap; }
+  .regalo-instalar button{ background:transparent; border:1.5px solid var(--border); color:var(--text-soft); border-radius:10px; padding:8px 12px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; }
+
+  .intro-overlay{
+    position: fixed; inset: 0; z-index: 999;
+    background: radial-gradient(120% 90% at 50% 0%, var(--plum) 0%, var(--plum-dark) 62%, #16110f 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding: 24px;
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .intro-overlay.hide{ opacity:0; transform: scale(1.06); pointer-events:none; }
+  .intro-sparkle{
+    position:absolute; font-size:1.4rem; opacity:0.5;
+    animation: flutter 3.4s ease-in-out infinite;
+  }
+  .intro-badge{
+    width: 108px; height: 108px;
+    border-radius: 28px;
+    background: linear-gradient(160deg, #fff, var(--bg));
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 26px;
+    font-size: 3.4rem;
+    animation: bob 2.6s ease-in-out infinite;
+    box-shadow: 0 14px 30px -8px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.15);
+  }
+  @media (prefers-reduced-motion: reduce){ .intro-badge, .intro-sparkle{ animation:none; } }
+  @keyframes bob{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+  .intro-title{
+    font-family:'Fraunces', serif; color:#fff; font-size:1.7rem; margin:0 0 8px;
+  }
+  .intro-sub{
+    color: rgba(255,255,255,0.8); font-size:0.92rem; margin:0 0 34px;
+    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+  }
+  .intro-btn{
+    background:#fff; color: var(--plum-dark);
+    padding: 14px 34px; border-radius:999px;
+    font-weight:700; font-size:0.98rem; min-height:48px;
+    box-shadow: 0 10px 22px -8px rgba(0,0,0,0.4);
+  }
+  nav{
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display:flex;
+    flex-wrap: nowrap;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  nav button{
+    flex:1;
+    min-width: 0;
+    background: none;
+    padding: 9px 2px 11px;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    color: var(--text-soft);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border-radius: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  nav button .icon{
+    font-size: 1.15rem;
+    width: 34px; height: 26px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius: 10px;
+    transition: background .15s ease;
+  }
+  nav button.active{ color: var(--plum); }
+  nav button.active .icon{ background: rgba(0,0,0,0.08); }
+  nav button:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
+    outline: 2.5px solid var(--plum);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="intro-overlay" id="introOverlay" onclick="openIntro()">
+  <span class="intro-sparkle" style="top:18%; left:16%;">✨</span>
+  <span class="intro-sparkle" style="top:70%; left:20%; animation-delay:1s;">📸</span>
+  <span class="intro-sparkle" style="top:22%; right:14%; animation-delay:1.8s;">✨</span>
+  <div class="intro-badge">📸</div>
+  <p class="intro-title" id="introTitle">Para ti</p>
+  <p class="intro-sub">Tu app personal &middot; solo tuya</p>
+  <button class="intro-btn" onclick="openIntro()">Toca para abrir</button>
+</div>
+<div id="app">
+  <header>
+    <span class="bfly b1">📸</span>
+    <span class="bfly b2">💡</span>
+    <span class="bfly b3">📸</span>
+    <span class="header-tag">100% privado · solo en tu celular</span>
+    <p class="greeting" id="greeting">Hola 📸</p>
+    <p class="date" id="todayDate"></p>
+    <p class="negocio-tag" id="negocioTag" style="display:none;"></p>
+    <button class="edit-name" id="editNameBtn" style="display:none;" onclick="editName()">cambiar nombre</button>
+  </header>
+
+  <main>
+
+    <!-- HOY -->
+    <section class="screen active" id="screen-hoy">
+      <div id="regaloExtras"></div>
+      <div id="setupBlock" style="display:none;">
+        <div class="card setup-card">
+          <h3 style="margin-top:0;">¿Cómo te llamas?</h3>
+          <input id="nameInput" type="text" placeholder="Tu nombre" maxlength="30">
+          <h3>¿Cómo se llama tu negocio?</h3>
+          <input id="negocioInput" type="text" placeholder="Nombre de tu negocio (opcional)" maxlength="40">
+          <button class="btn-solid" style="width:100%;" onclick="saveSetup()">Guardar</button>
+        </div>
+      </div>
+
+      <div id="mainHoyBlock">
+        <div class="card streak-card">
+          <p class="prog-caption" style="margin:0;">Llevas publicando</p>
+          <p class="streak-number" id="rachaNumber">0 días</p>
+          <p class="streak-caption" id="rachaCaption">Marca "Ya publiqué hoy" en Calendario para empezar.</p>
+        </div>
+
+        <div class="card msg-card">
+          <p id="dailyMessage">...</p>
+          <button class="btn-ghost" onclick="shuffleMessage()">Otro mensajito 📸</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- IDEAS -->
+    <section class="screen" id="screen-ideas">
+      <h2 class="section-title">Banco de ideas</h2>
+      <div class="section-rule"></div>
+      <div class="cat-row" id="catRow"></div>
+      <div class="add-row">
+        <input id="ideaText" type="text" placeholder="Escribe tu idea..." maxlength="140">
+        <button class="btn-solid" onclick="addIdea()">Agregar idea</button>
+      </div>
+      <div id="ideaList"></div>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarIdeas()">Fijar ideas en el código</button>
+    </section>
+
+    <!-- CALENDARIO -->
+    <section class="screen" id="screen-calendario">
+      <h2 class="section-title">Antes de publicar</h2>
+      <div class="section-rule"></div>
+      <p class="hint">Se desmarca solita cada mañana.</p>
+      <div id="checklistList"></div>
+      <button class="btn-solid" style="width:100%; margin:14px 0 24px;" onclick="marcarPublicacion()">Ya publiqué hoy 📸</button>
+
+      <h2 class="section-title">Tu racha</h2>
+      <div class="section-rule"></div>
+      <div class="card streak-card" style="margin-bottom:0;">
+        <p class="streak-number" id="rachaNumber2">0 días</p>
+        <p class="streak-caption" id="rachaCaption2">Publica seguido para hacer crecer tu racha.</p>
+      </div>
+    </section>
+
+    <!-- NOTAS -->
+    <section class="screen" id="screen-notas">
+      <h2 class="section-title">Tu libreta</h2>
+      <div class="section-rule"></div>
+      <div class="add-row">
+        <textarea id="noteText" placeholder="Ideas sueltas, pendientes, contraseñas (mejor no)..."></textarea>
+        <button class="btn-solid" onclick="addNote()">Guardar nota</button>
+      </div>
+      <div id="noteList"></div>
+      <p style="text-align:center; font-size:0.78rem; color:var(--text-soft); margin:28px 0 6px;">
+        Hecho con 🦋 · <a href="https://regaloparati.com?ref=regalo-recibido" target="_blank" rel="noopener" style="color:var(--plum-dark); font-weight:600;">regaloparati.com</a>
+      </p>
+      <button class="edit-link" style="display:block; margin:12px auto 0;" onclick="resetApp()">Reiniciar app (borra todo)</button>
+    </section>
+  </main>
+
+  <nav>
+    <button class="active" data-tab="hoy" onclick="showTab('hoy')">
+      <span class="icon">📸</span>Hoy
+    </button>
+    <button data-tab="ideas" onclick="showTab('ideas')">
+      <span class="icon">💡</span>Ideas
+    </button>
+    <button data-tab="calendario" onclick="showTab('calendario')">
+      <span class="icon">🗓️</span>Calendario
+    </button>
+    <button data-tab="notas" onclick="showTab('notas')">
+      <span class="icon">📝</span>Notas
+    </button>
+
+  </nav>
+</div>
+
+<script>
+// ==== MODO ARMAR ====
+// Las herramientas para quien arma la app (los botones "Fijar ... en el código")
+// solo aparecen si la URL trae ?armar=1. Quien recibe la app abre la liga normal y no las ve.
+const MODO_ARMAR = new URLSearchParams(location.search).get('armar') === '1';
+if(MODO_ARMAR){
+  document.body.classList.add('armando');
+  const aviso = document.createElement('div');
+  aviso.className = 'armar-banner';
+  aviso.textContent = 'Modo armar · quien recibe no ve estas herramientas';
+  document.body.appendChild(aviso);
+}
+
+// ==== MODAL (reemplaza a los prompt() del navegador) ====
+function pedir({ titulo, campos, aceptar = 'Guardar', cancelar = 'Cancelar' }){
+  return new Promise(resolve => {
+    const fondo = document.createElement('div');
+    fondo.className = 'modal-fondo';
+    const caja = document.createElement('form');
+    caja.className = 'modal-caja';
+    const h = document.createElement('h3');
+    h.textContent = titulo;
+    caja.appendChild(h);
+    const inputs = campos.map(c => {
+      const label = document.createElement('label');
+      label.className = 'modal-campo';
+      if(c.etiqueta){ const sp = document.createElement('span'); sp.textContent = c.etiqueta; label.appendChild(sp); }
+      const inp = document.createElement(c.tipo === 'largo' ? 'textarea' : 'input');
+      if(c.tipo !== 'largo') inp.type = c.tipo || 'text';
+      if(c.tipo === 'number'){ inp.inputMode = 'decimal'; }
+      inp.value = c.valor == null ? '' : String(c.valor);
+      if(c.placeholder) inp.placeholder = c.placeholder;
+      if(c.soloLectura) inp.readOnly = true;
+      label.appendChild(inp);
+      caja.appendChild(label);
+      return inp;
+    });
+    const botones = document.createElement('div');
+    botones.className = 'modal-botones';
+    const bCancel = document.createElement('button');
+    bCancel.type = 'button'; bCancel.className = 'modal-cancel'; bCancel.textContent = cancelar;
+    const bOk = document.createElement('button');
+    bOk.type = 'submit'; bOk.className = 'modal-ok'; bOk.textContent = aceptar;
+    botones.append(bCancel, bOk);
+    caja.appendChild(botones);
+    function esc(e){ if(e.key === 'Escape') cerrar(null); }
+    function cerrar(valor){ document.removeEventListener('keydown', esc); fondo.remove(); resolve(valor); }
+    caja.onsubmit = e => { e.preventDefault(); cerrar(inputs.map(i => i.value)); };
+    bCancel.onclick = () => cerrar(null);
+    fondo.onclick = e => { if(e.target === fondo) cerrar(null); };
+    document.addEventListener('keydown', esc);
+    fondo.appendChild(caja);
+    document.body.appendChild(fondo);
+    setTimeout(() => { if(inputs[0] && !inputs[0].readOnly) inputs[0].focus(); }, 50);
+  });
+}
+async function pedirUno(titulo, valor, extra = {}){
+  const r = await pedir({ titulo, campos: [{ valor, ...extra }] });
+  return r ? r[0] : null;
+}
+async function mostrarTexto(titulo, texto){
+  const fondoPrevio = document.querySelectorAll('.modal-fondo').length;
+  const promesa = pedir({ titulo, campos: [{ tipo: 'largo', valor: texto, soloLectura: true }], aceptar: 'Copiar', cancelar: 'Cerrar' });
+  const area = document.querySelectorAll('.modal-fondo')[fondoPrevio].querySelector('textarea');
+  area.addEventListener('focus', () => area.select());
+  const r = await promesa;
+  if(r){
+    try{ await navigator.clipboard.writeText(texto); }
+    catch(e){
+      const t = document.createElement('textarea'); t.value = texto; document.body.appendChild(t); t.select();
+      try{ document.execCommand('copy'); }catch(_){}
+      t.remove();
+    }
+  }
+}
+
+// ==== DEDICATORIA Y AVISO PARA INSTALAR ====
+const REGALO_VISTA = 'regalo-dedicatoria-vista';
+const REGALO_INSTALAR = 'regalo-instalar-cerrado';
+function leerMarca(k){ try{ return localStorage.getItem(APP_PREFIX + k) === '1'; }catch(e){ return false; } }
+function ponerMarca(k){ try{ localStorage.setItem(APP_PREFIX + k, '1'); }catch(e){} }
+function hayDedicatoria(){ return !!(PRESET_DEDICATORIA.trim() || PRESET_DE.trim()); }
+function textoDe(){ return PRESET_DE.trim() ? `Un regalo de ${PRESET_DE.trim()}` : 'Un regalo para ti'; }
+function appInstalada(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+let regaloAbierto = false;
+function despuesDeAbrir(){
+  if(regaloAbierto) return;
+  regaloAbierto = true;
+  if(hayDedicatoria() && !leerMarca(REGALO_VISTA)) mostrarDedicatoria();
+}
+function mostrarDedicatoria(){
+  const fondo = document.createElement('div');
+  fondo.className = 'modal-fondo';
+  const caja = document.createElement('div');
+  caja.className = 'modal-caja regalo-dedic';
+  const de = document.createElement('p'); de.className = 'de'; de.textContent = textoDe();
+  const txt = document.createElement('p'); txt.className = 'txt display'; txt.textContent = PRESET_DEDICATORIA.trim();
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'modal-ok'; btn.textContent = 'Abrir mi app';
+  btn.onclick = () => { ponerMarca(REGALO_VISTA); fondo.remove(); };
+  caja.append(de);
+  if(txt.textContent) caja.append(txt);
+  caja.append(btn);
+  fondo.appendChild(caja);
+  document.body.appendChild(fondo);
+}
+function pasosInstalar(){
+  const ua = navigator.userAgent || '';
+  const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const android = /Android/.test(ua);
+  if(ios && /CriOS|FxiOS|EdgiOS|OPiOS|Instagram|FBAN|FBAV|WhatsApp|Line\//.test(ua)){
+    return { intro: 'En iPhone solo se puede guardar desde Safari. Copia la liga, ábrela en Safari y luego:', pasos: ['Toca el botón Compartir (el cuadrito con la flecha hacia arriba).', 'Elige "Agregar a inicio".', 'Toca "Agregar".'], copiar: true };
+  }
+  if(ios) return { intro: 'Así queda como una app más en tu iPhone:', pasos: ['Toca el botón Compartir (el cuadrito con la flecha hacia arriba), abajo en Safari.', 'Desliza y elige "Agregar a inicio".', 'Toca "Agregar".'] };
+  if(android) return { intro: 'Así queda como una app más en tu celular:', pasos: ['Toca el menú ⋮ arriba a la derecha en Chrome.', 'Elige "Agregar a pantalla principal" (o "Instalar app").', 'Confirma con "Agregar".'] };
+  return { intro: 'Ábrela desde tu celular para guardarla en tu pantalla de inicio:', pasos: ['iPhone: en Safari toca Compartir y luego "Agregar a inicio".', 'Android: en Chrome toca el menú ⋮ y luego "Agregar a pantalla principal".'] };
+}
+function pintarRegalo(){
+  const cont = document.getElementById('regaloExtras');
+  if(!cont) return;
+  const pideNombre = document.getElementById('setupBlock');
+  if(pideNombre && pideNombre.nextElementSibling !== cont) pideNombre.after(cont);
+  cont.innerHTML = '';
+  if(hayDedicatoria()){
+    const d = document.createElement('details');
+    d.className = 'regalo-card';
+    const s = document.createElement('summary'); s.textContent = '💌 ' + textoDe();
+    d.appendChild(s);
+    if(PRESET_DEDICATORIA.trim()){ const t = document.createElement('p'); t.className = 'txt'; t.textContent = PRESET_DEDICATORIA.trim(); d.appendChild(t); }
+    cont.appendChild(d);
+  }
+  if(!appInstalada() && !leerMarca(REGALO_INSTALAR)){
+    const info = pasosInstalar();
+    const c = document.createElement('div');
+    c.className = 'regalo-card regalo-instalar';
+    const h = document.createElement('h4'); h.textContent = '📲 Guárdala en tu pantalla de inicio';
+    const p = document.createElement('p'); p.textContent = info.intro;
+    const ol = document.createElement('ol');
+    info.pasos.forEach(x => { const li = document.createElement('li'); li.textContent = x; ol.appendChild(li); });
+    const fila = document.createElement('div'); fila.className = 'fila';
+    if(info.copiar){
+      const bc = document.createElement('button'); bc.type = 'button'; bc.textContent = 'Copiar liga';
+      bc.onclick = async () => {
+        const liga = location.href.replace(/([?&])armar=1&?/, '$1').replace(/[?&]$/, '');
+        try{ await navigator.clipboard.writeText(liga); bc.textContent = 'Liga copiada ✓'; }catch(e){ mostrarTexto('Copia esta liga y ábrela en Safari', liga); }
+      };
+      fila.appendChild(bc);
+    }
+    const bx = document.createElement('button'); bx.type = 'button'; bx.textContent = 'Ya la guardé ✕';
+    bx.onclick = () => { ponerMarca(REGALO_INSTALAR); c.remove(); };
+    fila.appendChild(bx);
+    c.append(h, p, ol, fila);
+    cont.appendChild(c);
+  }
+}
+setTimeout(pintarRegalo, 0);
+
+
+const MESSAGES = [
+  "No necesitas salir perfecta en la foto, necesitas salir.",
+  "Publicar seguido gana más que publicar perfecto de vez en cuando.",
+  "Una idea anotada hoy es una publicación que no vas a improvisar mañana.",
+  "Mostrar cómo haces las cosas también vende, aunque no lo parezca.",
+  "No todas las publicaciones tienen que vender. Algunas solo tienen que conectar.",
+  "Tu changarro también se construye publicando cuando no tienes ganas.",
+  "El algoritmo cambia, la constancia no pasa de moda.",
+  "Una buena foto con luz natural gana a un filtro caro.",
+  "Cuéntales por qué haces lo que haces. Eso no lo copia nadie.",
+  "Guarda esa idea random de las 11pm. Mañana la vas a agradecer.",
+  "Compartir un testimonio real vale más que mil palabras tuyas.",
+  "Hoy también puedes reciclar una idea vieja con un toque nuevo.",
+  "No compares tu feed del mes 1 con el de otra cuenta en el mes 12.",
+  "Publicar da miedo al principio. Se hace más fácil con la repetición.",
+  "Tu contenido de hoy es la razón por la que alguien te va a encontrar mañana."
+];
+
+const CATEGORIAS = ['Detrás de cámaras', 'Producto', 'Testimonio', 'Promoción'];
+
+const DEFAULT_IDEAS_CONTENIDO = [
+  { categoria: 'Detrás de cámaras', text: 'Cómo preparas tu producto paso a paso' },
+  { categoria: 'Detrás de cámaras', text: 'Un día normal armando pedidos' },
+  { categoria: 'Producto', text: 'Muestra tu producto desde varios ángulos' },
+  { categoria: 'Producto', text: 'Antes y después de usarlo' },
+  { categoria: 'Testimonio', text: 'Comparte un mensaje de una clienta feliz' },
+  { categoria: 'Testimonio', text: 'Pide una reseña corta en video' },
+  { categoria: 'Promoción', text: 'Anuncia un descuento por tiempo limitado' },
+  { categoria: 'Promoción', text: 'Recuerda tus formas de pago y envío' }
+];
+
+const CHECKLIST_PUBLICAR = ['Foto lista', 'Caption escrito', 'Hashtags listos', 'Link en bio actualizado'];
+
+// ==== CONFIGURACIÓN INICIAL ====
+const PRESET_NAME = "";
+// Nombre del negocio. Vacío = la app lo pregunta al abrir (es opcional).
+const PRESET_NEGOCIO = "";
+// Dedicatoria de quien regala: sale en una tarjetita después de "Toca para abrir"
+// y luego queda en la pestaña Hoy. Vacíos = no aparece.
+const PRESET_DE = "";
+const PRESET_DEDICATORIA = "";
+// Banco de ideas: llénalo en la app y usa "Fijar ideas en el código".
+// Vacío = sale el banco sugerido de arriba (DEFAULT_IDEAS_CONTENIDO).
+const PRESET_IDEAS_CONTENIDO = [];
+// ================================
+
+let state = { name: "", negocio: "", ideas: [], publicaciones: [], checkHoy: { date: "", ids: [] }, notes: [], currentMsgIndex: 0 };
+let storageOk = true;
+let categoriaActiva = CATEGORIAS[0];
+
+const APP_PREFIX = 'app-calendario-';
+async function safeGet(key){
+  try{ return localStorage.getItem(APP_PREFIX + key); }catch(e){ return null; }
+}
+async function safeSet(key, value){
+  try{ localStorage.setItem(APP_PREFIX + key, value); }catch(e){ storageOk = false; }
+}
+
+async function init(){
+  document.getElementById('todayDate').textContent = formatDate();
+
+  const name = await safeGet('name');
+  const negocio = await safeGet('negocio');
+  state.name = name || PRESET_NAME || "";
+  if(!name && PRESET_NAME){ await safeSet('name', PRESET_NAME); }
+  state.negocio = negocio || PRESET_NEGOCIO || "";
+  if(!negocio && PRESET_NEGOCIO){ await safeSet('negocio', PRESET_NEGOCIO); }
+
+  state.ideas = parseOr(await safeGet('ideas'), null)
+    || (PRESET_IDEAS_CONTENIDO.length ? PRESET_IDEAS_CONTENIDO : DEFAULT_IDEAS_CONTENIDO).map(x => ({ id: newId(), categoria: x.categoria, text: x.text }));
+  await safeSet('ideas', JSON.stringify(state.ideas));
+  state.publicaciones = parseOr(await safeGet('publicaciones'), []);
+  state.checkHoy = parseOr(await safeGet('check-hoy'), { date: "", ids: [] });
+  state.notes = parseOr(await safeGet('notes'), []);
+
+  state.currentMsgIndex = dayOfYear() % MESSAGES.length;
+
+  renderGreeting();
+  renderCatRow();
+  renderIdeas();
+  renderChecklistPublicar();
+  renderRacha();
+  renderMessage();
+  renderNotes();
+}
+
+function renderGreeting(){
+  const setupBlock = document.getElementById('setupBlock');
+  const mainBlock = document.getElementById('mainHoyBlock');
+  const negocioTag = document.getElementById('negocioTag');
+  if(!state.name){
+    setupBlock.style.display = 'block';
+    mainBlock.style.display = 'none';
+    document.getElementById('greeting').textContent = "Hola 📸";
+  } else {
+    setupBlock.style.display = 'none';
+    mainBlock.style.display = 'block';
+    document.getElementById('greeting').textContent = `Hola, ${state.name} 📸`;
+    document.getElementById('editNameBtn').style.display = 'block';
+    document.getElementById('introTitle').textContent = `Para: ${state.name}`;
+  }
+  if(state.negocio){ negocioTag.textContent = state.negocio; negocioTag.style.display = 'block'; }
+  else negocioTag.style.display = 'none';
+}
+
+async function saveSetup(){
+  const name = document.getElementById('nameInput').value.trim();
+  const negocio = document.getElementById('negocioInput').value.trim();
+  if(!name) return;
+  state.name = name; state.negocio = negocio;
+  await safeSet('name', name);
+  await safeSet('negocio', negocio);
+  renderGreeting();
+}
+
+async function editName(){
+  const val = await pedirUno('¿Cómo quieres que te salude?', state.name);
+  if(val === null) return;
+  const trimmed = val.trim();
+  if(!trimmed) return;
+  state.name = trimmed;
+  await safeSet('name', trimmed);
+  renderGreeting();
+}
+
+function renderMessage(){
+  document.getElementById('dailyMessage').textContent = MESSAGES[state.currentMsgIndex];
+}
+function shuffleMessage(){
+  let next;
+  do{ next = Math.floor(Math.random() * MESSAGES.length); }while(next === state.currentMsgIndex && MESSAGES.length > 1);
+  state.currentMsgIndex = next;
+  renderMessage();
+}
+
+// ---- Ideas ----
+function renderCatRow(){
+  const row = document.getElementById('catRow');
+  row.innerHTML = '';
+  CATEGORIAS.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (cat === categoriaActiva ? ' selected' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { categoriaActiva = cat; renderCatRow(); };
+    row.appendChild(btn);
+  });
+}
+
+function renderIdeas(){
+  const list = document.getElementById('ideaList');
+  list.innerHTML = '';
+  if(state.ideas.length === 0){
+    list.innerHTML = '<p class="empty">Aún no tienes ideas guardadas. Agrega la primera arriba.</p>';
+    return;
+  }
+  state.ideas.forEach(i => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="item-body">
+        <span class="idea-tag">${escapeHtml(i.categoria)}</span>
+        <div class="item-text">${escapeHtml(i.text)}</div>
+      </div>
+      <button class="item-del" data-id="${i.id}">Eliminar</button>
+    `;
+    item.querySelector('.item-del').onclick = () => deleteIdea(i.id);
+    list.appendChild(item);
+  });
+}
+
+async function addIdea(){
+  const el = document.getElementById('ideaText');
+  const text = el.value.trim();
+  if(!text) return;
+  state.ideas.push({ id: newId(), categoria: categoriaActiva, text });
+  el.value = '';
+  await safeSet('ideas', JSON.stringify(state.ideas));
+  renderIdeas();
+}
+
+async function deleteIdea(id){
+  state.ideas = state.ideas.filter(x => x.id !== id);
+  await safeSet('ideas', JSON.stringify(state.ideas));
+  renderIdeas();
+}
+
+async function exportarIdeas(){
+  if(state.ideas.length === 0){ alert('El banco de ideas está vacío.'); return; }
+  const datos = state.ideas.map(i => ({ categoria: i.categoria, text: i.text }));
+  const codigo = 'const ' + `PRESET_IDEAS_CONTENIDO = ${JSON.stringify(datos).replace(/;/g, ';').replace(/</g, '<')};`;
+  const aviso = 'Pégalo en el archivo reemplazando la línea de PRESET_IDEAS_CONTENIDO, o pégalo en el configurador.';
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
+}
+
+// ---- Calendario: checklist "antes de publicar" (se reinicia cada día) ----
+function doneHoy(bucket){
+  if(bucket.date !== todayKey()){ bucket.date = todayKey(); bucket.ids = []; }
+  return bucket.ids;
+}
+
+function renderChecklistPublicar(){
+  const ids = doneHoy(state.checkHoy);
+  const list = document.getElementById('checklistList');
+  list.innerHTML = '';
+  CHECKLIST_PUBLICAR.forEach((text, idx) => {
+    const done = ids.includes(idx);
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="check ${done ? 'done' : ''}">${done ? '✓' : ''}</div>
+      <div class="item-body"><div class="item-text ${done ? 'done' : ''}">${escapeHtml(text)}</div></div>
+    `;
+    row.querySelector('.check').onclick = () => toggleChecklistPublicar(idx);
+    list.appendChild(row);
+  });
+}
+
+async function toggleChecklistPublicar(idx){
+  const ids = doneHoy(state.checkHoy);
+  const pos = ids.indexOf(idx);
+  if(pos >= 0) ids.splice(pos, 1); else ids.push(idx);
+  await safeSet('check-hoy', JSON.stringify(state.checkHoy));
+  renderChecklistPublicar();
+}
+
+async function marcarPublicacion(){
+  const hoy = todayKey();
+  if(!state.publicaciones.includes(hoy)){
+    state.publicaciones.push(hoy);
+    await safeSet('publicaciones', JSON.stringify(state.publicaciones));
+  }
+  renderRacha();
+}
+
+function calcRacha(){
+  const dias = new Set(state.publicaciones);
+  let racha = 0;
+  let cursor = new Date();
+  if(!dias.has(dateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+  while(dias.has(dateKey(cursor))){
+    racha++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return racha;
+}
+
+function renderRacha(){
+  const racha = calcRacha();
+  const texto = racha === 1 ? '1 día' : `${racha} días`;
+  const caption = racha === 0
+    ? 'Marca "Ya publiqué hoy" en Calendario para empezar.'
+    : 'Sigue así, un día a la vez.';
+  document.getElementById('rachaNumber').textContent = texto;
+  document.getElementById('rachaCaption').textContent = caption;
+  document.getElementById('rachaNumber2').textContent = texto;
+  document.getElementById('rachaCaption2').textContent = racha === 0
+    ? 'Publica seguido para hacer crecer tu racha.'
+    : caption;
+}
+
+// ---- Notas ----
+function renderNotes(){
+  const list = document.getElementById('noteList');
+  list.innerHTML = '';
+  if(state.notes.length === 0){
+    list.innerHTML = '<p class="empty">Aquí puedes anotar lo que quieras recordar. Escribe tu primera nota arriba.</p>';
+    return;
+  }
+  const sorted = [...state.notes].sort((a,b) => b.ts - a.ts);
+  sorted.forEach(n => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="item-body">
+        <div class="item-text">${escapeHtml(n.text)}</div>
+        <div class="item-date">${formatShort(n.ts)}</div>
+      </div>
+      <button class="item-del" data-id="${n.id}">Eliminar</button>
+    `;
+    item.querySelector('.item-del').onclick = () => deleteNote(n.id);
+    list.appendChild(item);
+  });
+}
+async function addNote(){
+  const el = document.getElementById('noteText');
+  const text = el.value.trim();
+  if(!text) return;
+  state.notes.push({ id: newId(), text, ts: Date.now() });
+  el.value = '';
+  await safeSet('notes', JSON.stringify(state.notes));
+  renderNotes();
+}
+async function deleteNote(id){
+  state.notes = state.notes.filter(x => x.id !== id);
+  await safeSet('notes', JSON.stringify(state.notes));
+  renderNotes();
+}
+
+function resetApp(){
+  if(!confirm('¿Borrar todo (nombre, negocio, ideas, calendario, notas) y empezar de cero?')) return;
+  ['name','negocio','ideas','publicaciones','check-hoy','notes'].forEach(k => {
+    try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
+  });
+  location.reload();
+}
+
+function pad2(n){ return String(n).padStart(2, '0'); }
+function dateKey(d){ return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; }
+function todayKey(){ return dateKey(new Date()); }
+function dayOfYear(){
+  const d = new Date();
+  const start = new Date(d.getFullYear(),0,0);
+  return Math.floor((d - start) / 86400000);
+}
+function formatDate(){
+  return new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+function formatShort(ts){
+  return new Date(ts).toLocaleDateString('es-MX', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+function formatMonto(n){
+  const dec = Math.round(n * 100) % 100 !== 0 ? 2 : 0;
+  return '$' + n.toLocaleString('es-MX', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+function newId(){ return Date.now()+"-"+Math.random().toString(36).slice(2,7); }
+function toItems(list){ return list.map(t => typeof t === 'string' ? { id: newId(), text: t, done:false } : t); }
+function parseOr(raw, fallback){
+  try{ return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; }
+}
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+function openIntro(){
+  const overlay = document.getElementById('introOverlay');
+  overlay.classList.add('hide');
+  despuesDeAbrir();
+  setTimeout(() => { overlay.style.display = 'none'; }, 500);
+}
+function showTab(tab){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+}
+
+init();
+</script>
+</body>
+</html>

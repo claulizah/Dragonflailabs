@@ -223,8 +223,8 @@ const LABELS_CONOCIDOS = {
   PRESET_DE: 'Quién regala (sale como "Un regalo de ___")',
   PRESET_DEDICATORIA: 'Dedicatoria (sale al abrir la app por primera vez)',
   PRESET_RAZONES: 'Razones para amarte (Romántico)',
-  PRESET_CARTAS: 'Cartas "Ábrelo cuando…" (Romántico)',
-  PRESET_DESDE: 'Desde cuándo están juntos (Nosotros dos)',
+  PRESET_CARTAS: 'Cartas "Ábrelo cuando…" (Romántico / Sanando de una ruptura)',
+  PRESET_DESDE: 'Fecha desde la que cuenta (Nosotros dos / Sanando de una ruptura)',
   PRESET_HISTORIA: 'Nuestra historia (Nosotros dos)',
   PRESET_MALETA_HOSPITAL: 'Maleta del hospital (Bebé)',
   PRESET_CHECKLIST_VIAJE: 'Checklist de viaje (Viaje)',
@@ -232,7 +232,12 @@ const LABELS_CONOCIDOS = {
   PRESET_HORARIO: 'Horario de clases (Mi semestre)',
   PRESET_CHECKLIST_DIARIO: 'Checklist diario (Home Office)',
   PRESET_RUTINA_INICIO: 'Rutina de inicio de jornada (Home Office)',
-  PRESET_RUTINA_CIERRE: 'Rutina de cierre de jornada (Home Office)'
+  PRESET_RUTINA_CIERRE: 'Rutina de cierre de jornada (Home Office)',
+  PRESET_NEGOCIO: 'Nombre del negocio',
+  PRESET_CHECKLIST_LANZAMIENTO: 'Checklist de lanzamiento (Mi changarro desde cero)',
+  PRESET_IDEAS_CONTENIDO: 'Banco de ideas de contenido (Calendario de contenido)',
+  PRESET_META_VENTAS: 'Meta de ventas del mes, sin signo de $ (Meta de ventas)',
+  PRESET_LIMITES: 'Límites / aprendizajes ya decididos (Sanando de una ruptura)'
 };
 function humanizeLabel(constName){
   if(LABELS_CONOCIDOS[constName]) return LABELS_CONOCIDOS[constName];
