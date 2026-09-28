@@ -691,6 +691,19 @@
       </div>
       <div id="mensajesList"></div>
       <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarMensajesDamas()">Fijar mensajes en el código</button>
+
+      <div id="cierreCirculo" style="display:none;">
+        <h2 class="section-title" style="margin-top:28px;">Cierre del círculo 💌</h2>
+        <div class="section-rule"></div>
+        <p class="hint" id="cierreCirculoHint"></p>
+        <div class="add-row">
+          <input id="vueltaNombre" type="text" placeholder="Tu nombre">
+          <textarea id="vueltaTexto" placeholder="Tu mensaje para ella..."></textarea>
+          <button class="btn-solid" style="width:100%;" onclick="addMensajeVuelta()">Dejar mi mensaje</button>
+        </div>
+        <div id="mensajesVueltaList"></div>
+        <button class="btn-ghost" style="width:100%; margin-top:12px;" id="armarRecuerdoBtn" onclick="armarRecuerdo()">Armar recuerdo 💌</button>
+      </div>
     </section>
   </main>
 
@@ -944,7 +957,7 @@ const DEFAULT_ITINERARIO_BODA = [
   { hora: "22:00", evento: "Fiesta" }
 ];
 
-let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], mensajesDamas: [], itinerario: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "La boda", date: "" }, messagePool: [] };
+let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], mensajesDamas: [], itinerario: [], mensajesVuelta: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "La boda", date: "" }, messagePool: [] };
 let storageOk = true;
 
 const APP_PREFIX = 'app-damashonor-';
@@ -998,6 +1011,7 @@ async function init(){
   const checklist = await safeGet('companion-checklist');
   const mensajesDamas = await safeGet('companion-mensajesdamas');
   const itinerario = await safeGet('companion-itinerario');
+  const mensajesVuelta = await safeGet('companion-mensajesvuelta');
 
   state.name = name || PRESET_NAME || "";
   if(!name && PRESET_NAME){ await safeSet('companion-name', PRESET_NAME); }
@@ -1027,6 +1041,7 @@ async function init(){
       .map((x, n) => ({ id: 'itin-' + n, hora: x.hora, evento: x.evento }));
     await safeSet('companion-itinerario', JSON.stringify(state.itinerario));
   }
+  try{ state.mensajesVuelta = mensajesVuelta ? JSON.parse(mensajesVuelta) : []; }catch(e){ state.mensajesVuelta = []; }
 
   state.messagePool = MESSAGES;
   state.currentMsgIndex = dayOfYear() % state.messagePool.length;
@@ -1044,6 +1059,7 @@ async function init(){
   renderReminders();
   renderNotes();
   renderMensajesDamas();
+  renderCierreCirculo();
 }
 
 function renderGreeting(){
@@ -1150,6 +1166,7 @@ async function editCountdown(){
   await safeSet('companion-countdown', JSON.stringify(state.countdown));
   renderCountdown();
   renderProximoEvento();
+  renderCierreCirculo();
 }
 
 function isCountdownReached(){
@@ -1218,6 +1235,75 @@ function exportarMensajesDamas(){
   const codigo = 'const ' + `PRESET_MENSAJES_DAMAS = ${JSON.stringify(state.mensajesDamas).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
   const aviso = 'Copia este texto y pégalo en el archivo, reemplazando la línea de PRESET_MENSAJES_DAMAS (cerca del inicio del <script>). Así todas las damas van a ver estos mismos mensajes desde que abran su copia:';
   navigator.clipboard.writeText(codigo).then(() => alert('Copiado ✓\n\n' + aviso), () => mostrarTexto(aviso, codigo));
+}
+
+// ---- Cierre del círculo: mensajes de vuelta de las damas para la novia ----
+// Libro de firmas compartido: se abre solo cuando ya pasó el día de la boda.
+function nombreNovia(){
+  const m = (state.countdown.name || '').match(/^La boda de (.+)$/);
+  return m ? m[1] : 'la novia';
+}
+
+function renderCierreCirculo(){
+  const bloque = document.getElementById('cierreCirculo');
+  if(!isCountdownReached() || !state.countdown.date){ bloque.style.display = 'none'; return; }
+  bloque.style.display = 'block';
+  const novia = nombreNovia();
+  document.getElementById('cierreCirculoHint').textContent = `Ahora les toca a ustedes. Cada quien deja su mensaje para ${novia}, como firmar un libro de invitados. Al final se junta todo en un recuerdo para ella.`;
+  document.getElementById('vueltaTexto').placeholder = `Tu mensaje para ${novia}...`;
+  document.getElementById('armarRecuerdoBtn').textContent = `Armar recuerdo para ${novia} 💌`;
+
+  const list = document.getElementById('mensajesVueltaList');
+  list.innerHTML = '';
+  if(state.mensajesVuelta.length === 0){
+    list.innerHTML = '<p class="empty">Todavía no hay ningún mensaje. Deja el primero abajo.</p>';
+    return;
+  }
+  const sorted = [...state.mensajesVuelta].sort((a,b) => a.ts - b.ts);
+  sorted.forEach(m => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="item-body">
+        <div class="item-text"><strong>${escapeHtml(m.nombre)}:</strong> ${escapeHtml(m.mensaje)}</div>
+        <div class="item-date">${formatShort(m.ts)}</div>
+      </div>
+      <button class="item-del" data-id="${m.id}">Eliminar</button>
+    `;
+    item.querySelector('.item-del').onclick = () => deleteMensajeVuelta(m.id);
+    list.appendChild(item);
+  });
+}
+
+async function addMensajeVuelta(){
+  const nombreEl = document.getElementById('vueltaNombre');
+  const textoEl = document.getElementById('vueltaTexto');
+  const nombre = nombreEl.value.trim();
+  const mensaje = textoEl.value.trim();
+  if(!nombre || !mensaje){ alert('Ponle tu nombre y tu mensaje.'); return; }
+  state.mensajesVuelta.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), nombre, mensaje, ts: Date.now() });
+  nombreEl.value = ''; textoEl.value = '';
+  await safeSet('companion-mensajesvuelta', JSON.stringify(state.mensajesVuelta));
+  renderCierreCirculo();
+}
+
+async function deleteMensajeVuelta(id){
+  state.mensajesVuelta = state.mensajesVuelta.filter(x => x.id !== id);
+  await safeSet('companion-mensajesvuelta', JSON.stringify(state.mensajesVuelta));
+  renderCierreCirculo();
+}
+
+async function armarRecuerdo(){
+  if(state.mensajesVuelta.length === 0){ alert('Todavía no hay ningún mensaje para armar el recuerdo.'); return; }
+  const novia = nombreNovia();
+  const sorted = [...state.mensajesVuelta].sort((a,b) => a.ts - b.ts);
+  const bloques = sorted.map(m => {
+    const fecha = new Date(m.ts).toLocaleDateString('es-MX', { day:'numeric', month:'short', year:'numeric' });
+    return `— ${m.nombre}: "${m.mensaje}"\n${fecha}`;
+  });
+  const texto = `💌 Un recuerdo para ${novia}, de tus damas de honor\n\n${bloques.join('\n\n')}`;
+  try{ await navigator.clipboard.writeText(texto); alert('Copiado ✓\n\nPégalo donde quieras enviárselo a ' + novia + '.'); }
+  catch(e){ mostrarTexto(`Copia este recuerdo para ${novia}`, texto); }
 }
 
 function resizeImage(file, maxDim, quality){
@@ -1691,7 +1777,7 @@ async function deleteNote(id){
 
 function resetApp(){
   if(!confirm('¿Borrar todo (nombre, recordatorios, notas, contactos, etc.) y empezar de cero?')) return;
-  ['companion-name','companion-reminders','companion-notes','companion-checklist','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-mensajesdamas','companion-itinerario'].forEach(k => {
+  ['companion-name','companion-reminders','companion-notes','companion-checklist','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-mensajesdamas','companion-itinerario','companion-mensajesvuelta'].forEach(k => {
     try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
   });
   location.reload();

@@ -188,29 +188,12 @@
   }
   .btn-solid:active{ filter: brightness(0.92); }
 
-  .mood-block{ margin-top: 22px; }
-  .mood-block h3{
-    font-size: 1rem;
-    color: var(--text-soft);
-    font-weight: 600;
-    margin: 0 0 12px;
+  .hint{ font-size: 0.88rem; color: var(--text-soft); margin: -4px 0 14px; line-height:1.45; }
+  .gratitud-card{ margin-top: 22px; }
+  .gratitud-card h3{
+    font-size: 1rem; color: var(--text-soft); font-weight:600; margin:0 0 4px;
   }
-  .mood-row{ display:flex; gap: 10px; flex-wrap: wrap; }
-  .mood-btn{
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    font-size: 1.5rem;
-    width: 56px; height: 56px;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .mood-btn.selected{ border-color: var(--sage); background: #EEF5EC; }
-  .mood-note{
-    margin-top: 14px;
-    font-size: 0.95rem;
-    color: var(--text-soft);
-    min-height: 1.2em;
-  }
+  .gratitud-card .add-row{ margin-bottom: 6px; }
   .next-card{
     margin-bottom: 18px;
     border-left: 5px solid var(--marigold);
@@ -296,33 +279,6 @@
   }
   .cd-caption{ font-size: 0.95rem; color: var(--text-soft); margin:0; }
 
-  .good-card{ margin-top: 22px; }
-  .good-card h3{
-    font-size: 1rem; color: var(--text-soft); font-weight:600; margin:0 0 12px;
-  }
-  .good-card .good-display{
-    font-family:'Fraunces', serif; font-size: 1.1rem; color: var(--plum-dark);
-    line-height:1.4; margin: 0 0 14px; min-height: 1.4em;
-  }
-  .good-actions{ display:flex; gap:10px; flex-wrap:wrap; }
-  .good-add-row{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
-  .good-add-row input{
-    font-family:inherit; font-size:0.95rem; padding:12px 14px;
-    border-radius:12px; border:1.5px solid var(--border);
-  }
-
-  .contact-item{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:8px; margin-bottom:10px;
-  }
-  .contact-item .name{ font-weight:600; font-size:0.95rem; flex:1; }
-  .contact-item .actions{ display:flex; gap:6px; }
-  .contact-item a{
-    display:flex; align-items:center; justify-content:center;
-    width:42px; height:42px; border-radius:12px; text-decoration:none; font-size:1.1rem;
-  }
-  .contact-item a.whatsapp{ background: var(--sage); }
-  .contact-item a.call{ background: var(--plum); }
 
   .setup-card input{
     width:100%;
@@ -649,27 +605,14 @@
           <div id="capsuleContent"></div>
         </div>
 
-        <div class="mood-block">
-          <h3>¿Cómo te sientes hoy?</h3>
-          <div class="mood-row" id="moodRow"></div>
-          <p class="mood-note" id="moodNote"></p>
-          <div class="contact-block" id="contactBlock" style="display:none;">
-            <p>Mándale un mensajito ahorita, seguro le alegra el día:</p>
-            <div id="contactList"></div>
-            <button class="btn-ghost" style="width:100%;" onclick="addContact()">+ Agregar a tu persona</button>
+        <div class="card gratitud-card">
+          <h3>¿Qué agradeces hoy de tu persona? 💕</h3>
+          <p class="hint">Ve guardando lo bueno de cada día, para nunca perderlo de vista.</p>
+          <div class="add-row">
+            <input id="gratitudInput" type="text" placeholder="Hoy agradezco que...">
+            <button class="btn-solid" style="width:100%;" onclick="addGratitud()">Guardar</button>
           </div>
-        </div>
-
-        <div class="card good-card">
-          <h3>Recuerditos 💕</h3>
-          <p class="good-display" id="goodDisplay">Aquí vas a poder guardar recuerditos lindos para releer cuando quieras.</p>
-          <div class="good-actions">
-            <button class="btn-ghost" onclick="shuffleGoodThing()">Ver otra</button>
-          </div>
-          <div class="good-add-row">
-            <input id="goodInput" type="text" placeholder="Un recuerdito lindo de hoy...">
-            <button class="btn-solid" style="width:100%;" onclick="addGoodThing()">Guardar</button>
-          </div>
+          <div id="gratitudList"></div>
         </div>
       </div>
     </section>
@@ -967,14 +910,6 @@ const MESSAGES = [
   "Juntos, hoy y lo que venga."
 ];
 
-const MOODS = [
-  {emoji:"😊", label:"feliz", note:"Me encanta que te sientas así, disfrútalo por los dos."},
-  {emoji:"🥰", label:"enamorada", note:"Ese mismo sentimiento va para ti, todos los días."},
-  {emoji:"😢", label:"te extraño", note:"Yo igual, ya casi nos vemos, aguanta un poquito más."},
-  {emoji:"😴", label:"cansada", note:"Descansa, mañana seguimos con más ganas."},
-  {emoji:"🤗", label:"con ganas de verte", note:"Yo también, ya se va a dar el momento."}
-];
-
 // ==== CONFIGURACIÓN INICIAL ====
 // Si ya sabes el nombre de la persona, escríbelo aquí antes de subir el archivo.
 // Así la app abre directo con su nombre, sin preguntarlo.
@@ -1020,7 +955,7 @@ const DEFAULT_IDEAS_CITAS = [
   "Maratón de la serie favorita del otro"
 ];
 
-let state = { name: "", reminders: [], notes: [], goodThings: [], contacts: [], photos: [], lugares: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, desde: "", historia: [], capsule: { text: "", sealed: false }, messagePool: [] };
+let state = { name: "", reminders: [], notes: [], gratitud: [], photos: [], lugares: [], checklist: [], currentMsgIndex: 0, countdown: { name: "Nuestra fecha especial", date: "" }, desde: "", historia: [], capsule: { text: "", sealed: false }, messagePool: [] };
 let lugarFotoTemp = null;
 let storageOk = true;
 
@@ -1066,9 +1001,7 @@ async function init(){
   const name = await safeGet('companion-name');
   const reminders = await safeGet('companion-reminders');
   const notes = await safeGet('companion-notes');
-  const moods = await safeGet('companion-moods');
-  const goodThings = await safeGet('companion-goodthings');
-  const contacts = await safeGet('companion-contacts');
+  const gratitud = await safeGet('companion-goodthings');
   const countdown = await safeGet('companion-countdown');
   const desde = await safeGet('companion-desde');
   const historia = await safeGet('companion-historia');
@@ -1081,9 +1014,7 @@ async function init(){
   if(!name && PRESET_NAME){ await safeSet('companion-name', PRESET_NAME); }
   try{ state.reminders = reminders ? JSON.parse(reminders) : []; }catch(e){ state.reminders = []; }
   try{ state.notes = notes ? JSON.parse(notes) : []; }catch(e){ state.notes = []; }
-  try{ state.goodThings = goodThings ? JSON.parse(goodThings) : []; }catch(e){ state.goodThings = []; }
-  try{ state.moodByDate = moods ? JSON.parse(moods) : {}; }catch(e){ state.moodByDate = {}; }
-  try{ state.contacts = contacts ? JSON.parse(contacts) : []; }catch(e){ state.contacts = []; }
+  try{ state.gratitud = gratitud ? JSON.parse(gratitud) : []; }catch(e){ state.gratitud = []; }
   // Si no hay nada guardado se queda el valor inicial de "state" (el que ajusta el configurador).
   try{ if(countdown) state.countdown = JSON.parse(countdown); }catch(e){}
   // Primera apertura: si la plantilla trae evento o fecha fijados, se guardan y ya no se pisan al recargar.
@@ -1124,8 +1055,7 @@ async function init(){
   renderChecklist();
   renderNextReminder();
   renderMessage();
-  renderMoods();
-  renderGoodThing();
+  renderGratitud();
   renderReminders();
   renderNotes();
 }
@@ -1537,91 +1467,44 @@ function renderNextReminder(){
   card.style.display = 'flex';
 }
 
-function renderMoods(){
-  const row = document.getElementById('moodRow');
-  row.innerHTML = '';
-  const todaysMood = state.moodByDate[todayKey()];
-  MOODS.forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'mood-btn' + (todaysMood === m.emoji ? ' selected' : '');
-    btn.textContent = m.emoji;
-    btn.title = m.label;
-    btn.onclick = () => selectMood(m);
-    row.appendChild(btn);
-  });
-  if(todaysMood){
-    const found = MOODS.find(m => m.emoji === todaysMood);
-    document.getElementById('moodNote').textContent = found ? found.note : '';
-    document.getElementById('contactBlock').style.display = (todaysMood === '😢') ? 'block' : 'none';
-    if(todaysMood === '😢') renderContacts();
-  } else {
-    document.getElementById('contactBlock').style.display = 'none';
-  }
-}
-
-async function selectMood(m){
-  state.moodByDate[todayKey()] = m.emoji;
-  await safeSet('companion-moods', JSON.stringify(state.moodByDate));
-  renderMoods();
-}
-
-function renderContacts(){
-  const list = document.getElementById('contactList');
+// ---- Diario de gratitud (fusiona el check-in de ánimo y "Recuerditos") ----
+function renderGratitud(){
+  const list = document.getElementById('gratitudList');
   list.innerHTML = '';
-  state.contacts.forEach(c => {
-    const msg = encodeURIComponent(`Te extraño, ¿qué andas haciendo? 🥰`);
-    const row = document.createElement('div');
-    row.className = 'contact-item';
-    row.innerHTML = `
-      <span class="name">${escapeHtml(c.name)}</span>
-      <div class="actions">
-        <a class="whatsapp" href="https://wa.me/${c.phone}?text=${msg}" title="WhatsApp">💬</a>
-        <a class="call" href="tel:+${c.phone}" title="Llamar">📱</a>
-      </div>
-    `;
-    list.appendChild(row);
-  });
-}
-
-async function addContact(){
-  const r = await pedir({ titulo: 'Agregar contacto', campos: [
-    { etiqueta: 'Nombre' },
-    { etiqueta: 'Número con código de país, sin espacios', tipo: 'tel', placeholder: 'ej. 525512345678' }
-  ] });
-  if(!r) return;
-  const [name, phone] = r;
-  if(!name.trim() || !phone.trim()) return;
-  state.contacts.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), name: name.trim(), phone: phone.trim().replace(/\D/g,'') });
-  await safeSet('companion-contacts', JSON.stringify(state.contacts));
-  renderContacts();
-}
-
-function renderGoodThing(){
-  const el = document.getElementById('goodDisplay');
-  if(state.goodThings.length === 0){
-    el.textContent = 'Aquí vas a poder guardar recuerditos lindos para releer cuando quieras.';
+  if(state.gratitud.length === 0){
+    list.innerHTML = '<p class="empty">Aún no anotas nada. Escribe lo primero que agradezcas hoy.</p>';
     return;
   }
-  el.textContent = state.goodThings[state.currentGoodIndex].text;
+  const sorted = [...state.gratitud].sort((a,b) => b.ts - a.ts);
+  sorted.forEach(g => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div class="item-body">
+        <div class="item-text">${escapeHtml(g.text)}</div>
+        <div class="item-date">${formatShort(g.ts)}</div>
+      </div>
+      <button class="item-del" data-id="${g.id}">Eliminar</button>
+    `;
+    item.querySelector('.item-del').onclick = () => deleteGratitud(g.id);
+    list.appendChild(item);
+  });
 }
 
-function shuffleGoodThing(){
-  if(state.goodThings.length === 0) return;
-  let next;
-  do{ next = Math.floor(Math.random() * state.goodThings.length); }while(next === state.currentGoodIndex && state.goodThings.length > 1);
-  state.currentGoodIndex = next;
-  renderGoodThing();
-}
-
-async function addGoodThing(){
-  const el = document.getElementById('goodInput');
+async function addGratitud(){
+  const el = document.getElementById('gratitudInput');
   const text = el.value.trim();
   if(!text) return;
-  state.goodThings.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, ts: Date.now() });
+  state.gratitud.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, ts: Date.now() });
   el.value = '';
-  await safeSet('companion-goodthings', JSON.stringify(state.goodThings));
-  state.currentGoodIndex = state.goodThings.length - 1;
-  renderGoodThing();
+  await safeSet('companion-goodthings', JSON.stringify(state.gratitud));
+  renderGratitud();
+}
+
+async function deleteGratitud(id){
+  state.gratitud = state.gratitud.filter(x => x.id !== id);
+  await safeSet('companion-goodthings', JSON.stringify(state.gratitud));
+  renderGratitud();
 }
 
 function renderReminders(){
@@ -1841,7 +1724,7 @@ async function exportarHistoria(){
 }
 
 function resetApp(){
-  if(!confirm('¿Borrar todo (nombre, recordatorios, notas, contactos, etc.) y empezar de cero?')) return;
+  if(!confirm('¿Borrar todo (nombre, recordatorios, notas, gratitud, etc.) y empezar de cero?')) return;
   ['companion-name','companion-reminders','companion-notes','companion-symptoms','companion-desde','companion-historia','companion-moods','companion-goodthings','companion-contacts','companion-countdown','companion-photos','companion-capsule','companion-lugares','companion-checklist'].forEach(k => {
     try{ localStorage.removeItem(APP_PREFIX + k); }catch(e){}
   });

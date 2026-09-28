@@ -187,9 +187,11 @@ Claudia aprobó 7 puntos: 3 ya definidos por completo (se construyeron directo) 
 4. **Itinerario del día de la boda** (Damas de honor) — pestaña nueva "Itinerario" (🗓️), con el horario precargado que aprobó Claudia (arreglo, fotos, ceremonia, cóctel, recepción, primer baile, fiesta), editable/agregable, ordenado por hora, con "Fijar itinerario en el código" (`solo-armar`). Si `PRESET_FECHA` es hoy, en Hoy aparece una tarjeta "Ahora: [evento] · [hora]" con el siguiente bloque.
 6. **Hitos automáticos** (Nosotros dos) — se detectan solos a partir de "desde cuándo están juntos": 100 días, 6 meses y cada año en adelante (1, 2, 3...). El día exacto de un hito, la tarjeta "Llevamos juntos" se reemplaza por una tarjeta de celebración (`#hitoCard`, confeti + el mensaje) sin botón de compartir, tal como se aprobó. Al día siguiente vuelve sola a la tarjeta normal.
 
-**Pendientes de propuesta de copys/formato antes de programar (5 y 7):**
-5. Cierre del círculo: mensajes de las damas de vuelta a la novia (libro de firmas compartido, Opción A) + botón "Armar recuerdo para [novia]" (Damas de honor).
-7. Mini-diario de gratitud, fusionado con "Recuerditos", en vez del check-in de ánimo actual (Nosotros dos).
+**5 y 7, construidos con los copys aprobados:**
+5. **Cierre del círculo** (Damas de honor) — dentro de la pestaña Mensajes, una segunda sección ("Cierre del círculo 💌") que solo aparece cuando ya pasó la fecha de la boda (reusa `isCountdownReached()`). Libro de firmas compartido: cada quien deja nombre + mensaje para la novia (su nombre se detecta solo de `PRESET_NOVIA`/el título de la cuenta regresiva), lista con fecha y botón eliminar, y el botón **"Armar recuerdo para [novia] 💌"** arma y copia el texto final con el formato aprobado.
+7. **Mini-diario de gratitud** (Nosotros dos) — reemplaza por completo el check-in de ánimo (se quitan los emojis de MOODS y el atajo de WhatsApp) y se fusiona con "Recuerditos" en una sola tarjeta: "¿Qué agradeces hoy de tu persona? 💕", campo + botón "Guardar", lista con fecha y botón eliminar por entrada (ya no hay vista barajada). Los recuerditos que ya existían se conservan (mismo storage `companion-goodthings`, solo cambia cómo se muestran). Se quitaron también los contactos de emergencia (nombre, teléfono, botón "+ Agregar a tu persona") por quedarse sin ningún disparador — mismo criterio que la limpieza de `shareSymptoms()`. Las claves viejas (`companion-moods`, `companion-contacts`) se quedan en "Reiniciar app" para limpiar datos de quien ya las tenía guardadas.
+
+**Con esto, los 7 puntos aprobados el 28-sep quedan construidos.**
 
 ## Próximos pasos
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ PR #1 mergeado el 27-sep; Pages lo publicó bien. La revisión UX parte 2 va en el PR nuevo.
