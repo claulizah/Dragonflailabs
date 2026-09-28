@@ -167,13 +167,27 @@ Claudia propuso 5 plantillas y 3 fixes de catálogo/paleta bajo la regla "esto l
 
 **Limpieza de catálogo/paleta:**
 - `demogenerica.html` pausada del catálogo de venta. Se revisó `index.html`, `regalos.html`, `pedido.html` y `catalogo.html`: ninguno referencia el archivo por nombre (el sitio de ventas fulfilla por categorías genéricas, no por archivo), así que no hubo nada que desconectar en código. El archivo se queda en `templates/`.
-- `nosotrosdos.html` cambia de paleta a azul grisáceo (`--plum: #5C7A8A`, `--plum-dark: #3D515C` calculado para mantener la misma proporción de oscurecido que el resto de las plantillas), en CSS, `theme-color` y el `theme_color` del manifest. Ya no comparte identidad visual con Romántico (antes: `#A9776D`/`#734E46`, idéntico). No se tocó el ícono/artwork de la portada (bitmap, fuera de lo aprobado) ni el emoji 🌹 (elegido en la diferenciación del punto 9, no parte de esta aprobación).
+- `nosotrosdos.html` cambia de paleta a azul grisáceo (`--plum: #5C7A8A`, `--plum-dark: #3D515C` calculado para mantener la misma proporción de oscurecido que el resto de las plantillas), en CSS, `theme-color` y el `theme_color` del manifest. Ya no comparte identidad visual con Romántico (antes: `#A9776D`/`#734E46`, idéntico). No se tocó el ícono/artwork de la portada (bitmap, fuera de lo aprobado). El emoji 🌹 se cambió después, ver la ronda del 28-sep siguiente.
 
 **Validado:**
 - Sintaxis JS, balance de llaves/paréntesis/corchetes y peso (`<50 KB` por imagen) en las 22 plantillas.
 - Modo armar: cero herramientas `.solo-armar` visibles sin `?armar=1` en las 22; con `?armar=1` si aparecen ("Fijar checklist/ideas en el código") en las plantillas que las tienen.
 - Flujo completo con Playwright en cada plantilla nueva: nombre/negocio, registro de ventas y racha (Mi changarro), pedidos con estatus + clientas con aviso de "hace cuánto no le escribes" (Mini CRM), banco de ideas por categoría + checklist de publicar + racha (Calendario de contenido), meta con barra de progreso + historial (Meta de ventas), contador ascendente + cartas selladas + límites (Sanando de una ruptura).
 - `configurador.html` detecta correctamente los `PRESET_` nuevos (`PRESET_NEGOCIO`, `PRESET_CHECKLIST_LANZAMIENTO`, `PRESET_IDEAS_CONTENIDO`, `PRESET_META_VENTAS`, `PRESET_LIMITES`) con etiquetas propias en `LABELS_CONOCIDOS`; probado subiendo `changarro.html`.
+
+## 7 mejoras aprobadas, segunda ronda (28-sep-2026)
+Claudia aprobó 7 puntos: 3 ya definidos por completo (se construyeron directo) y 4 nuevos sobre Damas de honor y Nosotros dos que son construcciones nuevas — para esos, la regla "esto lo decide Claudia" pide propuesta antes de programar el detalle fino.
+
+**Construidos (1-3):**
+1. `PRESET_NEGOCIO` en `metaventas.html` — mismo patrón que `changarro`/`minicrm`/`calendariocontenido`: campo en el setup inicial, `negocioTag` en la cabecera, se limpia con "Reiniciar app".
+2. Chips de "Ya no permito" en `sanandoruptura.html` reemplazados por los 3 ejemplos exactos que dio Claudia ("Que me busque solo cuando le conviene", "Minimizar lo que sentí", "Compararme con alguien más") — menos presuntuosos sobre la historia de quien la usa que los genéricos anteriores.
+3. Emoji de `nosotrosdos.html` cambiado de 🌹 (compartido con Romántico) a **⏳**, en cabecera, saludo, decoraciones y nav — se eligió sobre 🏡 porque encaja con el contador de días juntos y la cápsula del tiempo, que son el corazón de la app. De paso se corrigió un bug del mismo tipo que Damas/Mi Radar: el manifest y el `apple-mobile-web-app-title` decían "Mi favorita" (nombre viejo) en vez de "Nosotros dos".
+
+**Pendientes de propuesta antes de programar (4-7)** — no se toca código todavía:
+4. Itinerario del día de la boda (Damas de honor).
+5. Cierre del círculo: mensajes de las damas de vuelta a la novia + exportable (Damas de honor).
+6. Hitos automáticos (100 días, 6 meses, 1 año, 2 años...) con tarjeta de celebración (Nosotros dos).
+7. Mini-diario de gratitud en vez del check-in de ánimo actual (Nosotros dos).
 
 ## Próximos pasos
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ PR #1 mergeado el 27-sep; Pages lo publicó bien. La revisión UX parte 2 va en el PR nuevo.
