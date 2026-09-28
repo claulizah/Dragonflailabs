@@ -4,6 +4,13 @@ _Actualizado: 28-sep-2026 · este archivo se actualiza en el repo cada vez que s
 ## Flujo de trabajo
 El desarrollo se hace en **Claude Code**, directo sobre el repo, que es la fuente única de verdad. El chat se usa para decisiones de producto, revisión de assets visuales y análisis de lo que reporta Claude Code.
 
+## Regla: "esto lo decide Claudia" (28-sep-2026)
+Cuando algo queda marcado como **"esto lo decide Claudia"** (o equivalente, tipo "propón, no lo cambies sin consultarme"), no se programa todavía: se escribe la propuesta aquí o en el reporte, y se espera confirmación explícita antes de tocar el código. Si no hay forma de saber si ya se confirmó algo, se pregunta en vez de asumir. El detalle completo de esta regla vive en `CLAUDE.md`, en la raíz del repo.
+
+Aplica a cualquier cambio de producto que afecte cómo se ve o se siente una plantilla ante quien recibe o quien compra. **No aplica** a fixes técnicos, de rendimiento, seguridad o limpieza de código — esos se avanzan directo.
+
+Por qué existe: el punto 9 de la revisión UX (diferenciar Romántico y Nosotros dos) traía esa marca y se programó y mergeó en el PR #2 sin pasar por Claudia primero. El resultado quedó bien y no se deshizo, pero no se repite el patrón.
+
 ## Dominios y repos
 - **dragonflailabs.com**: repo `claulizah/Dragonflailabs`, GitHub Pages. Es el sitio de VENTAS (calculadora, Stripe, catálogo). Cupón activo: **VUELA30** (30%, primeros 20 pedidos).
 - **regaloparati.com**: en vivo con HTTPS. Repo `claulizacosta8/Dragonflai-regalos` (otra cuenta de GitHub). Solo hostea las páginas ya entregadas a clientes y la landing (`regaloparati-index.html`).
@@ -144,5 +151,5 @@ El commit de íconos (`b7ab85f`) no incluyó todo lo que decía su mensaje. Esto
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ PR #1 mergeado el 27-sep; Pages lo publicó bien. La revisión UX parte 2 va en el PR nuevo.
 2. ~~Integrar la carriola en Bebé.~~ ~~Home Office y Mensajes sorpresa.~~ Falta el ícono de Mi semestre (pila de libros pastel).
 3. ~~Decidir el ícono de Viaje.~~ Maleta, integrada el 27-sep.
-4. Decidir si se retoma Cumpleaños.
+4. **Esto lo decide Claudia** — Decidir si se retoma Cumpleaños y cómo (falta definir si la "línea de su vida" la arma una persona o varias). No se programa hasta que Claudia lo confirme; ver "Regla: 'esto lo decide Claudia'" arriba.
 5. Construir "Fan de artista" y "Tareas de hijos" si se sigue esa línea.
