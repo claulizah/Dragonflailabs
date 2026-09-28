@@ -214,12 +214,21 @@ function handleFile(file){
 const LABELS_CONOCIDOS = {
   PRESET_MENSAJES_DAMAS: 'Mensajes de la novia (Damas de honor)',
   PRESET_LUGARES: 'Lugares (Nuestro mapa)',
-  PRESET_CHECKLIST_JUNTOS: 'Checklist de cosas juntos',
+  PRESET_CHECKLIST_JUNTOS: 'Cosas por hacer juntos / ideas de citas (Nosotros dos)',
   PRESET_MENSAJES_SORPRESA: 'Mensajes sorpresa (varios remitentes)',
   PRESET_FESTEJO: 'Nombre de la ocasión (ej. "Tu graduación")',
   PRESET_FECHA: 'Fecha de la cuenta regresiva',
   PRESET_EVENTO: 'Título de la cuenta regresiva (ej. "La llegada de Emilia")',
   PRESET_NOVIA: 'Nombre de la novia (Damas de honor: "La boda de ___")',
+  PRESET_DE: 'Quién regala (sale como "Un regalo de ___")',
+  PRESET_DEDICATORIA: 'Dedicatoria (sale al abrir la app por primera vez)',
+  PRESET_RAZONES: 'Razones para amarte (Romántico)',
+  PRESET_CARTAS: 'Cartas "Ábrelo cuando…" (Romántico)',
+  PRESET_DESDE: 'Desde cuándo están juntos (Nosotros dos)',
+  PRESET_HISTORIA: 'Nuestra historia (Nosotros dos)',
+  PRESET_MALETA_HOSPITAL: 'Maleta del hospital (Bebé)',
+  PRESET_CHECKLIST_VIAJE: 'Checklist de viaje (Viaje)',
+  PRESET_ULTIMO_MES: 'Pendientes del último mes (Boda)',
   PRESET_HORARIO: 'Horario de clases (Mi semestre)',
   PRESET_CHECKLIST_DIARIO: 'Checklist diario (Home Office)',
   PRESET_RUTINA_INICIO: 'Rutina de inicio de jornada (Home Office)',
@@ -263,8 +272,10 @@ function scanDynamicPresets(text){
       <div class="const-name">${item.constName}${isEmpty ? '' : ' · ya tiene contenido, márcalo solo si lo quieres reemplazar'}</div>
       <div class="opt-fields" id="dynFields${idx}">
         ${item.isString
-          ? `<label for="dynInput${idx}">${/FECHA$/.test(item.constName) ? 'Elige la fecha' : 'Escríbelo tal cual, sin comillas'}</label>
-             <input id="dynInput${idx}" type="${/FECHA$/.test(item.constName) ? 'date' : 'text'}">`
+          ? `<label for="dynInput${idx}">${/(FECHA|DESDE)$/.test(item.constName) ? 'Elige la fecha' : 'Escríbelo tal cual, sin comillas'}</label>
+             ${/DEDICATORIA$/.test(item.constName)
+                ? `<textarea id="dynInput${idx}" placeholder="Puede tener varios renglones."></textarea>`
+                : `<input id="dynInput${idx}" type="${/(FECHA|DESDE)$/.test(item.constName) ? 'date' : 'text'}">`}`
           : `<label for="dynInput${idx}">Pega aquí lo que copiaste del botón "Fijar en el código"</label>
              <textarea id="dynInput${idx}" placeholder='Puede ser la línea completa, ej: const ${item.constName} = [...]; o solo el valor.'></textarea>`}
       </div>

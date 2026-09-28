@@ -478,6 +478,43 @@
   /* Modo armar: herramientas para quien arma la app (solo con ?armar=1 en la URL) */
   body:not(.armando) .solo-armar{ display:none !important; }
   .armar-banner{ position:fixed; top:0; left:0; right:0; z-index:1000; background:#1f1f1f; color:#fff; font:600 0.72rem/1.3 sans-serif; text-align:center; padding:6px 10px; letter-spacing:0.02em; }
+
+  /* Modal propio (reemplaza a los prompt() del navegador) */
+  .modal-fondo{ position:fixed; inset:0; z-index:1001; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal-caja{ background:var(--card); color:var(--text); width:100%; max-width:440px; border-radius:20px; padding:22px 20px 18px; box-shadow:0 20px 40px -12px rgba(0,0,0,0.4); animation: modalIn .18s ease; }
+  @keyframes modalIn{ from{ opacity:0; transform: translateY(8px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .modal-caja{ animation:none; } }
+  .modal-caja h3{ margin:0 0 14px; font-size:1.1rem; color:var(--plum-dark); line-height:1.3; }
+  .modal-campo{ display:block; margin-bottom:12px; }
+  .modal-campo span{ display:block; font-size:0.82rem; color:var(--text-soft); font-weight:600; margin-bottom:5px; }
+  .modal-campo input, .modal-campo textarea{ width:100%; box-sizing:border-box; font-family:inherit; font-size:1rem; padding:11px 13px; border-radius:12px; border:1.5px solid var(--border); background:var(--card); color:var(--text); }
+  .modal-campo textarea{ min-height:140px; font-size:0.82rem; resize:vertical; }
+  .modal-botones{ display:flex; gap:10px; margin-top:6px; }
+  .modal-botones button{ flex:1; min-height:46px; border-radius:12px; font-family:inherit; font-weight:700; font-size:0.95rem; cursor:pointer; }
+  .modal-ok{ background:var(--plum); color:#fff; border:none; }
+  .modal-cancel{ background:transparent; color:var(--text-soft); border:1.5px solid var(--border); }
+
+  /* Dedicatoria de quien regala y aviso para instalar */
+  .regalo-dedic{ text-align:center; padding:28px 22px 20px; }
+  .regalo-dedic .de{ font-size:0.74rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-soft); font-weight:700; margin:0 0 14px; }
+  .regalo-dedic .txt{ font-size:1.2rem; line-height:1.55; color:var(--plum-dark); margin:0 0 22px; white-space:pre-line; }
+  .regalo-dedic .modal-ok{ width:100%; min-height:48px; border-radius:12px; font-family:inherit; font-weight:700; font-size:0.98rem; cursor:pointer; }
+  .regalo-card{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:14px 18px; margin:0 0 16px; box-shadow:0 4px 18px -12px rgba(0,0,0,0.15); }
+  .regalo-card summary{ cursor:pointer; font-weight:700; color:var(--plum-dark); list-style:none; font-size:0.95rem; }
+  .regalo-card summary::-webkit-details-marker{ display:none; }
+  .regalo-card summary::after{ content:" ▾"; color:var(--text-soft); font-weight:400; }
+  .regalo-card[open] summary::after{ content:" ▴"; }
+  .regalo-card .txt{ margin:10px 0 0; line-height:1.55; color:var(--text); white-space:pre-line; }
+  .regalo-instalar h4{ margin:0 0 4px; font-size:1rem; color:var(--plum-dark); }
+  .regalo-instalar p{ margin:0 0 6px; font-size:0.9rem; color:var(--text-soft); line-height:1.45; }
+  .regalo-instalar ol{ margin:6px 0 10px; padding-left:20px; line-height:1.6; font-size:0.92rem; color:var(--text); }
+  .regalo-instalar .fila{ display:flex; gap:8px; flex-wrap:wrap; }
+  .regalo-instalar button{ background:transparent; border:1.5px solid var(--border); color:var(--text-soft); border-radius:10px; padding:8px 12px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; }
+
+  /* Secciones de la maleta del hospital */
+  .lista-grupo{ font-size:0.8rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-soft); margin:18px 0 2px; }
+  .lista-grupo:first-child{ margin-top:4px; }
+  #checklistGrupo{ font-family:inherit; font-size:1rem; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border); background:var(--card); color:var(--text); }
 </style>
 </head>
 <body>
@@ -504,6 +541,7 @@
   <main>
     <!-- HOY -->
     <section class="screen active" id="screen-hoy">
+      <div id="regaloExtras"></div>
       <div id="setupBlock" style="display:none;">
         <div class="card setup-card">
           <h3 style="margin-top:0;">¿Cómo te llamas?</h3>
@@ -602,16 +640,23 @@
     </section>
     <!-- PREPARATIVOS -->
     <section class="screen" id="screen-sintomas">
-      <h2 class="section-title">Preparativos</h2>
+      <h2 class="section-title">Maleta del hospital</h2>
       <div class="section-rule"></div>
+      <p class="empty" style="padding:0 0 10px;">Empezamos con la maleta del hospital. Borra lo que no necesites y agrega lo tuyo.</p>
       <p class="checklist-caption" id="checklistCaption">Aún no agregas pendientes.</p>
       <div class="prog-track" style="margin-bottom:18px;"><div class="prog-fill" id="checklistFill"></div></div>
       <div class="add-row">
+        <select id="checklistGrupo" aria-label="Sección">
+          <option value="mama">Para mamá</option>
+          <option value="bebe">Para el bebé</option>
+          <option value="">Otro pendiente</option>
+        </select>
         <input id="checklistText" type="text" placeholder="¿Qué falta hacer?">
         <button class="btn-solid" style="width:100%;" onclick="addChecklistItem()">Agregar pendiente</button>
       </div>
       <div id="checklistItems"></div>
       <button class="btn-ghost" style="width:100%; margin-top:16px;" onclick="shareChecklist()">Compartir mis preparativos 📋</button>
+      <button class="edit-link solo-armar" style="display:block; margin:16px auto 0;" onclick="exportarLista()">Fijar lista en el código</button>
     </section>
     <!-- DIARIO -->
     <section class="screen" id="screen-diario">
@@ -665,6 +710,158 @@ if(MODO_ARMAR){
   document.body.appendChild(aviso);
 }
 
+// ==== MODAL (reemplaza a los prompt() del navegador) ====
+// pedir({ titulo, campos: [{ etiqueta, valor, tipo: 'text'|'date'|'number'|'tel'|'largo', placeholder, soloLectura }] })
+// Devuelve una promesa con un arreglo de textos (uno por campo), o null si la persona cancela.
+function pedir({ titulo, campos, aceptar = 'Guardar', cancelar = 'Cancelar' }){
+  return new Promise(resolve => {
+    const fondo = document.createElement('div');
+    fondo.className = 'modal-fondo';
+    const caja = document.createElement('form');
+    caja.className = 'modal-caja';
+    const h = document.createElement('h3');
+    h.textContent = titulo;
+    caja.appendChild(h);
+    const inputs = campos.map(c => {
+      const label = document.createElement('label');
+      label.className = 'modal-campo';
+      if(c.etiqueta){ const sp = document.createElement('span'); sp.textContent = c.etiqueta; label.appendChild(sp); }
+      const inp = document.createElement(c.tipo === 'largo' ? 'textarea' : 'input');
+      if(c.tipo !== 'largo') inp.type = c.tipo || 'text';
+      if(c.tipo === 'number'){ inp.inputMode = 'numeric'; inp.min = '1'; }
+      inp.value = c.valor == null ? '' : String(c.valor);
+      if(c.placeholder) inp.placeholder = c.placeholder;
+      if(c.soloLectura) inp.readOnly = true;
+      label.appendChild(inp);
+      caja.appendChild(label);
+      return inp;
+    });
+    const botones = document.createElement('div');
+    botones.className = 'modal-botones';
+    const bCancel = document.createElement('button');
+    bCancel.type = 'button'; bCancel.className = 'modal-cancel'; bCancel.textContent = cancelar;
+    const bOk = document.createElement('button');
+    bOk.type = 'submit'; bOk.className = 'modal-ok'; bOk.textContent = aceptar;
+    botones.append(bCancel, bOk);
+    caja.appendChild(botones);
+    function esc(e){ if(e.key === 'Escape') cerrar(null); }
+    function cerrar(valor){ document.removeEventListener('keydown', esc); fondo.remove(); resolve(valor); }
+    caja.onsubmit = e => { e.preventDefault(); cerrar(inputs.map(i => i.value)); };
+    bCancel.onclick = () => cerrar(null);
+    fondo.onclick = e => { if(e.target === fondo) cerrar(null); };
+    document.addEventListener('keydown', esc);
+    fondo.appendChild(caja);
+    document.body.appendChild(fondo);
+    setTimeout(() => { if(inputs[0] && !inputs[0].readOnly) inputs[0].focus(); }, 50);
+  });
+}
+// Un solo campo: se usa igual que prompt() (texto, o null si cancela).
+async function pedirUno(titulo, valor, extra = {}){
+  const r = await pedir({ titulo, campos: [{ valor, ...extra }] });
+  return r ? r[0] : null;
+}
+// Muestra un texto para copiar (cuando el portapapeles no está disponible).
+async function mostrarTexto(titulo, texto){
+  const fondoPrevio = document.querySelectorAll('.modal-fondo').length;
+  const promesa = pedir({ titulo, campos: [{ tipo: 'largo', valor: texto, soloLectura: true }], aceptar: 'Copiar', cancelar: 'Cerrar' });
+  const area = document.querySelectorAll('.modal-fondo')[fondoPrevio].querySelector('textarea');
+  area.addEventListener('focus', () => area.select());
+  const r = await promesa;
+  if(r){
+    try{ await navigator.clipboard.writeText(texto); }
+    catch(e){
+      const t = document.createElement('textarea'); t.value = texto; document.body.appendChild(t); t.select();
+      try{ document.execCommand('copy'); }catch(_){}
+      t.remove();
+    }
+  }
+}
+
+// ==== DEDICATORIA Y AVISO PARA INSTALAR ====
+// La dedicatoria (PRESET_DE / PRESET_DEDICATORIA) sale una sola vez después de "Toca para abrir"
+// y luego queda en la pestaña Hoy. El aviso de "Guárdala en tu pantalla de inicio" sale en Hoy
+// hasta que la persona lo cierra, y no aparece si la app ya está instalada.
+const REGALO_VISTA = 'regalo-dedicatoria-vista';   // se guarda como APP_PREFIX + clave
+const REGALO_INSTALAR = 'regalo-instalar-cerrado';
+function leerMarca(k){ try{ return localStorage.getItem(APP_PREFIX + k) === '1'; }catch(e){ return false; } }
+function ponerMarca(k){ try{ localStorage.setItem(APP_PREFIX + k, '1'); }catch(e){} }
+function hayDedicatoria(){ return !!(PRESET_DEDICATORIA.trim() || PRESET_DE.trim()); }
+function textoDe(){ return PRESET_DE.trim() ? `Un regalo de ${PRESET_DE.trim()}` : 'Un regalo para ti'; }
+function appInstalada(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+let regaloAbierto = false;
+function despuesDeAbrir(){
+  if(regaloAbierto) return;
+  regaloAbierto = true;
+  if(hayDedicatoria() && !leerMarca(REGALO_VISTA)) mostrarDedicatoria();
+}
+function mostrarDedicatoria(){
+  const fondo = document.createElement('div');
+  fondo.className = 'modal-fondo';
+  const caja = document.createElement('div');
+  caja.className = 'modal-caja regalo-dedic';
+  const de = document.createElement('p'); de.className = 'de'; de.textContent = textoDe();
+  const txt = document.createElement('p'); txt.className = 'txt display'; txt.textContent = PRESET_DEDICATORIA.trim();
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'modal-ok'; btn.textContent = 'Abrir mi app';
+  btn.onclick = () => { ponerMarca(REGALO_VISTA); fondo.remove(); };
+  caja.append(de);
+  if(txt.textContent) caja.append(txt);
+  caja.append(btn);
+  fondo.appendChild(caja);
+  document.body.appendChild(fondo);
+}
+function pasosInstalar(){
+  const ua = navigator.userAgent || '';
+  const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const android = /Android/.test(ua);
+  if(ios && /CriOS|FxiOS|EdgiOS|OPiOS|Instagram|FBAN|FBAV|WhatsApp|Line\//.test(ua)){
+    return { intro: 'En iPhone solo se puede guardar desde Safari. Copia la liga, ábrela en Safari y luego:', pasos: ['Toca el botón Compartir (el cuadrito con la flecha hacia arriba).', 'Elige "Agregar a inicio".', 'Toca "Agregar".'], copiar: true };
+  }
+  if(ios) return { intro: 'Así queda como una app más en tu iPhone:', pasos: ['Toca el botón Compartir (el cuadrito con la flecha hacia arriba), abajo en Safari.', 'Desliza y elige "Agregar a inicio".', 'Toca "Agregar".'] };
+  if(android) return { intro: 'Así queda como una app más en tu celular:', pasos: ['Toca el menú ⋮ arriba a la derecha en Chrome.', 'Elige "Agregar a pantalla principal" (o "Instalar app").', 'Confirma con "Agregar".'] };
+  return { intro: 'Ábrela desde tu celular para guardarla en tu pantalla de inicio:', pasos: ['iPhone: en Safari toca Compartir y luego "Agregar a inicio".', 'Android: en Chrome toca el menú ⋮ y luego "Agregar a pantalla principal".'] };
+}
+function pintarRegalo(){
+  const cont = document.getElementById('regaloExtras');
+  if(!cont) return;
+  // Si la app pide el nombre al abrir, eso va primero y las tarjetas después.
+  const pideNombre = document.getElementById('setupBlock');
+  if(pideNombre && pideNombre.nextElementSibling !== cont) pideNombre.after(cont);
+  cont.innerHTML = '';
+  if(hayDedicatoria()){
+    const d = document.createElement('details');
+    d.className = 'regalo-card';
+    const s = document.createElement('summary'); s.textContent = '💌 ' + textoDe();
+    d.appendChild(s);
+    if(PRESET_DEDICATORIA.trim()){ const t = document.createElement('p'); t.className = 'txt'; t.textContent = PRESET_DEDICATORIA.trim(); d.appendChild(t); }
+    cont.appendChild(d);
+  }
+  if(!appInstalada() && !leerMarca(REGALO_INSTALAR)){
+    const info = pasosInstalar();
+    const c = document.createElement('div');
+    c.className = 'regalo-card regalo-instalar';
+    const h = document.createElement('h4'); h.textContent = '📲 Guárdala en tu pantalla de inicio';
+    const p = document.createElement('p'); p.textContent = info.intro;
+    const ol = document.createElement('ol');
+    info.pasos.forEach(x => { const li = document.createElement('li'); li.textContent = x; ol.appendChild(li); });
+    const fila = document.createElement('div'); fila.className = 'fila';
+    if(info.copiar){
+      const bc = document.createElement('button'); bc.type = 'button'; bc.textContent = 'Copiar liga';
+      bc.onclick = async () => {
+        const liga = location.href.replace(/([?&])armar=1&?/, '$1').replace(/[?&]$/, '');
+        try{ await navigator.clipboard.writeText(liga); bc.textContent = 'Liga copiada ✓'; }catch(e){ mostrarTexto('Copia esta liga y ábrela en Safari', liga); }
+      };
+      fila.appendChild(bc);
+    }
+    const bx = document.createElement('button'); bx.type = 'button'; bx.textContent = 'Ya la guardé ✕';
+    bx.onclick = () => { ponerMarca(REGALO_INSTALAR); c.remove(); };
+    fila.appendChild(bx);
+    c.append(h, p, ol, fila);
+    cont.appendChild(c);
+  }
+}
+// Se pinta cuando ya terminó de cargar el script (las PRESET_ se declaran más abajo).
+setTimeout(pintarRegalo, 0);
+
 const MESSAGES = [
   "Cada día que pasa, tu bebé sigue creciendo un poquito más.",
   "Ahorita ya puede escuchar tu voz, aunque no lo veas.",
@@ -701,10 +898,38 @@ const MOODS = [
 // Así la app abre directo con su nombre, sin preguntarlo.
 // Déjalo en "" (vacío) si quieres que la app pregunte el nombre al abrir.
 const PRESET_NAME = "";
+// Dedicatoria de quien regala: sale en una tarjetita después de "Toca para abrir"
+// y luego queda en la pestaña Hoy. Vacíos = no aparece.
+const PRESET_DE = "";            // ej. "Ana" (sale como "Un regalo de Ana")
+const PRESET_DEDICATORIA = "";   // ej. "Para que nunca se te olvide lo fuerte que eres."
 // Cuenta regresiva ya lista al abrir: título de la tarjeta y fecha. Vacíos = la persona la configura.
 const PRESET_EVENTO = "";   // ej. "La llegada de Emilia"
 const PRESET_FECHA = "";    // AAAA-MM-DD, ej. "2026-12-24"
+// Maleta del hospital (pestaña Prepara). Vacío = sale la lista sugerida de abajo (DEFAULT_MALETA_HOSPITAL).
+// Se edita en la app y se fija con "Fijar lista en el código" (con ?armar=1).
+const PRESET_MALETA_HOSPITAL = [];
 // ================================
+
+// Lista sugerida para la primera apertura. Quien recibe la app puede palomear, borrar y agregar.
+const DEFAULT_MALETA_HOSPITAL = [
+  {"text": "Carpeta con INE, póliza, plan de parto y estudios impresos (por si falla el celular)", "grupo": "mama"},
+  {"text": "Bata o pijama que abra al frente", "grupo": "mama"},
+  {"text": "2 o 3 brasieres de lactancia", "grupo": "mama"},
+  {"text": "Crema para pezones", "grupo": "mama"},
+  {"text": "Toallas sanitarias maternales", "grupo": "mama"},
+  {"text": "Calzones cómodos o desechables", "grupo": "mama"},
+  {"text": "Pantuflas y calcetines", "grupo": "mama"},
+  {"text": "Cepillo de dientes, shampoo y liga para el pelo", "grupo": "mama"},
+  {"text": "Cargador de celular con cable largo", "grupo": "mama"},
+  {"text": "Snacks ligeros para ti y tu acompañante", "grupo": "mama"},
+  {"text": "Ropa cómoda para salir del hospital", "grupo": "mama"},
+  {"text": "3 mamelucos o bodies", "grupo": "bebe"},
+  {"text": "Gorrito y calcetines", "grupo": "bebe"},
+  {"text": "Cobijita", "grupo": "bebe"},
+  {"text": "Pañales de recién nacido y toallitas", "grupo": "bebe"},
+  {"text": "Conjunto para salir del hospital", "grupo": "bebe"},
+  {"text": "Silla para el auto ya instalada", "grupo": "bebe"}
+];
 
 let state = { name: "", reminders: [], notes: [], symptoms: [], goodThings: [], contacts: [], photos: [], checklist: [], moodByDate: {}, currentMsgIndex: 0, currentGoodIndex: 0, countdown: { name: "La llegada", date: "" }, messagePool: [] };
 let storageOk = true;
@@ -776,6 +1001,10 @@ async function init(){
   }
   try{ state.photos = photos ? JSON.parse(photos) : []; }catch(e){ state.photos = []; }
   try{ state.checklist = checklist ? JSON.parse(checklist) : []; }catch(e){ state.checklist = []; }
+  if(!checklist){
+    state.checklist = (PRESET_MALETA_HOSPITAL.length ? PRESET_MALETA_HOSPITAL : DEFAULT_MALETA_HOSPITAL).map((x, n) => typeof x === 'string' ? { id: 'lista-' + n, text: x, done: false } : { id: 'lista-' + n, text: x.text, grupo: x.grupo, done: false });
+    await safeSet('companion-checklist', JSON.stringify(state.checklist));
+  }
 
   state.messagePool = MESSAGES;
   state.currentMsgIndex = dayOfYear() % state.messagePool.length;
@@ -820,11 +1049,12 @@ async function saveName(){
 function openIntro(){
   const overlay = document.getElementById('introOverlay');
   overlay.classList.add('hide');
+  despuesDeAbrir();
   setTimeout(() => { overlay.style.display = 'none'; }, 500);
 }
 
 async function editName(){
-  const val = prompt('¿Cómo quieres que te salude?', state.name);
+  const val = await pedirUno('¿Cómo quieres que te salude?', state.name);
   if(val === null) return;
   const trimmed = val.trim();
   if(!trimmed) return;
@@ -885,10 +1115,12 @@ function renderCountdown(){
 }
 
 async function editCountdown(){
-  const name = prompt('¿Cómo se llama esta fecha? (aniversario, reencuentro, etc.)', state.countdown.name);
-  if(name === null) return;
-  const date = prompt('Fecha (AAAA-MM-DD)', state.countdown.date || todayKey());
-  if(date === null) return;
+  const r = await pedir({ titulo: 'Cuenta regresiva', campos: [
+    { etiqueta: '¿Cómo se llama esta fecha? (ej. La llegada de Emilia)', valor: state.countdown.name },
+    { etiqueta: 'Fecha', tipo: 'date', valor: state.countdown.date || todayKey() }
+  ] });
+  if(!r) return;
+  const [name, date] = r;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) { alert('Formato de fecha inválido, usa AAAA-MM-DD'); return; }
   state.countdown = { name: name.trim() || 'La llegada', date: date.trim() };
   await safeSet('companion-countdown', JSON.stringify(state.countdown));
@@ -1011,10 +1243,13 @@ function renderContacts(){
 }
 
 async function addContact(){
-  const name = prompt('¿Nombre del contacto?');
-  if(name === null || !name.trim()) return;
-  const phone = prompt('Número con código de país, sin espacios (ej. 525512345678)');
-  if(phone === null || !phone.trim()) return;
+  const r = await pedir({ titulo: 'Agregar contacto', campos: [
+    { etiqueta: 'Nombre' },
+    { etiqueta: 'Número con código de país, sin espacios', tipo: 'tel', placeholder: 'ej. 525512345678' }
+  ] });
+  if(!r) return;
+  const [name, phone] = r;
+  if(!name.trim() || !phone.trim()) return;
   state.contacts.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), name: name.trim(), phone: phone.trim().replace(/\D/g,'') });
   await safeSet('companion-contacts', JSON.stringify(state.contacts));
   renderContacts();
@@ -1125,8 +1360,22 @@ function renderChecklist(){
   fill.style.width = Math.max(pct, 4) + '%';
   caption.textContent = `${pct}% completado · ${doneCount} de ${state.checklist.length} pendientes`;
 
-  const sorted = [...state.checklist].sort((a,b) => (a.done === b.done) ? 0 : (a.done ? 1 : -1));
+  // Secciones de la maleta: primero mamá, luego bebé, al final lo demás
+  const GRUPOS = [['mama', 'Para mamá'], ['bebe', 'Para el bebé'], ['', 'Otros pendientes']];
+  const sorted = [...state.checklist].sort((a,b) => {
+    const ga = GRUPOS.findIndex(g => g[0] === (a.grupo || '')), gb = GRUPOS.findIndex(g => g[0] === (b.grupo || ''));
+    if(ga !== gb) return ga - gb;
+    return (a.done === b.done) ? 0 : (a.done ? 1 : -1);
+  });
+  let grupoActual = null;
   sorted.forEach(i => {
+    if((i.grupo || '') !== grupoActual){
+      grupoActual = i.grupo || '';
+      const h = document.createElement('h3');
+      h.className = 'lista-grupo';
+      h.textContent = GRUPOS.find(g => g[0] === grupoActual)[1];
+      list.appendChild(h);
+    }
     const item = document.createElement('div');
     item.className = 'item';
     item.innerHTML = `
@@ -1146,7 +1395,8 @@ async function addChecklistItem(){
   const el = document.getElementById('checklistText');
   const text = el.value.trim();
   if(!text) return;
-  state.checklist.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, done:false });
+  const grupo = document.getElementById('checklistGrupo').value;
+  state.checklist.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, grupo: grupo || undefined, done:false });
   el.value = '';
   await safeSet('companion-checklist', JSON.stringify(state.checklist));
   renderChecklist();
@@ -1163,6 +1413,16 @@ async function deleteChecklistItem(id){
   state.checklist = state.checklist.filter(x => x.id !== id);
   await safeSet('companion-checklist', JSON.stringify(state.checklist));
   renderChecklist();
+}
+
+// "Fijar lista en el código": exporta la lista actual (sin palomitas) para pegarla en PRESET_MALETA_HOSPITAL.
+async function exportarLista(){
+  if(state.checklist.length === 0){ alert('La lista está vacía.'); return; }
+  const datos = state.checklist.map(i => i.grupo ? { text: i.text, grupo: i.grupo } : i.text);
+  const codigo = 'const ' + `PRESET_MALETA_HOSPITAL = ${JSON.stringify(datos).replace(/;/g, '\\u003b').replace(/</g, '\\u003c')};`;
+  const aviso = 'Pégalo en el archivo reemplazando la línea de PRESET_MALETA_HOSPITAL, o pégalo en el configurador.';
+  try{ await navigator.clipboard.writeText(codigo); alert('Copiado ✓\n\n' + aviso); }
+  catch(e){ mostrarTexto('Copia este texto. ' + aviso, codigo); }
 }
 
 async function shareChecklist(){
@@ -1185,7 +1445,7 @@ async function shareChecklist(){
     await navigator.clipboard.writeText(text);
     alert('Copiado. Ahora puedes pegarlo en WhatsApp, notas o donde quieras.');
   }catch(e){
-    prompt('Copia este texto manualmente:', text);
+    mostrarTexto('Copia este texto', text);
   }
 }
 
@@ -1220,7 +1480,7 @@ async function quickAddSymptom(text){
 }
 
 async function addCustomSymptom(){
-  const val = prompt('¿Qué quieres anotar?');
+  const val = await pedirUno('¿Qué quieres anotar?', '');
   if(val === null) return;
   const trimmed = val.trim();
   if(!trimmed) return;
@@ -1252,7 +1512,7 @@ async function shareSymptoms(){
     await navigator.clipboard.writeText(text);
     alert('Copiado. Ahora puedes pegarlo en WhatsApp, notas o donde quieras.');
   }catch(e){
-    prompt('Copia este texto manualmente:', text);
+    mostrarTexto('Copia este texto', text);
   }
 }
 
