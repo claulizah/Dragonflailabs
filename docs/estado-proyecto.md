@@ -1,5 +1,5 @@
 # Estado del proyecto: DragonflaiLabs / Apps de regalo
-_Actualizado: 28-sep-2026 · este archivo se actualiza en el repo cada vez que se cierra algo_
+_Actualizado: 28-sep-2026 (catálogo completo + sync a regaloparati.com) · este archivo se actualiza en el repo cada vez que se cierra algo_
 
 ## Flujo de trabajo
 El desarrollo se hace en **Claude Code**, directo sobre el repo, que es la fuente única de verdad. El chat se usa para decisiones de producto, revisión de assets visuales y análisis de lo que reporta Claude Code.
@@ -193,10 +193,20 @@ Claudia aprobó 7 puntos: 3 ya definidos por completo (se construyeron directo) 
 
 **Con esto, los 7 puntos aprobados el 28-sep quedan construidos.**
 
+## Catálogo de venta completo + sync a regaloparati.com (28-sep-2026)
+
+**Catálogo de venta (`dragonflailabs.com`):** PR #6 mergeado en `main` (`84bdf80`). `regalos.html` pasó de 5 a las **19 entradas** en `DISENOS` (18 plantillas activas + la demo genérica) — las 14 que faltaban ya estaban construidas desde las rondas anteriores pero no estaban en el catálogo de venta. `plantilla-regalo.html` también quedó con `TEMAS` extendido para que la vista previa (iframe de `demoUrl()`) muestre el color real de cada plantilla nueva en vez de un tema por default. Verificado en vivo contra `raw.githubusercontent.com` de `main` después del merge: las 19 entradas de `DISENOS` y las llaves nuevas de `TEMAS` (`changarro`, `minicrm`, `calendario`, `metaventas`, `sanando`) están ahí con sus colores correctos.
+
+**Sync a regaloparati.com:** repo `claulizacosta8/Dragonflai-regalos` (la otra cuenta de GitHub), commit `95797fb`. Las 18 plantillas activas quedaron ahí: 16 subidas por primera vez y `adultafuncional.html`/`romantico.html` reemplazadas por estar desactualizadas frente a `main`. Verificado byte a byte (hash) cada una de las 18 contra su versión en `templates/` de `main` de `Dragonflailabs` — las 18 coinciden exactamente.
+
+Con esto, `dragonflailabs.com` (venta) y `regaloparati.com` (entrega) quedan alineados: ya no hay brecha entre lo que se vende y lo que se puede entregar.
+
+**Nota de proceso:** durante este trabajo se detectó que tener los dos repos (`claulizah/Dragonflailabs` y `claulizacosta8/Dragonflai-regalos`, cuentas de GitHub distintas) agregados en una misma sesión cambia la identidad activa de las herramientas de GitHub y bloquea acciones de escritura (como abrir un PR) sobre el repo de la otra cuenta. A tener en cuenta a futuro: evitar mezclar ambos repos en una sola sesión cuando se necesite escribir en los dos — separarlo en sesiones distintas.
+
 ## Próximos pasos
 1. ~~Verificar que los fixes estén en `main`, y correr las validaciones en las 15 plantillas.~~ PR #1 mergeado el 27-sep; Pages lo publicó bien. La revisión UX parte 2 va en el PR nuevo.
 2. ~~Integrar la carriola en Bebé.~~ ~~Home Office y Mensajes sorpresa.~~ Falta el ícono de Mi semestre (pila de libros pastel) y los 5 íconos placeholder de las plantillas nuevas (28-sep).
 3. ~~Decidir el ícono de Viaje.~~ Maleta, integrada el 27-sep.
 4. **Esto lo decide Claudia** — Decidir si se retoma Cumpleaños y cómo (falta definir si la "línea de su vida" la arma una persona o varias). No se programa hasta que Claudia lo confirme; ver "Regla: 'esto lo decide Claudia'" arriba.
 5. Construir "Fan de artista" y "Tareas de hijos" si se sigue esa línea.
-6. Agregar las 5 plantillas nuevas al catálogo de venta (`index.html`/sitio) cuando Claudia decida cómo presentarlas — hoy solo existen como archivo en `templates/`.
+6. ~~Agregar las 5 plantillas nuevas al catálogo de venta.~~ Hecho el 28-sep: PR #6 mergeado (`84bdf80`), `regalos.html` ya trae las 19 entradas. `regaloparati.com` sincronizado en el mismo movimiento (commit `95797fb`).
