@@ -385,6 +385,7 @@ footer a:hover{ color:var(--violeta); }
   </div>
 </footer>
 
+<script src="disenos-catalogo.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════════════
    LO ÚNICO QUE TIENES QUE LLENAR
@@ -402,85 +403,7 @@ const AJUSTES = {
   whatsapp: "524411310704",
 };
 
-/* ── los cinco diseños ─────────────────────────────────────────── */
-const DISENOS = [
-  { id:"animo", nombre:"Para levantar el ánimo", tema:"mariposa",
-    titulo:"Para levantar el ánimo",
-    para:"Para alguien que está pasando una racha pesada y no siempre lo dice.",
-    trae:["Un mensajito distinto cada día","Cajita de cosas buenas para releer","Recordatorios de lo que se le olvida","Contactos a un toque para cuando no quiere estar sola"] },
-  { id:"salud", nombre:"Acompañamiento", tema:"durazno",
-    titulo:"Acompañamiento en un tratamiento",
-    para:"Para quien tiene que acordarse de citas, estudios y cómo se ha sentido.",
-    trae:["Diario de cómo se siente, listo para compartir con su doctora","Barra de avance del tratamiento","Recordatorios de citas y estudios","Libreta para lo que no quiere olvidar"] },
-  { id:"amor", nombre:"Romántico", tema:"noche",
-    titulo:"Para alguien que quieres",
-    para:"Para un aniversario, una distancia, o porque sí.",
-    trae:["Mensajes tuyos que aparecen cada día","Sus momentos guardados","Los planes que tienen pendientes","Tu dedicatoria al abrir el sobre"] },
-  { id:"reto", nombre:"Un reto personal", tema:"bosque",
-    titulo:"Para quien empezó algo difícil",
-    para:"Un maratón, dejar un vicio, volver al gimnasio, terminar la tesis.",
-    trae:["Barra de avance hacia su meta","Bitácora de cómo le fue cada día","Sus logros guardados","Recordatorios de sus horarios"] },
-  { id:"bebe", nombre:"Nueva mamá", tema:"atardecer",
-    titulo:"Para esta etapa",
-    para:"Embarazo o recién nacido, cuando se te olvida hasta tu nombre.",
-    trae:["Cuenta regresiva semana por semana","Cómo se ha sentido, para la consulta","Recordatorios de vitaminas y citas","Cositas para recordar después"] },
-  { id:"nosotrosdos", nombre:"Nosotros dos", tema:"nosotrosdos",
-    titulo:"Para los dos",
-    para:"Para tu pareja, para celebrar lo que llevan juntos y todo lo que falta.",
-    trae:["Contador de cuánto llevan juntos","Su historia y su mapa de lugares","Cosas por hacer juntos","Diario de gratitud del día"] },
-  { id:"boda", nombre:"Cuenta regresiva — boda", tema:"boda",
-    titulo:"Para la novia",
-    para:"Para la futura esposa, contando los días hasta el gran día.",
-    trae:["Cuenta regresiva a la boda","Diario de la novia","Pendientes del último mes","Fotos favoritas e ilusiones"] },
-  { id:"viaje", nombre:"Cuenta regresiva — viaje", tema:"viaje",
-    titulo:"Para el viaje que ya viene",
-    para:"Para quien está contando los días para su próximo viaje.",
-    trae:["Cuenta regresiva al viaje","Checklist de todo lo que hay que llevar","Diario del viaje día por día","Fotos favoritas e ilusiones"] },
-  { id:"adulta", nombre:"Adulta funcional", tema:"adulta",
-    titulo:"Para sobrevivir el mes",
-    para:"Para quien está aprendiendo a ser adulta y necesita ayuda para no perder el hilo.",
-    trae:["Bitácora de logros del día","Pagos del mes en un solo lugar","Generador de excusas para cuando no da más","Racha de días siendo adulta funcional"] },
-  { id:"radar", nombre:"Mi Radar", tema:"radar",
-    titulo:"Para andar de soltera",
-    para:"Para quien está soltera y quiere llevar cuentas claras de con quién anda.",
-    trae:["Radar con notas de cada prospecto","Victorias de soltera para celebrar","Diario de cómo se siente","Recordatorios para ella"] },
-  { id:"damashonor", nombre:"Damas de honor", tema:"damashonor",
-    titulo:"Para la boda de tu mejor amiga",
-    para:"Para las damas de honor, para organizar la boda de su amiga sin perder nada.",
-    trae:["Itinerario del día de la boda","Preparativos y pendientes","Mensajes de la novia para cada dama","Libro de firmas para armar un recuerdo"] },
-  { id:"sorpresa", nombre:"Mensajes sorpresa", tema:"sorpresa",
-    titulo:"Para un día especial",
-    para:"Para un cumpleaños, un aniversario o cualquier día que quieras hacer especial.",
-    trae:["Cuenta regresiva a su día","Mensajes sorpresa que le vas dejando","Su libreta para guardar lo que quiera","Recordatorios para no perder el hilo"] },
-  { id:"semestre", nombre:"Mi semestre", tema:"semestre",
-    titulo:"Para sobrevivir el semestre",
-    para:"Para quien está en la escuela y necesita organizarse sin ahogarse.",
-    trae:["Su horario de clases a la mano","Tareas y entregas con fecha","Apuntes rápidos","Racha de días estudiando"] },
-  { id:"homeoffice", nombre:"Home Office", tema:"homeoffice",
-    titulo:"Para trabajar desde casa",
-    para:"Para quien trabaja desde casa y necesita rutina, no caos.",
-    trae:["Rutina de inicio y de cierre del día","Checklist de lo de hoy","Facturas y gastos del mes","Sus últimas jornadas registradas"] },
-  { id:"changarro", nombre:"Mi changarro desde cero", tema:"changarro",
-    titulo:"Para arrancar su negocio",
-    para:"Para quien está empezando su changarro desde cero.",
-    trae:["Checklist de lanzamiento","Registro de ventas","Sus pendientes del negocio","Libreta para todo lo que se le ocurra"] },
-  { id:"minicrm", nombre:"Mini CRM de pedidos y clientas", tema:"minicrm",
-    titulo:"Para llevar el changarro",
-    para:"Para quien ya tiene su negocio y necesita llevar pedidos y clientas en orden.",
-    trae:["Sus pedidos en un solo lugar","Sus clientas con todo su historial","Libreta para notas del negocio","Todo con el nombre de su changarro"] },
-  { id:"calendario", nombre:"Calendario de contenido", tema:"calendario",
-    titulo:"Para las redes de su negocio",
-    para:"Para quien vende por redes y necesita organizar qué publicar.",
-    trae:["Banco de ideas para publicar","Checklist de antes de publicar","Racha de días publicando","Libreta para todo lo demás"] },
-  { id:"metaventas", nombre:"Meta de ventas del mes", tema:"metaventas",
-    titulo:"Para llegar a la meta",
-    para:"Para quien vende y quiere llevar el registro de su meta del mes.",
-    trae:["Su meta de ventas del mes","Comparativo con meses anteriores","Registro de cada venta","Libreta para lo que se le ocurra"] },
-  { id:"sanando", nombre:"Sanando de una ruptura", tema:"sanando",
-    titulo:"Para cuando terminó algo",
-    para:"Para quien está sanando de una ruptura y necesita un espacio para ella.",
-    trae:["Diario para escribir lo que siente","Lista de lo que ya no permite","Notas para leer cuando lo necesite","Cositas para abrir cuando esté lista"] },
-];
+/* DISENOS y NOMBRES viven en disenos-catalogo.js, compartido con index.html. */
 
 const $ = (s) => document.querySelector(s);
 document.getElementById("anio").textContent = new Date().getFullYear();
@@ -525,10 +448,6 @@ function cargarMarco(marcoId, respaldoId, url){
 
 cargarMarco("marcoPortada", "respaldoPortada", demoUrl(DISENOS[0], "Ana"));
 
-const NOMBRES = { animo:"Ana", salud:"Rosa", amor:"Sofi", reto:"Luis", bebe:"Mar",
-  nosotrosdos:"Ale", boda:"Vale", viaje:"Cami", adulta:"Fer", radar:"Any",
-  damashonor:"Pau", sorpresa:"Dani", semestre:"Mica", homeoffice:"Lore",
-  changarro:"Nay", minicrm:"Caro", calendario:"Vane", metaventas:"Isa", sanando:"Karla" };
 const tabs = document.getElementById("tabs");
 DISENOS.forEach((d, i) => {
   const b = document.createElement("button");

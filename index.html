@@ -121,11 +121,17 @@ section{ padding:74px 0; }
 .paso p{ color:var(--tinta-suave); font-size:.96rem; }
 
 /* ── diseños ── */
-.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+.tabs{
+  display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:12px;
+  padding-bottom:10px; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch;
+}
+.tabs::-webkit-scrollbar{ height:6px; }
+.tabs::-webkit-scrollbar-thumb{ background:var(--linea); border-radius:99px; }
 .tab{
   background:var(--superficie); border:1.6px solid var(--linea); color:var(--tinta-suave);
   padding:9px 17px; border-radius:999px; font-family:inherit; font-size:.93rem;
-  font-weight:600; cursor:pointer; transition:all .15s ease;
+  font-weight:600; cursor:pointer; transition:all .15s ease; flex:0 0 auto; white-space:nowrap;
+  scroll-snap-align:start;
 }
 .tab[aria-selected="true"]{ background:var(--violeta); border-color:var(--violeta); color:#fff; }
 .muestra{ display:grid; grid-template-columns:320px 1fr; gap:44px; align-items:center; }
@@ -259,10 +265,10 @@ footer a:hover{ color:var(--violeta); }
 <section id="disenos">
   <div class="envoltura">
     <p class="ojo">Los diseños</p>
-    <h2 style="font-size:1.9rem;margin-bottom:10px;">Siete puntos de partida</h2>
-    <p style="color:var(--tinta-suave);max-width:60ch;margin-bottom:26px;">
+    <h2 style="font-size:1.9rem;margin-bottom:10px;">18 puntos de partida</h2>
+    <p style="color:var(--tinta-suave);max-width:60ch;margin-bottom:8px;">
       Cada uno cambia los mensajes, las secciones y los colores. Toca uno para verlo funcionando de verdad —
-      no es una imagen, es la app.
+      no es una imagen, es la app. Desliza para ver los 18 →
     </p>
 
     <div class="tabs" role="tablist" id="tabs"></div>
@@ -344,7 +350,7 @@ footer a:hover{ color:var(--violeta); }
     </details>
 
     <details class="pregunta">
-      <summary>¿Puedo pedir algo que no está en los siete diseños?</summary>
+      <summary>¿Puedo pedir algo que no está en los diseños?</summary>
       <p>Sí. Escríbeme por WhatsApp y me cuentas de quién es y para qué. Si sale de la plantilla, es un
       diseño desde cero y te paso el precio antes de que pagues nada.</p>
     </details>
@@ -407,6 +413,7 @@ footer a:hover{ color:var(--violeta); }
   </div>
 </footer>
 
+<script src="disenos-catalogo.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════════════
    LO ÚNICO QUE TIENES QUE LLENAR
@@ -424,37 +431,7 @@ const AJUSTES = {
   whatsapp: "524411310704",
 };
 
-/* ── los siete diseños ─────────────────────────────────────────── */
-const DISENOS = [
-  { id:"animo", nombre:"Para levantar el ánimo", tema:"mariposa",
-    titulo:"Para levantar el ánimo",
-    para:"Para alguien que está pasando una racha pesada y no siempre lo dice.",
-    trae:["Un mensajito distinto cada día","Cajita de cosas buenas para releer","Recordatorios de lo que se le olvida","Contactos a un toque para cuando no quiere estar sola"] },
-  { id:"salud", nombre:"Acompañamiento", tema:"durazno",
-    titulo:"Acompañamiento en un tratamiento",
-    para:"Para quien tiene que acordarse de citas, estudios y cómo se ha sentido.",
-    trae:["Diario de cómo se siente, listo para compartir con su doctora","Barra de avance del tratamiento","Recordatorios de citas y estudios","Libreta para lo que no quiere olvidar"] },
-  { id:"amor", nombre:"Romántico", tema:"noche",
-    titulo:"Para alguien que quieres",
-    para:"Para un aniversario, una distancia, o porque sí.",
-    trae:["Mensajes tuyos que aparecen cada día","Sus momentos guardados","Los planes que tienen pendientes","Tu dedicatoria al abrir el sobre"] },
-  { id:"reto", nombre:"Un reto personal", tema:"bosque",
-    titulo:"Para quien empezó algo difícil",
-    para:"Un maratón, dejar un vicio, volver al gimnasio, terminar la tesis.",
-    trae:["Barra de avance hacia su meta","Bitácora de cómo le fue cada día","Sus logros guardados","Recordatorios de sus horarios"] },
-  { id:"bebe", nombre:"Nueva mamá", tema:"atardecer",
-    titulo:"Para esta etapa",
-    para:"Embarazo o recién nacido, cuando se te olvida hasta tu nombre.",
-    trae:["Cuenta regresiva semana por semana","Cómo se ha sentido, para la consulta","Recordatorios de vitaminas y citas","Cositas para recordar después"] },
-     { id:"cumple", nombre:"Cumpleaños", tema:"confeti",
-    titulo:"Para su cumpleaños",
-    para:"Cuenta regresiva a su día, con mensajes de quienes lo quieren.",
-    trae:["Cuenta regresiva a su cumple","Mensajes de varios seres queridos, sellados hasta el día","Recordatorios y notas","Galería de fotos"] },
-  { id:"adulta", nombre:"Adulta funcional", tema:"limón",
-    titulo:"Para quien va sobreviviendo la adultez",
-    para:"Con humor, para celebrar hasta los logros más chiquitos.",
-    trae:["Racha de logros random, con humor","Bitácora de cómo le fue cada día","Mensajitos de ánimo con humor","Recordatorios"] },
-];
+/* DISENOS y NOMBRES viven en disenos-catalogo.js, compartido con regalos.html. */
 
 const $ = (s) => document.querySelector(s);
 document.getElementById("anio").textContent = new Date().getFullYear();
@@ -497,11 +474,15 @@ function cargarMarco(marcoId, respaldoId, url){
   setTimeout(() => { if (!cargo && resp) resp.style.display = "flex"; }, 2500);
 }
 
-cargarMarco("marcoPortada", "respaldoPortada", demoUrl(DISENOS[0], "Ana"));
+/* Solo las plantillas activas (activo !== false) — deja fuera la demo
+   genérica y cualquier otra pausada, aunque sigan en DISENOS para
+   regalos.html. */
+const DISENOS_ACTIVOS = DISENOS.filter((d) => d.activo !== false);
 
-const NOMBRES = { animo:"Ana", salud:"Rosa", amor:"Sofi", reto:"Luis", bebe:"Mar", cumple:"Vale", adulta:"Caro" };
+cargarMarco("marcoPortada", "respaldoPortada", demoUrl(DISENOS_ACTIVOS[0], NOMBRES[DISENOS_ACTIVOS[0].id]));
+
 const tabs = document.getElementById("tabs");
-DISENOS.forEach((d, i) => {
+DISENOS_ACTIVOS.forEach((d, i) => {
   const b = document.createElement("button");
   b.className = "tab"; b.textContent = d.nombre; b.type = "button";
   b.setAttribute("role", "tab");
@@ -510,7 +491,7 @@ DISENOS.forEach((d, i) => {
   tabs.appendChild(b);
 });
 function mostrar(i){
-  const d = DISENOS[i];
+  const d = DISENOS_ACTIVOS[i];
   [...tabs.children].forEach((b, j) => b.setAttribute("aria-selected", j === i ? "true" : "false"));
   $("#mTitulo").textContent = d.titulo;
   $("#mPara").textContent = d.para;
