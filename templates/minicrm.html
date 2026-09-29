@@ -831,12 +831,13 @@ async function addPedido(){
   const r = await pedir({ titulo: 'Nuevo pedido', campos: [
     { etiqueta: 'Clienta' },
     { etiqueta: 'Producto' },
-    { etiqueta: 'Fecha', tipo: 'date', valor: todayKey() }
+    { etiqueta: 'Fecha', tipo: 'date', valor: todayKey() },
+    { etiqueta: 'WhatsApp de la clienta (opcional)', placeholder: 'Con código de país, ej. 5214421234567' }
   ] });
   if(!r) return;
-  const [clienta, producto, fecha] = r;
+  const [clienta, producto, fecha, telefono] = r;
   if(!clienta.trim() || !producto.trim()) return;
-  state.pedidos.push({ id: newId(), clienta: clienta.trim(), producto: producto.trim(), fecha: fecha || todayKey(), estatus: 'nuevo', ts: Date.now() });
+  state.pedidos.push({ id: newId(), clienta: clienta.trim(), producto: producto.trim(), fecha: fecha || todayKey(), telefono: (telefono || '').trim(), estatus: 'nuevo', ts: Date.now() });
   await safeSet('pedidos', JSON.stringify(state.pedidos));
   renderPedidos(); renderStats();
 }
@@ -848,6 +849,31 @@ async function avanzarPedido(id){
   p.estatus = ESTATUS_ORDEN[(idx + 1) % ESTATUS_ORDEN.length];
   await safeSet('pedidos', JSON.stringify(state.pedidos));
   renderPedidos(); renderStats();
+  if(p.estatus === 'entregado') await avisarEntrega(p);
+}
+
+/* Al marcar un pedido como entregado, abre WhatsApp con el mensaje ya
+   escrito. El número es el de la clienta (no el de Claudia — cada
+   quien usa su Mini CRM para su propio negocio), así que se busca en
+   este orden: el teléfono guardado en el pedido, luego el de su ficha
+   en Clientas (mismo nombre), y si no hay ninguno, se pide y se guarda
+   en el pedido para la próxima vez. */
+async function avisarEntrega(p){
+  let numero = (p.telefono || '').replace(/\D/g, '');
+  if(numero.length < 10){
+    const clienta = state.clientas.find(c => c.nombre.trim().toLowerCase() === p.clienta.trim().toLowerCase());
+    if(clienta) numero = (clienta.contacto || '').replace(/\D/g, '');
+  }
+  if(numero.length < 10){
+    const tel = await pedirUno('¿Cuál es el WhatsApp de ' + p.clienta + '?', '', { placeholder: 'Con código de país, ej. 5214421234567' });
+    if(tel === null) return;
+    numero = tel.replace(/\D/g, '');
+    if(numero.length < 10) return;
+    p.telefono = tel.trim();
+    await safeSet('pedidos', JSON.stringify(state.pedidos));
+  }
+  const mensaje = `¡Hola ${p.clienta}! Tu pedido (${p.producto}) ya está listo para salir. Te comparto los detalles...`;
+  window.open('https://wa.me/' + numero + '?text=' + encodeURIComponent(mensaje), '_blank', 'noopener');
 }
 
 async function deletePedido(id){
