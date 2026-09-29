@@ -158,6 +158,18 @@ section{ padding:74px 0; }
 .trae li{ display:flex; gap:10px; align-items:flex-start; font-size:.97rem; }
 .trae .tic{ color:var(--cyan); font-weight:700; flex:0 0 auto; }
 
+.campo-nombre-etq{ display:block; font-size:.76rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--violeta); margin-bottom:8px; }
+.campo-nombre{
+  width:100%; font-family:inherit; font-size:1.05rem; padding:12px 16px; border-radius:12px;
+  border:1.6px solid var(--linea); background:var(--superficie); color:var(--tinta); margin-bottom:18px;
+}
+.campo-nombre::placeholder{ color:var(--tinta-tenue); }
+.campo-nombre:focus{ outline:none; border-color:var(--violeta); box-shadow:0 0 0 3px rgba(122,74,214,.15); }
+.gancho-frase{
+  text-align:center; margin-top:14px; font-family:'Space Grotesk','Inter',sans-serif; font-weight:600;
+  color:var(--tinta); font-size:1rem; min-height:1.3em;
+}
+
 .modo-toggle{ display:inline-flex; gap:4px; padding:4px; border-radius:999px; background:var(--fondo-tenue); margin-bottom:16px; }
 .modo-btn{
   font-family:inherit; font-size:.85rem; font-weight:600; padding:7px 14px; border-radius:999px;
@@ -299,16 +311,22 @@ footer a:hover{ color:var(--violeta); }
     <div id="grupos"></div>
 
     <div class="muestra" id="muestra">
-      <div class="tel">
-        <div class="pantalla">
-          <div class="respaldo" id="respaldoMuestra" style="display:none;">
-            <div class="sobre" id="sobreMuestra">💌</div><div class="nom" id="nomMuestra">Vista previa</div>
-            <div class="peq">Sube la demo a tu sitio para verla aquí.</div>
+      <div>
+        <div class="tel">
+          <div class="pantalla">
+            <div class="respaldo" id="respaldoMuestra" style="display:none;">
+              <div class="sobre" id="sobreMuestra">💌</div><div class="nom" id="nomMuestra">Vista previa</div>
+              <div class="peq">Sube la demo a tu sitio para verla aquí.</div>
+            </div>
+            <iframe id="marcoMuestra" title="Vista previa del diseño"></iframe>
           </div>
-          <iframe id="marcoMuestra" title="Vista previa del diseño"></iframe>
         </div>
+        <p class="gancho-frase" id="ganchoFrase"></p>
       </div>
       <div>
+        <label class="campo-nombre-etq" for="campoNombre">Personalízala en vivo</label>
+        <input class="campo-nombre" id="campoNombre" type="text" autocomplete="off" maxlength="40" placeholder="Escribe su nombre">
+
         <div class="modo-toggle" role="tablist" id="modoToggle">
           <button class="modo-btn" type="button" role="tab" data-modo="regalo">Es un regalo 🎁</button>
           <button class="modo-btn" type="button" role="tab" data-modo="propia">Es para mí 💜</button>
@@ -520,10 +538,13 @@ cargarMarco("marcoPortada", "respaldoPortada", demoUrl(DISENOS_ACTIVOS[0], NOMBR
 const catNav = document.getElementById("catNav");
 const grupos = document.getElementById("grupos");
 const modoToggle = document.getElementById("modoToggle");
+const campoNombre = document.getElementById("campoNombre");
+const ganchoFrase = document.getElementById("ganchoFrase");
 
 let categoriaActiva = "Todas";
 let modoActual = "regalo";
 let disenoActivo = DISENOS_ACTIVOS[0];
+let timerNombre = null;
 
 const PISTAS_MODO = {
   regalo: "Se personaliza con su nombre y una dedicatoria tuya — perfecta para regalar.",
@@ -574,13 +595,38 @@ function seleccionar(id){
   $("#mTrae").innerHTML = disenoActivo.trae.map((t) => '<li><span class="tic">✓</span><span>' + t + "</span></li>").join("");
   $("#sobreMuestra").textContent = disenoActivo.icono;
   $("#nomMuestra").textContent = disenoActivo.nombre;
+  /* El campo se limpia al cambiar de tarjeta: el nombre que escribieron
+     para una plantilla no debe quedarse pegado en otra. */
+  campoNombre.value = "";
+  campoNombre.placeholder = disenoActivo.placeholder || "Escribe su nombre";
+  actualizarGancho();
   cargarDemoActiva();
+}
+
+/* Nombre para la demo: lo que escriba la persona, o el de muestra por
+   default si el campo está vacío — así el teléfono nunca se ve roto. */
+function nombreParaDemo(){
+  return campoNombre.value.trim() || NOMBRES[disenoActivo.id];
+}
+
+function actualizarGancho(){
+  const plantilla = disenoActivo.gancho;
+  ganchoFrase.textContent = plantilla ? plantilla.replace("{nombre}", nombreParaDemo()) : "";
 }
 
 function cargarDemoActiva(){
   const de = modoActual === "regalo" ? "Clau" : "";
-  cargarMarco("marcoMuestra", "respaldoMuestra", demoUrl(disenoActivo, NOMBRES[disenoActivo.id], de));
+  cargarMarco("marcoMuestra", "respaldoMuestra", demoUrl(disenoActivo, nombreParaDemo(), de));
 }
+
+/* El nombre de la frase-gancho se actualiza al toque (es texto local,
+   no cuesta nada); recargar el iframe con el nombre nuevo sí pesa un
+   poco, así que ese se debounce ~180ms para que no se sienta brusco. */
+campoNombre.addEventListener("input", () => {
+  actualizarGancho();
+  clearTimeout(timerNombre);
+  timerNombre = setTimeout(cargarDemoActiva, 180);
+});
 
 [...modoToggle.children].forEach((b) => {
   b.onclick = () => {
