@@ -168,6 +168,10 @@ section{ padding:74px 0; }
   background:var(--fondo); border:1px solid var(--linea); border-radius:14px;
   padding:16px; border-left-width:4px; border-left-style:solid; min-width:0;
 }
+.tarjeta .captura{
+  display:block; width:100%; aspect-ratio:3/4; object-fit:cover; object-position:top;
+  border-radius:10px; margin-bottom:10px; background:var(--linea);
+}
 .tarjeta .icono{ font-size:1.2rem; margin-bottom:6px; display:block; }
 .tarjeta h4{ font-size:.98rem; margin:0 0 5px; line-height:1.3; }
 .tarjeta p{ font-size:.82rem; color:var(--tinta-suave); line-height:1.45; }
@@ -270,42 +274,42 @@ footer a:hover{ color:var(--violeta); }
     <div class="grupo">
       <div class="grupo-cabeza"><span class="emoji">💍</span><h3>Bodas y parejas</h3><span class="cuenta">7 apps</span></div>
       <div class="rejilla">
-        <article class="tarjeta" style="border-left-color:#B08AD1;"><span class="icono">🦋</span><h4>Damas de honor</h4><p>Cuenta regresiva, itinerario del día y el "cierre del círculo": mensajes de todas las damas, revelados el día de la boda.</p></article>
-        <article class="tarjeta" style="border-left-color:#D9A94A;"><span class="icono">💍</span><h4>Cuenta regresiva · Boda</h4><p>Días para el gran día, diario de preparativos y mensajes que se abren cuando toca.</p></article>
-        <article class="tarjeta" style="border-left-color:#C96A82;"><span class="icono">💌</span><h4>Romántico</h4><p>Cartas selladas "ábrelo cuando…", razones para amarte y el mapa de lo que han vivido juntos.</p></article>
-        <article class="tarjeta" style="border-left-color:#5C7A8A;"><span class="icono">⏳</span><h4>Nosotros dos</h4><p>Contador de "llevamos juntos" con hitos automáticos y diario de gratitud.</p></article>
-        <article class="tarjeta" style="border-left-color:#3D9483;"><span class="icono">✈️</span><h4>Cuenta regresiva · Viaje</h4><p>Días para la próxima aventura, diario de viaje y mensajes para el camino.</p></article>
-        <article class="tarjeta" style="border-left-color:#E39BB5;"><span class="icono">👶</span><h4>Cuenta regresiva · Bebé</h4><p>Días para conocerlo, diario del embarazo y mensajes guardados para cuando llegue.</p></article>
-        <article class="tarjeta" style="border-left-color:#C97AA8;"><span class="icono">🎁</span><h4>Mensajes sorpresa</h4><p>Cuenta regresiva más mensajes sellados de varias personas, ocultos hasta el día indicado.</p></article>
+        <article class="tarjeta" style="border-left-color:#B08AD1;"><img class="captura" src="capturas/damashonor.jpg" alt="Captura de la pantalla principal de la app de Damas de honor" loading="lazy"><span class="icono">🦋</span><h4>Damas de honor</h4><p>Cuenta regresiva, itinerario del día y el "cierre del círculo": mensajes de todas las damas, revelados el día de la boda.</p></article>
+        <article class="tarjeta" style="border-left-color:#D9A94A;"><img class="captura" src="capturas/boda.jpg" alt="Captura de la pantalla principal de la app de Cuenta regresiva de boda" loading="lazy"><span class="icono">💍</span><h4>Cuenta regresiva · Boda</h4><p>Días para el gran día, diario de preparativos y mensajes que se abren cuando toca.</p></article>
+        <article class="tarjeta" style="border-left-color:#C96A82;"><img class="captura" src="capturas/amor.jpg" alt="Captura de la pantalla principal de la app Romántico" loading="lazy"><span class="icono">💌</span><h4>Romántico</h4><p>Cartas selladas "ábrelo cuando…", razones para amarte y el mapa de lo que han vivido juntos.</p></article>
+        <article class="tarjeta" style="border-left-color:#5C7A8A;"><img class="captura" src="capturas/nosotrosdos.jpg" alt="Captura de la pantalla principal de la app Nosotros dos" loading="lazy"><span class="icono">⏳</span><h4>Nosotros dos</h4><p>Contador de "llevamos juntos" con hitos automáticos y diario de gratitud.</p></article>
+        <article class="tarjeta" style="border-left-color:#3D9483;"><img class="captura" src="capturas/viaje.jpg" alt="Captura de la pantalla principal de la app de Cuenta regresiva de viaje" loading="lazy"><span class="icono">✈️</span><h4>Cuenta regresiva · Viaje</h4><p>Días para la próxima aventura, diario de viaje y mensajes para el camino.</p></article>
+        <article class="tarjeta" style="border-left-color:#E39BB5;"><img class="captura" src="capturas/bebe.jpg" alt="Captura de la pantalla principal de la app de Cuenta regresiva de bebé" loading="lazy"><span class="icono">👶</span><h4>Cuenta regresiva · Bebé</h4><p>Días para conocerlo, diario del embarazo y mensajes guardados para cuando llegue.</p></article>
+        <article class="tarjeta" style="border-left-color:#C97AA8;"><img class="captura" src="capturas/sorpresa.jpg" alt="Captura de la pantalla principal de la app Mensajes sorpresa" loading="lazy"><span class="icono">🎁</span><h4>Mensajes sorpresa</h4><p>Cuenta regresiva más mensajes sellados de varias personas, ocultos hasta el día indicado.</p></article>
       </div>
     </div>
 
     <div class="grupo">
       <div class="grupo-cabeza"><span class="emoji">🌱</span><h3>Bienestar y crecimiento personal</h3><span class="cuenta">4 apps</span></div>
       <div class="rejilla">
-        <article class="tarjeta" style="border-left-color:#5FA8A0;"><span class="icono">💙</span><h4>Mi acompañante de salud</h4><p>Diario de síntomas, seguimiento de tu progreso y espacio de acompañamiento.</p></article>
-        <article class="tarjeta" style="border-left-color:#6B8F71;"><span class="icono">🎯</span><h4>Reto personal</h4><p>Marca tu día, ve tu avance en un mapa y mantén tu meta siempre a la vista.</p></article>
-        <article class="tarjeta" style="border-left-color:#8B5FBF;"><span class="icono">👁️</span><h4>Mi Radar</h4><p>Un espacio para registrar red flags y confiar en lo que sientes.</p></article>
-        <article class="tarjeta" style="border-left-color:#7C6F8C;"><span class="icono">🌙</span><h4>Sanando de una ruptura</h4><p>Contador de días, cartas selladas para ti misma y tus límites, por escrito.</p></article>
+        <article class="tarjeta" style="border-left-color:#5FA8A0;"><img class="captura" src="capturas/salud.jpg" alt="Captura de la pantalla principal de la app Mi acompañante de salud" loading="lazy"><span class="icono">💙</span><h4>Mi acompañante de salud</h4><p>Diario de síntomas, seguimiento de tu progreso y espacio de acompañamiento.</p></article>
+        <article class="tarjeta" style="border-left-color:#6B8F71;"><img class="captura" src="capturas/reto.jpg" alt="Captura de la pantalla principal de la app Reto personal" loading="lazy"><span class="icono">🎯</span><h4>Reto personal</h4><p>Marca tu día, ve tu avance en un mapa y mantén tu meta siempre a la vista.</p></article>
+        <article class="tarjeta" style="border-left-color:#8B5FBF;"><img class="captura" src="capturas/radar.jpg" alt="Captura de la pantalla principal de la app Mi Radar" loading="lazy"><span class="icono">👁️</span><h4>Mi Radar</h4><p>Un espacio para registrar red flags y confiar en lo que sientes.</p></article>
+        <article class="tarjeta" style="border-left-color:#7C6F8C;"><img class="captura" src="capturas/sanando.jpg" alt="Captura de la pantalla principal de la app Sanando de una ruptura" loading="lazy"><span class="icono">🌙</span><h4>Sanando de una ruptura</h4><p>Contador de días, cartas selladas para ti misma y tus límites, por escrito.</p></article>
       </div>
     </div>
 
     <div class="grupo">
       <div class="grupo-cabeza"><span class="emoji">💼</span><h3>Negocio y emprendimiento</h3><span class="cuenta">4 apps</span></div>
       <div class="rejilla">
-        <article class="tarjeta" style="border-left-color:#C1861F;"><span class="icono">🌱</span><h4>Mi changarro desde cero</h4><p>Checklist de lanzamiento y registro de ventas que celebra cada racha.</p></article>
-        <article class="tarjeta" style="border-left-color:#C23B75;"><span class="icono">📦</span><h4>Mini CRM</h4><p>Pedidos con estatus y fichas de tus clientas, para no perder de vista a nadie.</p></article>
-        <article class="tarjeta" style="border-left-color:#1E9E8E;"><span class="icono">💡</span><h4>Calendario de contenido</h4><p>Banco de ideas, calendario de publicación y checklist antes de publicar.</p></article>
-        <article class="tarjeta" style="border-left-color:#2568C4;"><span class="icono">📊</span><h4>Meta de ventas del mes</h4><p>Barra de progreso y registro rápido de cada venta.</p></article>
+        <article class="tarjeta" style="border-left-color:#C1861F;"><img class="captura" src="capturas/changarro.jpg" alt="Captura de la pantalla principal de la app Mi changarro desde cero" loading="lazy"><span class="icono">🌱</span><h4>Mi changarro desde cero</h4><p>Checklist de lanzamiento y registro de ventas que celebra cada racha.</p></article>
+        <article class="tarjeta" style="border-left-color:#C23B75;"><img class="captura" src="capturas/minicrm.jpg" alt="Captura de la pantalla principal de la app Mini CRM" loading="lazy"><span class="icono">📦</span><h4>Mini CRM</h4><p>Pedidos con estatus y fichas de tus clientas, para no perder de vista a nadie.</p></article>
+        <article class="tarjeta" style="border-left-color:#1E9E8E;"><img class="captura" src="capturas/calendario.jpg" alt="Captura de la pantalla principal de la app Calendario de contenido" loading="lazy"><span class="icono">💡</span><h4>Calendario de contenido</h4><p>Banco de ideas, calendario de publicación y checklist antes de publicar.</p></article>
+        <article class="tarjeta" style="border-left-color:#2568C4;"><img class="captura" src="capturas/metaventas.jpg" alt="Captura de la pantalla principal de la app Meta de ventas del mes" loading="lazy"><span class="icono">📊</span><h4>Meta de ventas del mes</h4><p>Barra de progreso y registro rápido de cada venta.</p></article>
       </div>
     </div>
 
     <div class="grupo">
       <div class="grupo-cabeza"><span class="emoji">🗓️</span><h3>Vida diaria</h3><span class="cuenta">3 apps</span></div>
       <div class="rejilla">
-        <article class="tarjeta" style="border-left-color:#3B7FC4;"><span class="icono">📚</span><h4>Mi semestre</h4><p>Tareas, horario, racha de estudio y cuenta regresiva a lo que más te importa.</p></article>
-        <article class="tarjeta" style="border-left-color:#6E9B8B;"><span class="icono">🧾</span><h4>Home Office</h4><p>Checklist diario, rutinas y control de facturas y gastos.</p></article>
-        <article class="tarjeta" style="border-left-color:#E0703D;"><span class="icono">😅</span><h4>Adulta funcional</h4><p>Generador de excusas, pagos del mes y una racha que celebra que sí la libras.</p></article>
+        <article class="tarjeta" style="border-left-color:#3B7FC4;"><img class="captura" src="capturas/semestre.jpg" alt="Captura de la pantalla principal de la app Mi semestre" loading="lazy"><span class="icono">📚</span><h4>Mi semestre</h4><p>Tareas, horario, racha de estudio y cuenta regresiva a lo que más te importa.</p></article>
+        <article class="tarjeta" style="border-left-color:#6E9B8B;"><img class="captura" src="capturas/homeoffice.jpg" alt="Captura de la pantalla principal de la app Home Office" loading="lazy"><span class="icono">🧾</span><h4>Home Office</h4><p>Checklist diario, rutinas y control de facturas y gastos.</p></article>
+        <article class="tarjeta" style="border-left-color:#E0703D;"><img class="captura" src="capturas/adulta.jpg" alt="Captura de la pantalla principal de la app Adulta funcional" loading="lazy"><span class="icono">😅</span><h4>Adulta funcional</h4><p>Generador de excusas, pagos del mes y una racha que celebra que sí la libras.</p></article>
       </div>
     </div>
   </div>
