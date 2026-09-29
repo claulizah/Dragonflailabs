@@ -102,6 +102,31 @@ section{ padding:74px 0; }
 .ruta .cabeza h3{ font-size:1.25rem; }
 .ruta .cabeza span.chica{ display:block; font-size:.8rem; color:var(--tinta-suave); font-weight:500; margin-top:2px; }
 
+/* ── mini animación: dónde tocar, sin depender de leer el texto ── */
+.mini-fono{
+  position:relative; width:132px; margin:0 auto 20px; background:#1C1733;
+  border-radius:18px; padding:6px; box-shadow:var(--sombra);
+}
+.mini-pantalla{ background:var(--fondo-tenue); border-radius:11px; height:96px; position:relative; }
+.mini-barra{
+  height:32px; margin-top:4px; background:var(--superficie); border-radius:0 0 9px 9px;
+  display:flex; align-items:center; justify-content:center; position:relative;
+}
+.mini-fono.android .mini-barra{ justify-content:flex-end; padding-right:10px; }
+.mini-toque{ position:relative; display:flex; align-items:center; justify-content:center; width:26px; height:26px; }
+.mini-toque .icono{ position:relative; z-index:2; font-size:.95rem; }
+.mini-toque .onda{
+  position:absolute; inset:0; margin:auto; width:26px; height:26px; border-radius:50%;
+  background:var(--violeta); opacity:.4; animation:mini-pulso 1.7s ease-out infinite;
+}
+.mini-toque .onda.retraso{ animation-delay:.85s; }
+@keyframes mini-pulso{
+  0%{ transform:scale(.5); opacity:.5; }
+  75%{ transform:scale(2.1); opacity:0; }
+  100%{ opacity:0; }
+}
+@media (prefers-reduced-motion:reduce){ .mini-toque .onda{ animation:none; opacity:.25; } }
+
 .pasitos{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; }
 .pasitos li{ display:flex; gap:14px; }
 .pasitos li .num{
@@ -191,6 +216,12 @@ footer a:hover{ color:var(--violeta); }
           <div class="glifo">🍏</div>
           <div><h3>iPhone</h3><span class="chica">Safari</span></div>
         </div>
+        <div class="mini-fono" aria-hidden="true">
+          <div class="mini-pantalla"></div>
+          <div class="mini-barra">
+            <span class="mini-toque"><span class="onda"></span><span class="onda retraso"></span><span class="icono">⬆️</span></span>
+          </div>
+        </div>
         <ol class="pasitos">
           <li><span class="num">1</span><p>Abre el link de tu app en <strong>Safari</strong> (no en Chrome ni otro navegador).</p></li>
           <li><span class="num">2</span><p>Toca el ícono de <strong>Compartir</strong> (el cuadrito con la flecha hacia arriba), en la barra de abajo.</p></li>
@@ -204,6 +235,12 @@ footer a:hover{ color:var(--violeta); }
         <div class="cabeza">
           <div class="glifo">🤖</div>
           <div><h3>Android</h3><span class="chica">Chrome</span></div>
+        </div>
+        <div class="mini-fono android" aria-hidden="true">
+          <div class="mini-pantalla"></div>
+          <div class="mini-barra">
+            <span class="mini-toque"><span class="onda"></span><span class="onda retraso"></span><span class="icono">⋮</span></span>
+          </div>
         </div>
         <ol class="pasitos">
           <li><span class="num">1</span><p>Abre el link de tu app en <strong>Chrome</strong>.</p></li>
