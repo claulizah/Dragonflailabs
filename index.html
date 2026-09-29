@@ -540,6 +540,12 @@ function pintarCatNav(){
   });
 }
 
+/* Evita que "Cuenta regresiva — boda/viaje" corte la línea justo después
+   del guion largo y lo deje colgando solo al final del renglón. */
+function nombreCorte(nombre){
+  return nombre.replace(/ — (\S+)$/, " — $1");
+}
+
 function pintarGrupos(){
   const cats = categoriaActiva === "Todas" ? CATEGORIAS_ORDEN : [categoriaActiva];
   grupos.innerHTML = cats.map((cat) => {
@@ -551,7 +557,7 @@ function pintarGrupos(){
         '<button class="tarjeta-diseno" type="button" data-id="' + d.id + '" aria-pressed="' +
         (disenoActivo && d.id === disenoActivo.id) + '" style="background:linear-gradient(155deg,' + d.color +
         ',color-mix(in srgb,' + d.color + ' 62%, #201A2E))"><span class="icono">' + d.icono +
-        '</span><span class="nombre">' + d.nombre + "</span></button>"
+        '</span><span class="nombre">' + nombreCorte(d.nombre) + "</span></button>"
       ).join("") + "</div></div>";
   }).join("");
   [...grupos.querySelectorAll(".tarjeta-diseno")].forEach((b) => {
