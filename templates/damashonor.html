@@ -628,12 +628,13 @@
       <h2 class="section-title">Tus recordatorios</h2>
       <div class="section-rule"></div>
       <div class="quick-row">
-        <button class="chip" onclick="quickAddReminder('Revisar lista de pendientes', '')">+ Revisar pendientes</button>
-        <button class="chip" onclick="quickAddReminder('Confirmar un detalle importante', '')">+ Confirmar detalle</button>
+        <button class="chip" onclick="quickAddReminder('Revisar lista de pendientes')">+ Revisar pendientes</button>
+        <button class="chip" onclick="quickAddReminder('Confirmar un detalle importante')">+ Confirmar detalle</button>
       </div>
       <div class="add-row">
         <input id="reminderText" type="text" placeholder="¿Qué quieres recordar?">
-        <input id="reminderTime" type="text" placeholder="Hora (opcional), ej. 9:00 am">
+        <input id="reminderDate" type="date" required>
+        <input id="reminderTime" type="time" required>
         <button class="btn-solid" onclick="addReminder()">Agregar recordatorio</button>
       </div>
       <div id="reminderList"></div>
@@ -994,6 +995,14 @@ function formatDate(){
 function formatShort(ts){
   const d = new Date(ts);
   return d.toLocaleDateString('es-MX', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function formatFechaCorta(fecha){
+  return new Date(fecha + 'T00:00:00').toLocaleDateString('es-MX', { day:'numeric', month:'short' });
+}
+
+function ordenFechaHora(r){
+  return (r.date || '') + ' ' + (r.time || '');
 }
 
 async function init(){
@@ -1365,13 +1374,13 @@ async function deletePhoto(id){
 
 function renderNextReminder(){
   const card = document.getElementById('nextReminderCard');
-  const pending = state.reminders.find(r => !r.done);
+  const pending = [...state.reminders].filter(r => !r.done).sort((a,b) => ordenFechaHora(a).localeCompare(ordenFechaHora(b)))[0];
   if(!pending){
     card.style.display = 'none';
     return;
   }
   document.getElementById('nextReminderText').textContent = pending.text;
-  document.getElementById('nextReminderTime').textContent = pending.time || '';
+  document.getElementById('nextReminderTime').textContent = pending.date ? `${formatFechaCorta(pending.date)} · ${pending.time || ''}` : (pending.time || '');
   card.style.display = 'flex';
 }
 
@@ -1469,15 +1478,16 @@ function renderReminders(){
     list.innerHTML = '<p class="empty">Aún no tienes recordatorios. Escribe el primero arriba.</p>';
     return;
   }
-  const sorted = [...state.reminders].sort((a,b) => (a.done === b.done) ? 0 : (a.done ? 1 : -1));
+  const sorted = [...state.reminders].sort((a,b) => ordenFechaHora(a).localeCompare(ordenFechaHora(b)));
   sorted.forEach(r => {
     const item = document.createElement('div');
     item.className = 'item';
+    const cuando = r.date ? `${formatFechaCorta(r.date)}${r.time ? ' · ' + r.time : ''}` : (r.time || '');
     item.innerHTML = `
       <div class="check ${r.done ? 'done' : ''}" data-id="${r.id}">${r.done ? '✓' : ''}</div>
       <div class="item-body">
         <div class="item-text ${r.done ? 'done' : ''}">${escapeHtml(r.text)}</div>
-        ${r.time ? `<div class="item-time">${escapeHtml(r.time)}</div>` : ''}
+        ${cuando ? `<div class="item-time">${escapeHtml(cuando)}</div>` : ''}
       </div>
       <button class="item-del" data-id="${r.id}">Eliminar</button>
     `;
@@ -1489,18 +1499,24 @@ function renderReminders(){
 
 async function addReminder(){
   const textEl = document.getElementById('reminderText');
+  const dateEl = document.getElementById('reminderDate');
   const timeEl = document.getElementById('reminderTime');
   const text = textEl.value.trim();
-  if(!text) return;
-  state.reminders.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, time: timeEl.value.trim(), done:false });
-  textEl.value = ''; timeEl.value = '';
+  const date = dateEl.value;
+  const time = timeEl.value;
+  if(!text || !date || !time){
+    alert('Escribe qué quieres recordar y elige la fecha y la hora.');
+    return;
+  }
+  state.reminders.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, date, time, done:false });
+  textEl.value = ''; dateEl.value = ''; timeEl.value = '';
   await safeSet('companion-reminders', JSON.stringify(state.reminders));
   renderReminders();
   renderNextReminder();
 }
 
-async function quickAddReminder(text, time){
-  state.reminders.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, time, done:false });
+async function quickAddReminder(text){
+  state.reminders.push({ id: Date.now()+"-"+Math.random().toString(36).slice(2,7), text, date: todayKey(), time: '09:00', done:false });
   await safeSet('companion-reminders', JSON.stringify(state.reminders));
   renderReminders();
   renderNextReminder();
