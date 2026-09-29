@@ -1,10 +1,16 @@
 <div class="cifra-calc" id="calculadoraPrecio">
-  <div style="background:var(--fondo); border:1.5px dashed var(--violeta); border-radius:12px; padding:10px 14px; margin-bottom:18px; font-size:.9rem; text-align:center;">
-    🪽 Usa el código <strong>VUELA50</strong> y llévate 50% de descuento — cupos limitados a los primeros 80 pedidos
+  <div style="background:linear-gradient(135deg,var(--violeta),var(--coral)); border-radius:12px;
+    padding:13px 16px; margin-bottom:20px; font-size:.95rem; text-align:center;
+    color:#fff; font-weight:600; box-shadow:0 10px 24px rgba(122,74,214,.35);">
+    🪽 Usa el código <strong style="background:rgba(255,255,255,.22); padding:2px 8px; border-radius:6px; letter-spacing:.02em;">VUELA50</strong> y llévate 50% de descuento — cupos limitados a los primeros 80 pedidos
   </div>
-  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;">
-    <span style="font-size:1rem;color:var(--tinta-suave);">Total</span>
-    <span id="calcTotal" style="font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--tinta);">$499</span>
+  <div style="text-align:right; margin-bottom:18px;">
+    <div style="font-size:1rem; color:var(--tinta-suave); margin-bottom:8px;">Total</div>
+    <div style="display:flex; align-items:baseline; gap:10px; justify-content:flex-end; margin-bottom:4px;">
+      <span id="calcAntes" style="font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:600; color:var(--tinta-tenue); text-decoration:line-through;">$499</span>
+      <span style="background:var(--coral); color:#fff; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:.02em;">-50%</span>
+    </div>
+    <div id="calcTotal" style="font-family:'Space Grotesk',sans-serif; font-size:2.5rem; font-weight:700; color:var(--tinta);">$250</div>
   </div>
 </div>
 <p style="color:var(--tinta-suave);font-size:.95rem;">No es suscripción. Se paga una vez y es de esa persona para siempre.</p>
@@ -49,13 +55,16 @@
   };
   const chkLogo = document.getElementById('extraLogo');
   const chkExpress = document.getElementById('extraExpress');
+  const antes = document.getElementById('calcAntes');
   const total = document.getElementById('calcTotal');
   const boton = document.getElementById('calcBotonPagar');
   function actualizar(){
     let precio = 499;
     if (chkLogo.checked) precio += 150;
     if (chkExpress.checked) precio += 200;
-    total.textContent = "$" + precio;
+    antes.textContent = "$" + precio;
+    const conDescuento = Math.round(precio / 2);
+    total.textContent = "$" + conDescuento;
     let link = LINKS.base;
     if (chkLogo.checked && chkExpress.checked) link = LINKS.logoYExpress;
     else if (chkLogo.checked) link = LINKS.logo;
