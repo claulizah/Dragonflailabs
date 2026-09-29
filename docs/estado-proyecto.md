@@ -12,9 +12,9 @@ Aplica a cualquier cambio de producto que afecte cómo se ve o se siente una pla
 Por qué existe: el punto 9 de la revisión UX (diferenciar Romántico y Nosotros dos) traía esa marca y se programó y mergeó en el PR #2 sin pasar por Claudia primero. El resultado quedó bien y no se deshizo, pero no se repite el patrón.
 
 ## Dominios y repos
-- **dragonflailabs.com**: repo `claulizah/Dragonflailabs`, GitHub Pages. Es el sitio de VENTAS (calculadora, Stripe, catálogo). Cupón activo: **VUELA30** (30%, primeros 20 pedidos).
+- **dragonflailabs.com**: repo `claulizah/Dragonflailabs`, GitHub Pages. Es el sitio de VENTAS (calculadora, Stripe, catálogo). Cupón activo: **VUELA50** (50%, primeros 80 pedidos, límite manejado en Stripe).
 - **regaloparati.com**: en vivo con HTTPS. Repo `claulizacosta8/Dragonflai-regalos` (otra cuenta de GitHub). Solo hostea las páginas ya entregadas a clientes y la landing (`regaloparati-index.html`).
-- **Cupón de referidos `TAMBIENTEREGALO`**: decidido pero pausado mientras VUELA30 siga con el mismo 30%. La landing no muestra ningún código mientras no exista en Stripe. La clase `.code-box` se queda en el CSS para ese momento.
+- **Cupón de referidos `TAMBIENTEREGALO`**: decidido pero pausado mientras siga activo VUELA50. La landing no muestra ningún código mientras no exista en Stripe. La clase `.code-box` se queda en el CSS para ese momento.
 
 ## Fixes de la auditoría (en `main` desde el 27-sep, PR #1)
 1. La cuenta regresiva y la meta del configurador se sobreescribían con el valor por defecto. Corregido en 10 plantillas.

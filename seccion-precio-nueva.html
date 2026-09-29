@@ -1,6 +1,6 @@
 <div class="cifra-calc" id="calculadoraPrecio">
   <div style="background:var(--fondo); border:1.5px dashed var(--violeta); border-radius:12px; padding:10px 14px; margin-bottom:18px; font-size:.9rem; text-align:center;">
-    🪽 Usa el código <strong>VUELA30</strong> y llévate 30% de descuento — cupos limitados a los primeros 20 pedidos
+    🪽 Usa el código <strong>VUELA50</strong> y llévate 50% de descuento — cupos limitados a los primeros 80 pedidos
   </div>
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;">
     <span style="font-size:1rem;color:var(--tinta-suave);">Total</span>
@@ -40,6 +40,7 @@
 
 <script>
 (function(){
+  const CUPON_ACTIVO = "VUELA50";
   const LINKS = {
     base: "https://buy.stripe.com/7sYbJ2bds0Yq7EYdXBdEs0j",
     logo: "https://buy.stripe.com/fZucN63L0fTk1gA1aPdEs0k",
@@ -59,9 +60,10 @@
     if (chkLogo.checked && chkExpress.checked) link = LINKS.logoYExpress;
     else if (chkLogo.checked) link = LINKS.logo;
     else if (chkExpress.checked) link = LINKS.express;
-    boton.href = link;
+    boton.href = link + "?prefilled_promo_code=" + encodeURIComponent(CUPON_ACTIVO);
   }
   chkLogo.addEventListener('change', actualizar);
   chkExpress.addEventListener('change', actualizar);
+  actualizar();
 })();
 </script>
