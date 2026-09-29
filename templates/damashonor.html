@@ -559,7 +559,7 @@
       <div id="mainHoyBlock">
         <div class="card next-card" id="nextReminderCard" style="display:none;">
           <div>
-            <p class="label">Tu próximo pendiente</p>
+            <p class="label">Para hoy</p>
             <p class="text" id="nextReminderText"></p>
             <span class="time" id="nextReminderTime"></span>
           </div>
@@ -1374,13 +1374,17 @@ async function deletePhoto(id){
 
 function renderNextReminder(){
   const card = document.getElementById('nextReminderCard');
-  const pending = [...state.reminders].filter(r => !r.done).sort((a,b) => ordenFechaHora(a).localeCompare(ordenFechaHora(b)))[0];
-  if(!pending){
+  /* Solo de hoy (aquí sí hay fecha por recordatorio) — si el próximo
+     pendiente es de otro día, la tarjeta destacada no debe alertar por
+     algo que no urge todavía. */
+  const deHoy = [...state.reminders].filter(r => !r.done && r.date === todayKey())
+    .sort((a,b) => ordenFechaHora(a).localeCompare(ordenFechaHora(b)))[0];
+  if(!deHoy){
     card.style.display = 'none';
     return;
   }
-  document.getElementById('nextReminderText').textContent = pending.text;
-  document.getElementById('nextReminderTime').textContent = pending.date ? `${formatFechaCorta(pending.date)} · ${pending.time || ''}` : (pending.time || '');
+  document.getElementById('nextReminderText').textContent = deHoy.text;
+  document.getElementById('nextReminderTime').textContent = deHoy.time || '';
   card.style.display = 'flex';
 }
 
